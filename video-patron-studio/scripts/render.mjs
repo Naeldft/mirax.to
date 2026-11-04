@@ -47,7 +47,12 @@ const render = async (id, inputProps, output, frameRange) => {
 };
 
 const main = path.join(OUT, 'patron-studio-presentation.mp4');
-await render('PatronStudio', { showContact: true }, main);
+const raw = path.join(OUT, '_brut.mp4');
+await render('PatronStudio', { showContact: true }, raw);
+// Normalisation yuv420p (plage vidéo standard) pour TikTok / Instagram / Snapchat
+execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-vf', 'scale=in_range=full:out_range=tv,format=yuv420p',
+  '-c:v', 'libx264', '-crf', '18', '-preset', 'slow', '-r', '30', '-c:a', 'copy', '-movflags', '+faststart', main]);
+fs.unlinkSync(raw);
 execFileSync('npx', ['tsx', 'scripts/srt.ts', path.join(OUT, 'patron-studio-presentation.srt')], { cwd: ROOT, stdio: 'inherit' });
 
 if (!onlyMain) {
