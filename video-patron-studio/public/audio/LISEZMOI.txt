@@ -1,0 +1,4 @@
+Déposez ici votre musique sous le nom : musique.mp3
+- Elle sera ajoutée automatiquement (volume bas, fondu d'entrée et de sortie).
+- Sans fichier, la vidéo est exportée sans musique, sans erreur.
+- Utilisez uniquement une musique dont vous avez les droits.
