@@ -6,6 +6,7 @@
  *
  *  Astuce : entourez un mot avec des *étoiles* pour l'afficher
  *  en vert (accent). Ex. : "votre *maquette gratuite*".
+ *  "\n" force un retour à la ligne dans les sous-titres.
  */
 
 export const config = {
@@ -70,7 +71,7 @@ export const config = {
       { montant: '40 €', periode: '/ mois', lignes: ['Avec plus de', 'modifications.'] },
     ],
     sansEngagement: '*Sans engagement.*',
-    surDevis: 'Boutique en ligne et cas particuliers : sur devis.',
+    surDevis: 'Boutique en ligne et cas particuliers :\nsur devis.', // \n = retour à la ligne
 
     // Scène 6 — rassurer
     rassurer1: '*Maquette gratuite.*',
@@ -83,6 +84,11 @@ export const config = {
   },
 
   son: {
+    // true = vidéo totalement muette (ni musique ni bruitages)
+    couperTout: false,
+    // Bruitages générés en code (public/sfx, recréés par scripts/build-sfx.mjs)
+    bruitages: true,
+    volumeBruitages: 0.55, // volume général des bruitages (0 à 1)
     // Fichier facultatif : public/audio/musique.mp3
     volume: 0.25,
     fonduEntreeSec: 1.5,

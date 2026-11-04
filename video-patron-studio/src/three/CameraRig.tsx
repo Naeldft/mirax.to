@@ -24,8 +24,8 @@ export const KEYS: Key[] = [
   { f: 258, pos: [0.9, 0.6, -12.6], tgt: [0, 0.3, -24], shift: 170 },
   { f: 300, pos: [0, 0, -27], tgt: [0, 0, -45], shift: 230 },
   { f: 552, pos: [0, 0, -101], tgt: [0, 0, -119], shift: 230, ease: smoothLinear },
-  { f: 600, pos: [0.2, 0.5, -112.6], tgt: [0, 0.25, -125], shift: 230 },
-  { f: 878, pos: [-0.7, 0.75, -113.2], tgt: [0, 0.25, -125], shift: 230 },
+  { f: 600, pos: [0.25, 0.35, -111.6], tgt: [0, -0.45, -125], shift: 285 },
+  { f: 878, pos: [-0.55, 0.55, -112], tgt: [0, -0.45, -125], shift: 285 },
   { f: 914, pos: [-0.25, 0.85, -124.45], tgt: [-0.25, 0.85, -140], shift: 0 },
   { f: 958, pos: [0, 0, -138.5], tgt: [0, 0, -150], shift: 210 },
   { f: 1162, pos: [0.45, 0.25, -139.2], tgt: [0, 0, -150], shift: 210 },
@@ -54,7 +54,7 @@ export const CameraRig: React.FC = () => {
   useLayoutEffect(() => {
     const { pos, tgt, shift } = cameraAt(frame);
     // légère respiration et roulis pendant le couloir
-    const roll = frame > 280 && frame < 570 ? Math.sin((frame - 280) / 60) * 0.06 : 0;
+    const roll = 0; // pas de roulis : les cartes restent bien alignées
     camera.position.set(pos[0], pos[1], pos[2]);
     camera.up.set(Math.sin(roll), Math.cos(roll), 0);
     camera.lookAt(tgt[0], tgt[1], tgt[2]);

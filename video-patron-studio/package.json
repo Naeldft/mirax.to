@@ -7,7 +7,9 @@
     "preview": "remotion studio src/index.ts",
     "render": "node scripts/render.mjs",
     "stills": "node scripts/stills.mjs",
-    "build-fonts": "node scripts/build-fonts.mjs && node scripts/build-mark.mjs"
+    "build-fonts": "node scripts/build-fonts.mjs && node scripts/build-mark.mjs",
+    "build-sfx": "node scripts/build-sfx.mjs",
+    "check": "node scripts/check-layout.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",

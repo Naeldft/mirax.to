@@ -63,10 +63,13 @@ if (!onlyMain) {
   execFileSync('ffmpeg', [
     '-y', '-loglevel', 'error',
     '-i', main, '-i', tail,
-    '-filter_complex', `[0:v]trim=end_frame=${CTA_START},setpts=PTS-STARTPTS[a];[1:v]setpts=PTS-STARTPTS[b];[a][b]concat=n=2:v=1:a=0[v]`,
-    '-map', '[v]', '-map', '0:a',
+    // image et son de la fin viennent de la version sans contact (pas de clics des lignes de contact)
+    '-filter_complex',
+    `[0:v]trim=end_frame=${CTA_START},setpts=PTS-STARTPTS[a];[1:v]setpts=PTS-STARTPTS[b];[a][b]concat=n=2:v=1:a=0[v];` +
+      `[0:a]atrim=end=${CTA_START / 30},asetpts=PTS-STARTPTS[x];[1:a]asetpts=PTS-STARTPTS[y];[x][y]concat=n=2:v=0:a=1[au]`,
+    '-map', '[v]', '-map', '[au]',
     '-c:v', 'libx264', '-crf', '18', '-preset', 'slow', '-pix_fmt', 'yuv420p', '-r', '30',
-    '-c:a', 'copy', '-movflags', '+faststart', sans,
+    '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', sans,
   ]);
   fs.unlinkSync(tail);
   execFileSync('npx', ['tsx', 'scripts/srt.ts', path.join(OUT, 'patron-studio-presentation-sans-contact.srt'), 'sans-contact'], { cwd: ROOT, stdio: 'inherit' });

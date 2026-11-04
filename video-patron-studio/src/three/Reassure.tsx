@@ -21,6 +21,10 @@ const checkShape = () => {
   return s;
 };
 
+// Téléphone à gauche, coche à droite : écart d'environ 50 px à l'écran, jamais superposés.
+const PHONE_X = -0.5;
+const BADGE_X = 1.0;
+
 /** Scène 6 : téléphone avec maquette + coche "validé". */
 export const Reassure: React.FC = () => {
   const frame = useCurrentFrame();
@@ -30,24 +34,26 @@ export const Reassure: React.FC = () => {
     () => new THREE.ExtrudeGeometry(checkShape(), { depth: 0.12, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 2 }),
     [],
   );
-  if (frame < 1135 || frame > 1345) return null;
+  if (frame < 1135 || frame > 1330) return null;
 
   const enter = sp(frame, 1160, 14, 1, 70);
   const pop = sp(frame, 1200, 9, 0.7, 140);
-  const out = ramp(frame, 1298, 1340, easeInOut);
+  const out = ramp(frame, 1292, 1322, easeInOut);
+  // la coche disparaît avant que le téléphone ne bouge (aucun croisement)
+  const badgeOut = ramp(frame, 1280, 1292, easeInOut);
   const idle = Math.sin((frame - 1170) / 45) * 0.18;
 
   return (
     <group position={[0, -15.73, -150]}>
       <group
-        position={[-out * 6, (1 - enter) * 4, out * -2]}
+        position={[PHONE_X - out * 6, (1 - enter) * 4, out * -2]}
         rotation={[0.04, (1 - enter) * 2.2 + idle - out * 3.5, (1 - enter) * 0.3]}
         scale={1.65}
       >
         <Phone tex={tex} />
       </group>
       {/* badge coche */}
-      <group position={[1.15 - out * 7, 1.15, 0.6]} scale={Math.max(0.001, pop) * 0.85} rotation={[0, (1 - pop) * 2 - idle, 0]}>
+      <group position={[BADGE_X, 0.8, 0.6]} scale={Math.max(0.001, pop * (1 - badgeOut)) * 0.85} rotation={[0, (1 - pop) * 2 - idle, 0]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.62, 0.62, 0.18, 48]} />
           <meshPhysicalMaterial color={G} emissive={G} emissiveIntensity={0.35} metalness={0.2} roughness={0.25} clearcoat={1} />

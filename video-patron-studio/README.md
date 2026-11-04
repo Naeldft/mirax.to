@@ -52,6 +52,18 @@ Si un texte devient plus long, vérifiez-le avec les images fixes : les durées 
 
 Déposez `public/audio/musique.mp3`. Elle est ajoutée automatiquement, à volume bas (`son.volume` dans `config.ts`) avec un fondu d'entrée et de sortie. Sans ce fichier, la vidéo est exportée sans musique, avec une piste audio AAC silencieuse.
 
+## Bruitages
+
+Bruitages générés en code (synthèse, aucun fichier externe ni droits) : `node scripts/build-sfx.mjs` crée `public/sfx/whoosh.wav`, `clic.wav` et `impact.wav`.
+- whoosh à chaque transition de scène, clic à chaque apparition de texte, impact grave à l'arrivée du monogramme PS ;
+- réglages dans `config.ts` → `son` : `bruitages` (oui / non), `volumeBruitages`, `couperTout` (vidéo muette) ;
+- si une musique est présente, elle baisse légèrement sous les impacts ;
+- placement des bruitages : `src/Sound.tsx`.
+
+## Contrôle de mise en page
+
+`node scripts/check-layout.mjs` rend séparément la 3D et les textes (une image sur trois) et signale tout texte hors de la zone de sécurité, trop près d'un bord ou recouvert par un objet 3D.
+
 ## Organisation
 
 - `src/config.ts` : textes, coordonnées, couleurs
@@ -59,6 +71,7 @@ Déposez `public/audio/musique.mp3`. Elle est ajoutée automatiquement, à volum
 - `src/captions.ts` : sous-titres incrustés et minutage
 - `src/three/` : scènes 3D (accroche, monogramme, titre, couloir de cartes, appareils, prix, rassurer)
 - `src/three/CameraRig.tsx` : trajectoire de la caméra (transitions)
+- `src/Sound.tsx` : musique et bruitages
 - `src/overlay/Overlay.tsx` : sous-titres, mentions, écran final
 - `src/textures.ts` : maquettes de sites dessinées en code
 - `public/ps-mark.svg` : monogramme PS en SVG (généré par `scripts/build-mark.mjs`)

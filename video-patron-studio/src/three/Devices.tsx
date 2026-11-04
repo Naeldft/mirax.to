@@ -11,6 +11,15 @@ const LID_H = 2.2;
 const SCREEN_W = 3.22;
 const SCREEN_H = (SCREEN_W * 800) / 1280;
 
+// Téléphone placé SOUS l'ordinateur, sans contact possible :
+// le bas de l'ordinateur est à y = -0,40 ; le haut du téléphone (demi-hauteur 0,98) reste
+// à y ≤ -0,85, quelle que soit sa rotation autour de l'axe vertical → marge ≥ 0,45 unité.
+const PHONE_HALF_H = (2.06 * 0.95) / 2;
+const SAFETY = 0.45;
+const PHONE_Y = -0.4 - SAFETY - PHONE_HALF_H;
+const PHONE_X = 0.6;
+const PHONE_Z = 1.1;
+
 /** Téléphone 3D réutilisable. */
 export const Phone: React.FC<{ tex: THREE.Texture; screenDim?: number }> = ({ tex, screenDim = 1 }) => (
   <group>
@@ -29,14 +38,14 @@ export const Devices: React.FC = () => {
   const frame = useCurrentFrame();
   const laptopTex = useMemo(() => [0, 1, 2].map((s) => laptopScreenTexture(s as 0 | 1 | 2)), []);
   const phoneTex = useMemo(() => [0, 1, 2].map((s) => phoneScreenTexture(s as 0 | 1 | 2)), []);
-  if (frame < 470 || frame > 916) return null;
+  if (frame < 556 || frame > 916) return null;
 
   const step = frame < STEP_STARTS[1] ? 0 : frame < STEP_STARTS[2] ? 1 : 2;
   const stepStart = STEP_STARTS[step];
 
   // Entrée : rotation dans l'espace avec ressort
-  const enter = sp(frame, 528, 15, 1, 70);
-  const lidOpen = sp(frame, 552, 14, 1, 80);
+  const enter = sp(frame, 558, 15, 1, 70);
+  const lidOpen = sp(frame, 572, 14, 1, 80);
   // Sortie : on se met bien face à l'écran pour "plonger" dedans
   const toFront = ramp(frame, 872, 906, easeInOut);
   const idle = Math.sin((frame - 560) / 55) * 0.22;
@@ -59,8 +68,9 @@ export const Devices: React.FC = () => {
   // Téléphone : petit tour sur lui-même à chaque étape, nouveau contenu à mi-rotation
   const spin = step === 0 ? 1 : sp(frame, stepStart, 16, 0.8, 90);
   const phoneShown = spin < 0.5 && step > 0 ? phoneTex[step - 1] : phoneTex[step];
-  const phoneOut = ramp(frame, 868, 900, easeInOut);
-  const phoneEnter = sp(frame, 565, 13, 0.9, 80);
+  // sortie par la droite, avant la plongée (jamais vers le texte du bas)
+  const phoneOut = ramp(frame, 850, 874, easeInOut);
+  const phoneEnter = sp(frame, 584, 20, 0.9, 80); // amorti : pas de rebond vers l'ordinateur
 
   return (
     <group position={[-0.25, 0.05, -125]} rotation={[0, yaw, 0]} scale={0.85 + enter * 0.15}>
@@ -96,7 +106,7 @@ export const Devices: React.FC = () => {
       </group>
       {/* téléphone */}
       <group
-        position={[1.3 + phoneOut * 3, -0.55 - (1 - phoneEnter) * 3 - phoneOut * 1.5, 1.6]}
+        position={[PHONE_X + (1 - Math.min(1, phoneEnter)) * 3.5 + phoneOut * 4, PHONE_Y, PHONE_Z]}
         rotation={[0.05, -0.38 + spin * Math.PI * 2 * (step > 0 ? 1 : 0) + idle * 0.6, 0.04]}
         scale={0.95}
       >

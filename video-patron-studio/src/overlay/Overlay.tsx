@@ -9,31 +9,44 @@ import { SAFE_BOTTOM, SAFE_TOP, W } from '../timeline';
 const G = config.marque.vert;
 const TX = config.textes;
 
+/**
+ * Texte avec mots en vert (*accent*), apparition mot par mot.
+ * Les coupures de ligne ne se font qu'aux espaces : la ponctuation reste collée au mot
+ * (espace insécable avant « : ? ! ; » à la française).
+ */
 const Accent: React.FC<{ text: string; frame: number; start: number; stagger?: number }> = ({ text, frame, start, stagger = 1.6 }) => {
-  // apparition mot par mot (montée douce), lisible immédiatement
-  let k = 0;
+  const clean = text.replace(/ ([:?!;])/g, '\u00A0$1');
+  // mots = suites de morceaux (normal / accent) sans espace
+  const words: { t: string; accent: boolean }[][] = [[]];
+  for (const seg of parseAccent(clean)) {
+    // un groupe vert court (≤ 3 mots, ex. « en ligne ») ne se coupe jamais en fin de ligne
+    const t = seg.accent && seg.t.trim().length <= 14 ? seg.t.replace(/(\S) (?=\S)/g, '$1\u00A0') : seg.t;
+    t.split(/( +|\n)/).forEach((piece) => {
+      if (piece === '') return;
+      if (piece === '\n') words.push([{ t: '\n', accent: false }], []);
+      else if (/^ +$/.test(piece)) words.push([]);
+      else words[words.length - 1].push({ t: piece, accent: seg.accent });
+    });
+  }
+  const list = words.filter((w) => w.length);
   return (
     <>
-      {parseAccent(text).map((seg, si) =>
-        seg.t.split(/(\s+)/).map((word, wi) => {
-          if (/^\s+$/.test(word)) return word;
-          const i = k++;
-          const p = ramp(frame, start + i * stagger, start + i * stagger + 9, easeOut);
-          return (
-            <span
-              key={`${si}-${wi}`}
-              style={{
-                display: 'inline-block',
-                color: seg.accent ? G : '#fff',
-                opacity: p,
-                transform: `translateY(${(1 - p) * 26}px)`,
-              }}
-            >
-              {word}
+      {list.map((w, i) => {
+        if (w[0].t === '\n') return <br key={i} />;
+        const p = ramp(frame, start + i * stagger, start + i * stagger + 9, easeOut);
+        return (
+          <React.Fragment key={i}>
+            <span style={{ display: 'inline-block', whiteSpace: 'nowrap', opacity: p, transform: `translateY(${(1 - p) * 26}px)` }}>
+              {w.map((part, j) => (
+                <span key={j} style={{ color: part.accent ? G : '#fff' }}>
+                  {part.t}
+                </span>
+              ))}
             </span>
-          );
-        }),
-      )}
+            {i < list.length - 1 ? ' ' : ''}
+          </React.Fragment>
+        );
+      })}
     </>
   );
 };
@@ -48,8 +61,8 @@ const Caption: React.FC<{ c: Cap; frame: number }> = ({ c, frame }) => {
     <div
       style={{
         position: 'absolute',
-        left: 60,
-        right: 60,
+        left: 90,
+        right: 90,
         top: CAPTION_TOP,
         maxHeight: CAPTION_BOTTOM_LIMIT - CAPTION_TOP,
         display: 'flex',
@@ -79,7 +92,7 @@ const Caption: React.FC<{ c: Cap; frame: number }> = ({ c, frame }) => {
             marginTop: 26,
             fontFamily: BODY,
             fontWeight: c.big ? 700 : 600,
-            fontSize: c.big ? 60 : 44,
+            fontSize: c.big ? 50 : 40,
             lineHeight: 1.2,
             color: c.big ? '#fff' : '#d4d4d4',
             textShadow: '0 4px 20px rgba(0,0,0,0.9)',
@@ -165,7 +178,7 @@ const CTA: React.FC<{ frame: number; showContact: boolean }> = ({ frame, showCon
   const text = TX.utiliserVarianteCta ? TX.ctaVariante : TX.cta;
   type Row = { key: string; icon: React.ReactNode; label?: string; value: string; size: number; font: string; color: string };
   const rows: Row[] = [];
-  if (C.site) rows.push({ key: 'site', icon: <GlobeIcon size={58} />, value: C.site, size: 70, font: DISPLAY, color: G });
+  if (C.site) rows.push({ key: 'site', icon: <GlobeIcon size={58} />, value: C.site, size: 62, font: DISPLAY, color: G });
   if (C.whatsapp) rows.push({ key: 'wa', icon: <ChatIcon size={66} />, label: 'WhatsApp', value: C.whatsapp, size: 66, font: BODY, color: '#fff' });
   C.emails.filter(Boolean).forEach((e, i) => rows.push({ key: `mail${i}`, icon: <MailIcon size={52} />, value: e, size: 44, font: BODY, color: '#fff' }));
   // Réseaux sociaux : uniquement si renseignés dans config.ts
@@ -180,8 +193,8 @@ const CTA: React.FC<{ frame: number; showContact: boolean }> = ({ frame, showCon
         style={{
           position: 'absolute',
           top: 660,
-          left: 70,
-          right: 70,
+          left: 90,
+          right: 90,
           textAlign: 'center',
           fontFamily: DISPLAY,
           fontWeight: 800,
@@ -199,8 +212,8 @@ const CTA: React.FC<{ frame: number; showContact: boolean }> = ({ frame, showCon
             position: 'absolute',
             top: 940,
             bottom: SAFE_BOTTOM + 30,
-            left: 60,
-            right: 60,
+            left: 90,
+            right: 90,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -265,11 +278,11 @@ export const Overlay: React.FC<{ showContact: boolean; debugSafe?: boolean }> = 
       {CAPTIONS.map((c, i) => (
         <Caption key={i} c={c} frame={frame} />
       ))}
-      <Pill frame={frame} from={150} to={262} top={1105}>
+      <Pill frame={frame} from={178} to={262} top={1105}>
         <PinIcon />
         {TX.lieu}
       </Pill>
-      <Pill frame={frame} from={300} to={556} top={1130} muted>
+      <Pill frame={frame} from={300} to={556} top={1545} muted>
         {TX.mentionConcepts}
       </Pill>
       <CTA frame={frame} showContact={showContact} />

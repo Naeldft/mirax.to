@@ -1,48 +1,28 @@
 import { ThreeCanvas } from '@remotion/three';
 import React from 'react';
-import { AbsoluteFill, Audio, getStaticFiles, interpolate, staticFile, useVideoConfig } from 'remotion';
+import { AbsoluteFill, useVideoConfig } from 'remotion';
 import { AssetGate } from './assets';
 import { config } from './config';
 import { Overlay } from './overlay/Overlay';
 import { World } from './three/World';
-import { FPS } from './timeline';
+import { Sound } from './Sound';
 
-export type VideoProps = { showContact: boolean; debugSafe?: boolean };
+/** layer : 'all' (normal), '3d' ou 'text' — calques séparés pour le contrôle automatique de mise en page. */
+export type VideoProps = { showContact: boolean; debugSafe?: boolean; layer?: 'all' | '3d' | 'text' };
 
-const MUSIC = 'audio/musique.mp3';
-
-/** Musique facultative : ajoutée seulement si public/audio/musique.mp3 existe. */
-const Music: React.FC = () => {
-  const { durationInFrames } = useVideoConfig();
-  const exists = getStaticFiles().some((f) => f.name === MUSIC);
-  if (!exists) return null;
-  const { volume, fonduEntreeSec, fonduSortieSec } = config.son;
-  return (
-    <Audio
-      src={staticFile(MUSIC)}
-      volume={(f) =>
-        interpolate(
-          f,
-          [0, fonduEntreeSec * FPS, durationInFrames - fonduSortieSec * FPS, durationInFrames],
-          [0, volume, volume, 0],
-          { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
-        )
-      }
-    />
-  );
-};
-
-export const PatronVideo: React.FC<VideoProps> = ({ showContact, debugSafe }) => {
+export const PatronVideo: React.FC<VideoProps> = ({ showContact, debugSafe, layer = 'all' }) => {
   const { width, height } = useVideoConfig();
   return (
     <AbsoluteFill style={{ backgroundColor: config.marque.fond }}>
       <AssetGate>
-        <ThreeCanvas width={width} height={height} camera={{ fov: 40, position: [0, 0, 13], near: 0.05, far: 300 }} gl={{ antialias: true }}>
-          <World />
-        </ThreeCanvas>
-        <Overlay showContact={showContact} debugSafe={debugSafe} />
+        {layer !== 'text' && (
+          <ThreeCanvas width={width} height={height} camera={{ fov: 40, position: [0, 0, 13], near: 0.05, far: 300 }} gl={{ antialias: true }}>
+            <World decor={layer === 'all'} />
+          </ThreeCanvas>
+        )}
+        {layer !== '3d' && <Overlay showContact={showContact} debugSafe={debugSafe} />}
       </AssetGate>
-      <Music />
+      {layer === 'all' && <Sound showContact={showContact} />}
     </AbsoluteFill>
   );
 };

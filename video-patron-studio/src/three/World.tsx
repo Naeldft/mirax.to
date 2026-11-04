@@ -73,19 +73,19 @@ const Floor: React.FC = () => {
 /** Monogramme final (scène 7). */
 const FinalMark: React.FC = () => {
   const frame = useCurrentFrame();
-  if (frame < 1290) return null;
-  const s = sp(frame, 1290, 14, 1, 70);
-  const glow = ramp(frame, 1330, 1370);
+  if (frame < 1316) return null;
+  const s = sp(frame, 1318, 14, 1, 70); // arrive après la sortie du téléphone
+  const glow = ramp(frame, 1336, 1376);
   const idle = Math.sin((frame - 1300) / 40) * 0.12;
   return (
-    <group position={[0, -13.65, -175 - (1 - s) * 30]} rotation={[0, (1 - s) * Math.PI * 2 + idle, 0]} scale={0.78}>
+    <group position={[0, -13.78, -175 - (1 - s) * 30]} rotation={[0, (1 - s) * Math.PI * 2 + idle, 0]} scale={0.7}>
       <Monogram glow={glow} />
       <pointLight position={[-3 + glow * 6, 1, 3]} intensity={14} distance={8} />
     </group>
   );
 };
 
-export const World: React.FC = () => {
+export const World: React.FC<{ decor?: boolean }> = ({ decor = true }) => {
   const frame = useCurrentFrame();
   return (
     <>
@@ -94,8 +94,8 @@ export const World: React.FC = () => {
       <ambientLight intensity={0.25} />
       <directionalLight position={[3, 5, 6]} intensity={2.2} />
       <directionalLight position={[-5, -2, 2]} intensity={0.6} color={G} />
-      <Particles />
-      {frame < 930 && <Floor />}
+      {decor && <Particles />}
+      {decor && frame < 930 && <Floor />}
       {frame < 160 && <Hook />}
       {frame >= 110 && frame < 305 && <Title3D z={-24} />}
       <Corridor />

@@ -20,7 +20,7 @@ export const Title3D: React.FC<{ z: number }> = ({ z }) => {
     const words = [config.marque.nom1, config.marque.nom2];
     const res = font3d.data.resolution;
     const size = 1;
-    const maxWidth = 4.1; // largeur visible ≈ 4.4 unités à cette distance
+    const maxWidth = 3.7; // largeur visible ≈ 4.4 unités à cette distance
     const lineGap = 1.35;
     // mesure des lignes
     const adv = (ch: string) => ((font3d.data.glyphs[ch]?.ha ?? 600) / res) * size;
@@ -52,26 +52,26 @@ export const Title3D: React.FC<{ z: number }> = ({ z }) => {
   }, [font3d]);
 
   const start = 116;
-  const exitT = easeIn(ramp(frame, 256, 298, (t) => t));
+  const exitT = easeIn(ramp(frame, 264, 300, (t) => t));
   const sweep = ramp(frame, 150, 240);
 
   return (
     <group position={[0, 0.25, z]}>
       {letters.list.map((l) => {
         const s = sp(frame, start + l.idx * 3, 13, 0.9, 100);
-        const r = (k: number) => rand(l.idx * 11 + k) - 0.5;
-        const from = new THREE.Vector3(r(1) * 10, r(2) * 12, -6 - rand(l.idx + 3) * 10);
-        const away = new THREE.Vector3(Math.sign(l.x || 0.1) * (2 + Math.abs(r(4)) * 6), r(5) * 7, 9 + rand(l.idx) * 4);
+        // arrivée depuis l'arrière, dans l'axe de sa place finale (projection fixe → aucun croisement)
+        const from = new THREE.Vector3(l.x * 1.96, l.y * 1.96, -12);
+        // départ radial (écartement proportionnel à la position → les lettres s'éloignent sans se croiser)
+        const away = new THREE.Vector3(l.x * 2.2, (l.y + 0.1) * 2.2, 8);
         const px = THREE.MathUtils.lerp(from.x, l.x, s) + away.x * exitT;
         const py = THREE.MathUtils.lerp(from.y, l.y, s) + away.y * exitT;
         const pz = THREE.MathUtils.lerp(from.z, 0, s) + away.z * exitT;
-        const rot = (1 - s) * 3 + exitT * 2.5;
         return (
           <mesh
             key={l.idx}
             geometry={l.geo}
             position={[px, py, pz]}
-            rotation={[r(6) * rot, r(7) * rot * 1.5, r(8) * rot]}
+            rotation={[0, (1 - s) * 2.4 + exitT * 0.6 * Math.sign(l.x || 1), 0]}
             scale={letters.scale * Math.max(0.001, 0.4 + s * 0.6)}
           >
             <meshPhysicalMaterial

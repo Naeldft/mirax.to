@@ -276,16 +276,16 @@ const drawPatronSite = (ctx: CanvasRenderingContext2D, x0: number, y0: number, w
   ctx.font = `800 ${17 * u}px ${DISPLAY}`;
   ctx.fillText(`${config.marque.nom1} ${config.marque.nom2}`, x0 + 70 * u, y0 + 42 * u);
   const title = ['Parlez-nous', 'de votre', 'activité.'];
-  const fs = mobile ? 40 : 58;
+  const fs = mobile ? 40 : 48; // titre court : ne touche jamais le formulaire à droite
   ctx.font = `800 ${fs * u}px ${DISPLAY}`;
   title.forEach((l, i) => {
     ctx.fillStyle = i === title.length - 1 ? G : '#fff';
     ctx.fillText(l, x0 + (mobile ? 24 : 50) * u, y0 + ((mobile ? 120 : 160) + i * fs * 1.1) * u);
   });
   const fields = ['Votre métier', 'Vos couleurs', 'Vos horaires', 'Vos photos'];
-  const fx = mobile ? 24 : 560;
+  const fx = mobile ? 24 : 600;
   const fy = mobile ? 290 : 110;
-  const fw = mobile ? 352 : 390;
+  const fw = mobile ? 352 : 360;
   fields.forEach((f, i) => {
     const yy = y0 + (fy + i * 78) * u;
     rr(ctx, x0 + fx * u, yy, fw * u, 60 * u, 12 * u);
@@ -367,10 +367,16 @@ export const laptopScreenTexture = (step: 0 | 1 | 2) => {
   const { c, ctx } = makeCanvas(w, h);
   const url = step === 0 ? config.coordonnees.site : step === 1 ? 'maquette · aperçu' : 'votre-site.fr';
   browserBar(ctx, w, url);
+  // Étapes 2 et 3 : le badge a sa propre bande en bas, il ne recouvre jamais le site.
+  const band = step === 0 ? 0 : 130;
   if (step === 0) drawPatronSite(ctx, 0, 64, w, h - 64, false);
-  else drawSite(ctx, 0, 64, w, h - 64, CLIENT, 'Boulangerie', 'Pains & viennoiseries', false);
-  if (step === 1) badge(ctx, w / 2, h - 130, 'MAQUETTE GRATUITE', 40);
-  if (step === 2) badge(ctx, w / 2, h - 130, 'EN LIGNE', 40, true);
+  else drawSite(ctx, 0, 64, w, h - 64 - band, CLIENT, 'Boulangerie', 'Pains & viennoiseries', false);
+  if (band) {
+    ctx.fillStyle = '#0A0A0A';
+    ctx.fillRect(0, h - band, w, band);
+  }
+  if (step === 1) badge(ctx, w / 2, h - band + 27, 'MAQUETTE GRATUITE', 40);
+  if (step === 2) badge(ctx, w / 2, h - band + 27, 'EN LIGNE', 40, true);
   return toTexture(c);
 };
 
@@ -382,8 +388,14 @@ export const phoneScreenTexture = (step: 0 | 1 | 2 | 3) => {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
   const top = 70;
+  const band = step === 0 ? 0 : 180;
   if (step === 0) drawPatronSite(ctx, 0, top, w, h - top, true);
-  else drawSite(ctx, 0, top, w, h - top, CLIENT, 'Boulangerie', 'Pains & viennoiseries', true);
+  else drawSite(ctx, 0, top, w, h - top - band, CLIENT, 'Boulangerie', 'Pains & viennoiseries', true);
+  if (band) {
+    ctx.fillStyle = '#0A0A0A';
+    ctx.fillRect(0, h - band, w, band);
+  }
+  const by = h - band + 55;
   // barre d'état
   ctx.fillStyle = step === 0 ? '#fff' : '#fff';
   ctx.font = `700 26px ${BODY}`;
@@ -392,22 +404,9 @@ export const phoneScreenTexture = (step: 0 | 1 | 2 | 3) => {
   rr(ctx, w / 2 - 70, 16, 140, 38, 19);
   ctx.fillStyle = '#000';
   ctx.fill();
-  if (step === 1) badge(ctx, w / 2, h - 200, 'MAQUETTE GRATUITE', 32);
-  if (step === 2) badge(ctx, w / 2, h - 200, 'EN LIGNE', 34, true);
-  if (step === 3) {
-    // filigrane maquette
-    ctx.save();
-    ctx.translate(w / 2, h / 2 + 40);
-    ctx.rotate(-0.42);
-    ctx.font = `800 64px ${DISPLAY}`;
-    ctx.textAlign = 'center';
-    ctx.strokeStyle = G;
-    ctx.lineWidth = 4;
-    ctx.globalAlpha = 0.9;
-    ctx.strokeText('MAQUETTE', 0, 0);
-    ctx.restore();
-    badge(ctx, w / 2, h - 200, 'GRATUITE', 40);
-  }
+  if (step === 1) badge(ctx, w / 2, by, 'MAQUETTE GRATUITE', 32);
+  if (step === 2) badge(ctx, w / 2, by, 'EN LIGNE', 34, true);
+  if (step === 3) badge(ctx, w / 2, by, 'MAQUETTE GRATUITE', 32);
   return toTexture(c);
 };
 

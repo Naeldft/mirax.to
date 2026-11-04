@@ -8,12 +8,12 @@ import { Monogram } from './Monogram';
 
 // 1 px écran ≈ PX unités à 12 unités de la caméra (fov 40°, 1920 px de haut)
 const PX = (2 * 12 * Math.tan((20 * Math.PI) / 180)) / 1920;
-const SHATTER = 80; // image où le texte se brise
+const SHATTER = 66; // image où le texte se brise
 
 /** Scène 1 : la question, qui se brise en éclats, puis le monogramme PS. */
 export const Hook: React.FC = () => {
   const frame = useCurrentFrame();
-  const { tex, w, h } = useMemo(() => hookTexture(config.textes.accroche, 960), []);
+  const { tex, w, h } = useMemo(() => hookTexture(config.textes.accroche, 800), []);
   const W3 = w * PX;
   const H3 = h * PX;
 
@@ -69,15 +69,16 @@ export const Hook: React.FC = () => {
   const intro = sp(frame, 0, 16, 0.6, 140); // apparition immédiate (image 0 déjà lisible)
   const crack = frame >= SHATTER - 8 && frame < SHATTER ? Math.sin(frame * 3.1) * 0.02 : 0;
   const t = Math.max(0, frame - SHATTER) / 30; // secondes depuis la brisure
-  const explode = easeIn(Math.min(1, t / 1.2));
+  const explode = easeIn(Math.min(1, t / 0.6));
 
-  const monoIn = sp(frame, SHATTER + 4, 13, 0.9, 90);
-  const glow = ramp(frame, SHATTER + 14, SHATTER + 40);
+  // le monogramme n'apparaît qu'une fois les éclats partis (aucune superposition)
+  const monoIn = sp(frame, SHATTER + 18, 13, 0.9, 90);
+  const glow = ramp(frame, SHATTER + 26, SHATTER + 50);
   const open = ramp(frame, 108, 146);
 
   return (
     <group>
-      {frame < SHATTER + 40 && (
+      {frame < SHATTER + 18 && (
         <group position={[crack, 0.15, 0]} scale={0.94 + intro * 0.06}>
           {shards.map(({ geo, c, seed }) => {
             const dir = new THREE.Vector3(c.x * 1.4 + (rand(seed) - 0.5) * 2, c.y * 1.4 + (rand(seed + 9) - 0.5) * 2, 0.5 + rand(seed + 4) * 3);
@@ -89,13 +90,13 @@ export const Hook: React.FC = () => {
                 position={[c.x + dir.x * d * 0.35, c.y + dir.y * d * 0.35, dir.z * d]}
                 rotation={[explode * (rand(seed + 5) - 0.5) * 8, explode * (rand(seed + 6) - 0.5) * 8, explode * (rand(seed + 7) - 0.5) * 6]}
               >
-                <meshBasicMaterial map={tex} transparent opacity={1 - explode * 0.9} side={THREE.DoubleSide} depthWrite={false} />
+                <meshBasicMaterial map={tex} transparent opacity={1 - Math.min(1, explode * 1.15)} side={THREE.DoubleSide} depthWrite={false} />
               </mesh>
             );
           })}
         </group>
       )}
-      {frame >= SHATTER && (
+      {frame >= SHATTER + 18 && (
         <group position={[0, 0.2, -0.5]} scale={0.2 + monoIn * 0.8} rotation={[0, (1 - monoIn) * -1.6, 0]}>
           <Monogram glow={glow} open={open} opacity={1} />
         </group>
