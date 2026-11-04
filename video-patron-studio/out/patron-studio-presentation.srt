@@ -3,7 +3,7 @@
 Votre activité n’a pas encore de site ?
 
 2
-00:00:04,000 --> 00:00:08,733
+00:00:04,333 --> 00:00:08,733
 Patrôn Studio — Des sites internet pour tous les métiers.
 
 3
@@ -23,17 +23,15 @@ votre site, à votre image.
 2. Vous voyez votre maquette gratuite.
 
 7
-00:00:26,667 --> 00:00:29,667
+00:00:26,667 --> 00:00:29,467
 3. On met votre site en ligne.
 
 8
 00:00:31,000 --> 00:00:32,800
-80 € : Le site, une seule fois.
-30 € / mois : Site, hébergement, domaine et entretien.
-40 € / mois : Avec plus de modifications.
+80 € : Le site, une seule fois. 30 € / mois : Site, hébergement, domaine et entretien. 40 € / mois : Avec plus de modifications.
 
 9
-00:00:32,833 --> 00:00:38,667
+00:00:32,833 --> 00:00:38,067
 Sans engagement. Boutique en ligne et cas particuliers : sur devis.
 
 10
@@ -42,5 +40,4 @@ Maquette gratuite. Vous décidez après l’avoir vue.
 
 11
 00:00:44,533 --> 00:00:50,000
-Écrivez-nous : votre maquette gratuite en quelques jours.
-patrônstudio.fr · WhatsApp 07 60 33 74 74 · admin.ps@patrônstudio.fr · patronstudio59@hotmail.com
+Écrivez-nous : votre maquette gratuite en quelques jours. patrônstudio.fr · WhatsApp 07 60 33 74 74 · admin.ps@patrônstudio.fr · patronstudio59@hotmail.com
