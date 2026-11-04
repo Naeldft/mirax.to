@@ -167,12 +167,12 @@ const CTA: React.FC<{ frame: number; showContact: boolean }> = ({ frame, showCon
   const rows: Row[] = [];
   if (C.site) rows.push({ key: 'site', icon: <GlobeIcon size={58} />, value: C.site, size: 70, font: DISPLAY, color: G });
   if (C.whatsapp) rows.push({ key: 'wa', icon: <ChatIcon size={66} />, label: 'WhatsApp', value: C.whatsapp, size: 66, font: BODY, color: '#fff' });
-  if (C.email) rows.push({ key: 'mail', icon: <MailIcon size={52} />, value: C.email, size: 44, font: BODY, color: '#fff' });
+  C.emails.filter(Boolean).forEach((e, i) => rows.push({ key: `mail${i}`, icon: <MailIcon size={52} />, value: e, size: 44, font: BODY, color: '#fff' }));
   // Réseaux sociaux : uniquement si renseignés dans config.ts
   if (C.instagram) rows.push({ key: 'ig', icon: null, label: 'Instagram', value: C.instagram, size: 40, font: BODY, color: '#fff' });
   if (C.tiktok) rows.push({ key: 'tt', icon: null, label: 'TikTok', value: C.tiktok, size: 40, font: BODY, color: '#fff' });
   if (C.snapchat) rows.push({ key: 'sc', icon: null, label: 'Snapchat', value: C.snapchat, size: 40, font: BODY, color: '#fff' });
-  const compact = rows.length > 3;
+  const compact = rows.length > 4;
 
   return (
     <AbsoluteFill>

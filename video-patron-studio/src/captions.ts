@@ -21,7 +21,7 @@ export const allLines = (showContact: boolean) => {
   const C = config.coordonnees;
   const prix = TX.prix.map((p) => `${p.montant}${p.periode ? ' ' + p.periode : ''} : ${p.lignes.join(' ')}`).join('\n');
   const cta = TX.utiliserVarianteCta ? TX.ctaVariante : TX.cta;
-  const contact = [C.site, C.whatsapp && `WhatsApp ${C.whatsapp}`, C.email, C.instagram, C.tiktok, C.snapchat].filter(Boolean).join(' · ');
+  const contact = [C.site, C.whatsapp && `WhatsApp ${C.whatsapp}`, ...C.emails, C.instagram, C.tiktok, C.snapchat].filter(Boolean).join(' · ');
   const lines = [
     { from: 0, to: 80, text: TX.accroche.join(' ') },
     { from: 120, to: 262, text: `${config.marque.nom1} ${config.marque.nom2} — ${TX.presentation}` },

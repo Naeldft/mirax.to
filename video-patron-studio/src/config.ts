@@ -22,7 +22,9 @@ export const config = {
 
   coordonnees: {
     site: 'patrônstudio.fr',
-    email: 'patronstudio59@hotmail.com',
+    // Adresses e-mail affichées (dans l'ordre). Le domaine est écrit sous sa forme lisible :
+    // admin.ps@patrônstudio.fr = admin.ps@xn--patrn-studio-hib.fr
+    emails: ['admin.ps@patrônstudio.fr', 'patronstudio59@hotmail.com'],
     whatsapp: '07 60 33 74 74',
     // Laissez vide ('') tant que le compte n'existe pas : la ligne n'apparaît pas.
     instagram: '',
@@ -47,11 +49,13 @@ export const config = {
       ['Boulangerie', 'Pains & viennoiseries'],
       ['Coiffeur', 'Prenez rendez-vous'],
       ['Plombier', 'Dépannage & installation'],
+      ['Menuiserie', 'Sur mesure & rénovation'],
       ['Coach', 'Séances sur mesure'],
       ['Boutique', 'Nouvelle collection'],
       ['Restaurant', 'Découvrez la carte'],
       ['Association', 'Rejoignez-nous'],
       ['Photographe', 'Portfolio & tarifs'],
+      ['Fleuriste', 'Bouquets & événements'],
     ] as [string, string][],
 
     // Scène 4 — comment ça marche

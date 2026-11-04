@@ -26,7 +26,7 @@ const Env: React.FC = () => {
     scene.environment = env;
     scene.environmentIntensity = 0.55;
     scene.background = new THREE.Color(config.marque.fond);
-    scene.fog = new THREE.Fog(config.marque.fond, 15, 46);
+    scene.fog = new THREE.Fog(config.marque.fond, 15, 58);
     return () => {
       env.dispose();
       pmrem.dispose();
@@ -74,11 +74,11 @@ const Floor: React.FC = () => {
 const FinalMark: React.FC = () => {
   const frame = useCurrentFrame();
   if (frame < 1290) return null;
-  const s = sp(frame, 1300, 14, 1, 70);
+  const s = sp(frame, 1290, 14, 1, 70);
   const glow = ramp(frame, 1330, 1370);
   const idle = Math.sin((frame - 1300) / 40) * 0.12;
   return (
-    <group position={[0, -13.5, -175 - (1 - s) * 30]} rotation={[0, (1 - s) * Math.PI * 2 + idle, 0]} scale={0.85}>
+    <group position={[0, -13.65, -175 - (1 - s) * 30]} rotation={[0, (1 - s) * Math.PI * 2 + idle, 0]} scale={0.78}>
       <Monogram glow={glow} />
       <pointLight position={[-3 + glow * 6, 1, 3]} intensity={14} distance={8} />
     </group>

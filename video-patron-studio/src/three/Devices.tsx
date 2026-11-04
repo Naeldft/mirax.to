@@ -29,14 +29,14 @@ export const Devices: React.FC = () => {
   const frame = useCurrentFrame();
   const laptopTex = useMemo(() => [0, 1, 2].map((s) => laptopScreenTexture(s as 0 | 1 | 2)), []);
   const phoneTex = useMemo(() => [0, 1, 2].map((s) => phoneScreenTexture(s as 0 | 1 | 2)), []);
-  if (frame < 540 || frame > 916) return null;
+  if (frame < 470 || frame > 916) return null;
 
   const step = frame < STEP_STARTS[1] ? 0 : frame < STEP_STARTS[2] ? 1 : 2;
   const stepStart = STEP_STARTS[step];
 
   // Entrée : rotation dans l'espace avec ressort
-  const enter = sp(frame, 552, 15, 1, 70);
-  const lidOpen = sp(frame, 572, 14, 1, 80);
+  const enter = sp(frame, 528, 15, 1, 70);
+  const lidOpen = sp(frame, 552, 14, 1, 80);
   // Sortie : on se met bien face à l'écran pour "plonger" dedans
   const toFront = ramp(frame, 872, 906, easeInOut);
   const idle = Math.sin((frame - 560) / 55) * 0.22;
@@ -60,7 +60,7 @@ export const Devices: React.FC = () => {
   const spin = step === 0 ? 1 : sp(frame, stepStart, 16, 0.8, 90);
   const phoneShown = spin < 0.5 && step > 0 ? phoneTex[step - 1] : phoneTex[step];
   const phoneOut = ramp(frame, 868, 900, easeInOut);
-  const phoneEnter = sp(frame, 585, 13, 0.9, 80);
+  const phoneEnter = sp(frame, 565, 13, 0.9, 80);
 
   return (
     <group position={[-0.25, 0.05, -125]} rotation={[0, yaw, 0]} scale={0.85 + enter * 0.15}>

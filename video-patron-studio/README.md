@@ -42,7 +42,7 @@ Variable `CONCURRENCY` pour régler le nombre d'images rendues en parallèle (3 
 Tout se trouve dans **`src/config.ts`** :
 - textes de chaque scène (mettez un mot entre `*étoiles*` pour l'afficher en vert) ;
 - prix ;
-- site, e-mail, WhatsApp ;
+- site, adresses e-mail (`emails`, une ou plusieurs), WhatsApp ;
 - `instagram`, `tiktok`, `snapchat` : vides pour l'instant. Tant qu'un champ est vide, sa ligne n'apparaît pas ;
 - couleur verte (`marque.vert`).
 

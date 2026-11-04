@@ -99,11 +99,13 @@ export const PALETTES: Palette[] = [
   { bg: '#F6EBDD', ink: '#3B2414', primary: '#8B4A1F', accent: '#E7A44B', soft: '#EAD7BF' }, // boulangerie
   { bg: '#141414', ink: '#F7EDEA', primary: '#F2C7C7', accent: '#E58FA0', soft: '#2A2224' }, // coiffeur
   { bg: '#EAF2FB', ink: '#0D2A4F', primary: '#1453A3', accent: '#F2B705', soft: '#D3E2F4' }, // plombier
+  { bg: '#F3EEE6', ink: '#2B2118', primary: '#6B4A2E', accent: '#2F7D6D', soft: '#E2D6C4' }, // menuiserie
   { bg: '#0E1A12', ink: '#F2F7EE', primary: '#C6F432', accent: '#8FD14F', soft: '#1D2E22' }, // coach
   { bg: '#FFF4F0', ink: '#1D1D1D', primary: '#1D1D1D', accent: '#E86A4A', soft: '#F6DED5' }, // boutique
   { bg: '#1C0F0B', ink: '#F3E2C7', primary: '#F3E2C7', accent: '#C8502E', soft: '#33201A' }, // restaurant
   { bg: '#F2F7EF', ink: '#173D20', primary: '#2E6B3A', accent: '#F29F05', soft: '#DCEAD6' }, // association
   { bg: '#F4F4F4', ink: '#151515', primary: '#151515', accent: '#7C6CF2', soft: '#E2E2E2' }, // photographe
+  { bg: '#FBEFF3', ink: '#3A1626', primary: '#B03A6B', accent: '#5E9E4B', soft: '#F3D6E1' }, // fleuriste
 ];
 
 /** Formes abstraites "photo" (aucune image réelle). */

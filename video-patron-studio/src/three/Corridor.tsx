@@ -17,10 +17,10 @@ export const Corridor: React.FC = () => {
       config.textes.cartes.map(([name, tag], i) => {
         const p = PALETTES[i % PALETTES.length];
         // ellipse autour de l'axe de caméra (format vertical : plus de place en hauteur)
-        const angle = [2.5, -0.5, 3.6, 0.4, 2.2, -0.9, 3.9, 0.9][i % 8];
+        const angle = [2.5, -0.5, 3.6, 0.4, 2.2, -0.9, 3.9, 0.9, 2.8, -0.2][i % 10];
         const x = Math.cos(angle) * 1.25;
         const y = Math.sin(angle) * 1.55 + 0.75;
-        const z = -40 - i * 8.6;
+        const z = -38 - i * 7.6;
         return { tex: siteCardTexture(name, tag, p, i + 1), x, y, z, bg: p.bg, i };
       }),
     [],
@@ -30,7 +30,7 @@ export const Corridor: React.FC = () => {
   return (
     <group>
       {cards.map((c) => {
-        const appear = ramp(frame, 262 + c.i * 14, 300 + c.i * 14);
+        const appear = ramp(frame, 262 + c.i * 12, 300 + c.i * 12);
         const sway = Math.sin((frame + c.i * 20) / 40) * 0.08;
         // à l'approche de la caméra, la carte s'écarte (effet de passage)
         const dist = camZ - c.z;

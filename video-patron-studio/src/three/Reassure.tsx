@@ -30,7 +30,7 @@ export const Reassure: React.FC = () => {
     () => new THREE.ExtrudeGeometry(checkShape(), { depth: 0.12, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 2 }),
     [],
   );
-  if (frame < 1150 || frame > 1345) return null;
+  if (frame < 1135 || frame > 1345) return null;
 
   const enter = sp(frame, 1160, 14, 1, 70);
   const pop = sp(frame, 1200, 9, 0.7, 140);
@@ -40,7 +40,7 @@ export const Reassure: React.FC = () => {
   return (
     <group position={[0, -15.73, -150]}>
       <group
-        position={[-out * 6, (1 - enter) * -6, out * -2]}
+        position={[-out * 6, (1 - enter) * 4, out * -2]}
         rotation={[0.04, (1 - enter) * 2.2 + idle - out * 3.5, (1 - enter) * 0.3]}
         scale={1.65}
       >
