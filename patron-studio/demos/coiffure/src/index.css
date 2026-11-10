@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/dm-sans';
+
+/* Identité visuelle Atelier Mèche : éditorial mode, crème et rose poudré */
+@theme {
+  --color-creme: #f7efe9;
+  --color-lin: #efe3da;
+  --color-poudre: #d9a5a0;
+  --color-poudre-fonce: #b9746e;
+  --color-encre: #1c1a1a;
+  --color-taupe: #6f625b;
+  --color-or: #c79a52;
+  --font-serif: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'DM Sans Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-creme); color: var(--color-encre); overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.02em; }
+  ::selection { background: var(--color-poudre); color: var(--color-encre); }
+  :focus-visible { outline: 2px solid var(--color-poudre-fonce); outline-offset: 3px; border-radius: 4px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-encre); color: var(--color-creme); padding: 0.6rem 1rem; border-radius: 999px; }
+  .skip-link:focus { top: 1rem; }
+  .btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+    min-height: 3.1rem; padding: 0.8rem 1.7rem; border-radius: 999px; font-weight: 500; letter-spacing: 0.02em;
+    overflow: hidden; isolation: isolate; transition: color 0.4s ease, transform 0.25s ease;
+  }
+  /* micro-animation : un voile rose qui balaie le bouton */
+  .btn::before { content: ''; position: absolute; inset: 0; z-index: -1; transform: scaleX(0); transform-origin: right; transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1); }
+  .btn:hover::before { transform: scaleX(1); transform-origin: left; }
+  .btn:active { transform: scale(0.97); }
+  .btn-encre { background: var(--color-encre); color: var(--color-creme); }
+  .btn-encre::before { background: var(--color-poudre-fonce); }
+  .btn-ligne { box-shadow: inset 0 0 0 1px var(--color-encre); color: var(--color-encre); }
+  .btn-ligne::before { background: var(--color-encre); }
+  .btn-ligne:hover { color: var(--color-creme); }
+  .numero { font-family: var(--font-serif); font-style: italic; color: var(--color-poudre-fonce); }
+  .section { padding: 5.5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 8rem 2rem; } }
+  .field { width: 100%; min-height: 3.1rem; background: transparent; border: 0; border-bottom: 1px solid rgb(28 26 26 / 0.3); padding: 0.6rem 0.2rem; font-size: 1rem; color: var(--color-encre); transition: border-color 0.2s; }
+  .field:focus { outline: none; border-color: var(--color-poudre-fonce); }
+  .field[aria-invalid='true'] { border-color: #b3261e; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

@@ -24,7 +24,11 @@ function Item({ q, a, classes, defaultOpen }) {
       <h3>
         <button type="button" className={classes.button} aria-expanded={open} aria-controls={id} onClick={toggle}>
           <span>{q}</span>
-          <span className={classes.icon} aria-hidden="true" style={{ transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .3s' }}>
+          <span
+            className={classes.icon}
+            aria-hidden="true"
+            style={{ transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .3s' }}
+          >
             +
           </span>
         </button>

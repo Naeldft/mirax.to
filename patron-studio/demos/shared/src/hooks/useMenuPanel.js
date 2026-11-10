@@ -17,7 +17,11 @@ export function useMenuPanel({ open, setOpen, panel, button, reduced, origin = '
       if (reduced) gsap.set(el, { clipPath: full });
       else {
         gsap.fromTo(el, { clipPath: closed }, { clipPath: full, duration: 0.7, ease: 'power3.inOut' });
-        gsap.fromTo(el.querySelectorAll('[data-item]'), { y: 40, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.06, delay: 0.25, duration: 0.5, ease: 'power3.out' });
+        gsap.fromTo(
+          el.querySelectorAll('[data-item]'),
+          { y: 40, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.06, delay: 0.25, duration: 0.5, ease: 'power3.out' },
+        );
       }
       el.querySelector('a, button')?.focus();
     } else if (reduced) gsap.set(el, { visibility: 'hidden', clipPath: closed });

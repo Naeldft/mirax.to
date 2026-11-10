@@ -84,7 +84,10 @@ export default function Loader({ ready, name, tagline, mark, colors, minMs = 900
         </p>
       )}
       <div data-l className="flex w-48 items-center gap-3" aria-hidden="true">
-        <span className="relative h-[2px] flex-1 overflow-hidden" style={{ background: 'color-mix(in srgb, currentColor 18%, transparent)' }}>
+        <span
+          className="relative h-[2px] flex-1 overflow-hidden"
+          style={{ background: 'color-mix(in srgb, currentColor 18%, transparent)' }}
+        >
           <span ref={bar} className="absolute inset-0 origin-left" style={{ background: colors.accent, transform: 'scaleX(0)' }} />
         </span>
         <span ref={pct} className="w-8 text-right text-xs tabular-nums opacity-70">

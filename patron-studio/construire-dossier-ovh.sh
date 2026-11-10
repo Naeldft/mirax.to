@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-DEMOS=(restauration plomberie location-voitures btp)
+DEMOS=(restauration plomberie location-voitures btp coiffure boulangerie coach boutique photographe association)
 OUT=dossier-ovh
 
 echo "→ Installation des dépendances des démos"

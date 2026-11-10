@@ -2,8 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { useReducedMotion } from '../hooks/useReducedMotion.js';
 import { gsap } from '../lib/gsap.js';
 
-const fmt = (v, decimals) =>
-  v.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+const fmt = (v, decimals) => v.toLocaleString('fr-FR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 
 /** Nombre qui défile jusqu'à sa valeur quand il apparaît à l'écran. */
 export default function Counter({ value, decimals = 0, prefix = '', suffix = '', duration = 1.8, className = '' }) {
