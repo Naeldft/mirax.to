@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { categories, formatPrix, pizzaImage, pizzas } from '../data/pizzas';
 import { carte } from '../data/site';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { useReveal } from '../hooks/useReveal';
-import { gsap } from '../lib/gsap';
+import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
+import { useReveal } from '@demos/shared/hooks/useReveal.js';
+import { gsap } from '@demos/shared/lib/gsap.js';
 import { Chili, Leaf } from './Icons';
 import SectionTitle from './SectionTitle';
 

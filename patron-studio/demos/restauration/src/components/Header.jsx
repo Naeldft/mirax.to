@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { restaurant } from '../data/site';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { gsap } from '../lib/gsap';
+import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
+import { gsap } from '@demos/shared/lib/gsap.js';
 import { Flame, Phone } from './Icons';
 
 export const NAV = [

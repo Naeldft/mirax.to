@@ -1,0 +1,187 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
+
+/* Identité visuelle Ondine Plomberie */
+@theme {
+  --color-nuit: #0a1724;
+  --color-nuit-2: #0f2235;
+  --color-nuit-3: #16304a;
+  --color-cuivre: #d08a52;
+  --color-cuivre-clair: #f0b583;
+  --color-eau: #5fd4e8;
+  --color-ecume: #e8f6fa;
+  --color-alerte: #ff5a4a;
+  --font-display: 'Space Grotesk Variable', system-ui, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-nuit);
+    color: var(--color-ecume);
+    overflow-x: hidden;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  ::selection {
+    background: var(--color-eau);
+    color: var(--color-nuit);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-eau);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  .skip-link {
+    position: fixed;
+    left: 1rem;
+    top: -4rem;
+    z-index: 200;
+    background: var(--color-eau);
+    color: var(--color-nuit);
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+  /* fond "plan technique" */
+  .blueprint {
+    background-image:
+      linear-gradient(rgb(95 212 232 / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(95 212 232 / 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 3.1rem;
+    padding: 0.85rem 1.5rem;
+    border-radius: 14px;
+    font-weight: 700;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+  }
+  /* micro-animation : vague qui remplit le bouton au survol */
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: translateY(101%);
+    border-radius: 40% 40% 0 0;
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.45s;
+  }
+  .btn:hover::before {
+    transform: translateY(0);
+    border-radius: 0;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-eau {
+    background: var(--color-eau);
+    color: var(--color-nuit);
+    box-shadow: 0 12px 30px -12px rgb(95 212 232 / 0.8);
+  }
+  .btn-eau::before {
+    background: var(--color-ecume);
+  }
+  .btn-ligne {
+    border: 1px solid rgb(232 246 250 / 0.3);
+    color: var(--color-ecume);
+  }
+  .btn-ligne::before {
+    background: var(--color-cuivre);
+  }
+  .btn-ligne:hover {
+    color: var(--color-nuit);
+    border-color: var(--color-cuivre);
+  }
+  .tag {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-eau);
+    font-weight: 600;
+  }
+  .section {
+    padding: 5.5rem 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .section {
+      padding: 8rem 2rem;
+    }
+  }
+  .field {
+    width: 100%;
+    min-height: 3.1rem;
+    border-radius: 12px;
+    background: rgb(232 246 250 / 0.05);
+    border: 1px solid rgb(232 246 250 / 0.15);
+    padding: 0.75rem 1rem;
+    color: var(--color-ecume);
+    font-size: 1rem;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-eau);
+    background: rgb(232 246 250 / 0.08);
+  }
+  .field[aria-invalid='true'] {
+    border-color: var(--color-alerte);
+  }
+  .field option {
+    background: var(--color-nuit-2);
+  }
+  .pulse-dot {
+    position: relative;
+  }
+  .pulse-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 999px;
+    border: 2px solid currentColor;
+    animation: pulse 1.8s ease-out infinite;
+  }
+  @keyframes pulse {
+    from { transform: scale(0.6); opacity: 1; }
+    to { transform: scale(1.8); opacity: 0; }
+  }
+  @keyframes defile {
+    to { transform: translateX(-50%); }
+  }
+  .defile {
+    animation: defile 28s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

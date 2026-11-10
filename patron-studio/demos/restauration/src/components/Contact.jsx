@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { horaires, restaurant } from '../data/site';
-import { useReveal } from '../hooks/useReveal';
+import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { formatServices } from '../lib/horaires';
 import { Clock, Phone, Pin } from './Icons';
 import SectionTitle from './SectionTitle';

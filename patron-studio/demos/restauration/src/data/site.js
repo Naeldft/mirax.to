@@ -100,28 +100,30 @@ export const histoire = {
     'Aujourd’hui, la pâte repose toujours quarante-huit heures. Le four monte à 450 degrés, et chaque pizza y cuit en quatre-vingt-dix secondes. Le feu ne s’éteint jamais vraiment : c’est lui, le cœur de Forno Vivo.',
   ],
   chiffres: [
-    { valeur: '48 h', label: 'de maturation de la pâte' },
-    { valeur: '450 °C', label: 'dans le four à bois' },
-    { valeur: '90 s', label: 'de cuisson par pizza' },
+    { valeur: 48, suffixe: ' h', label: 'de maturation de la pâte' },
+    { valeur: 450, suffixe: ' °C', label: 'dans le four à bois' },
+    { valeur: 90, suffixe: ' s', label: 'de cuisson par pizza' },
   ],
 };
 
+const BASE = import.meta.env?.BASE_URL ?? '/';
+
 /** Galerie : remplacez simplement les fichiers dans public/images/galerie/ par vos photos. */
 export const galerie = [
-  { src: '/images/galerie/four.webp', alt: 'Le four à bois de Forno Vivo, braises incandescentes', legende: 'Le four, allumé dès l’aube' },
+  { src: BASE + 'images/galerie/four.webp', alt: 'Le four à bois de Forno Vivo, braises incandescentes', legende: 'Le four, allumé dès l’aube' },
   {
-    src: '/images/galerie/margherita.webp',
+    src: BASE + 'images/galerie/margherita.webp',
     alt: 'Margherita sortie du four, mozzarella fondante et basilic',
     legende: 'Margherita, l’éternelle',
   },
-  { src: '/images/galerie/diavola.webp', alt: 'Pizza Diavola au salame piccante', legende: 'Diavola, la piquante' },
+  { src: BASE + 'images/galerie/diavola.webp', alt: 'Pizza Diavola au salame piccante', legende: 'Diavola, la piquante' },
   {
-    src: '/images/galerie/ingredients.webp',
+    src: BASE + 'images/galerie/ingredients.webp',
     alt: 'Tomates, basilic et mozzarella sur le plan de travail',
     legende: 'Des produits de Campanie',
   },
-  { src: '/images/galerie/tartufo.webp', alt: 'Pizza Tartufo à la crème de truffe', legende: 'Tartufo, pour les grandes occasions' },
-  { src: '/images/galerie/vivo.webp', alt: 'La Vivo, pizza signature du chef à la pistache', legende: 'La Vivo, signature du chef' },
+  { src: BASE + 'images/galerie/tartufo.webp', alt: 'Pizza Tartufo à la crème de truffe', legende: 'Tartufo, pour les grandes occasions' },
+  { src: BASE + 'images/galerie/vivo.webp', alt: 'La Vivo, pizza signature du chef à la pistache', legende: 'La Vivo, signature du chef' },
 ];
 
 /** Avis (fictifs, site démo). */
@@ -150,4 +152,12 @@ export const avis = [
     texte: 'Super soirée en amoureux. Réservez le week-end, c’est vite complet, et pour cause !',
     date: 'Août 2026',
   },
+];
+
+/** Questions fréquentes. */
+export const faq = [
+  { q: 'Faut-il réserver ?', a: 'C’est conseillé le vendredi et le samedi soir. En semaine, nous gardons toujours quelques tables pour les clients de passage.' },
+  { q: 'Proposez-vous des pizzas sans gluten ?', a: 'Oui, sur demande, avec une pâte sans gluten préparée à part. La cuisson se fait dans le même four : nous ne pouvons pas garantir l’absence totale de traces.' },
+  { q: 'Peut-on commander à emporter ?', a: 'Oui, toutes nos pizzas sont disponibles à emporter. Appelez-nous : elle sera prête en quinze minutes environ.' },
+  { q: 'Accueillez-vous les groupes ?', a: 'Jusqu’à dix personnes avec la réservation en ligne. Au-delà, et pour privatiser la salle, appelez-nous directement.' },
 ];

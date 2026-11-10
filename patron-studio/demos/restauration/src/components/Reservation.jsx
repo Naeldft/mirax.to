@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { restaurant } from '../data/site';
-import { useReveal } from '../hooks/useReveal';
+import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { creneaux, isoLocal, jourDe, parseIso } from '../lib/horaires';
 import { Check, Phone } from './Icons';
 import SectionTitle from './SectionTitle';

@@ -1,6 +1,7 @@
 import { ContactShadows, Environment, Lightformer, PerformanceMonitor, Sparkles } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
+import { pointer, usePointer } from '@demos/shared/hooks/usePointer.js';
 import { Pizza3D } from './Pizza3D';
 
 /** Lumière du four : légère fluctuation, comme des flammes. */
@@ -17,11 +18,18 @@ function FireLight({ reduced }) {
 /** Mouvement lié au défilement : la pizza s'incline, monte et se rapproche. */
 function ScrollRig({ progress, children, reduced }) {
   const group = useRef();
+  const tilt = useRef({ x: 0, y: 0 });
   const { camera } = useThree();
+  usePointer();
   useFrame(() => {
     const p = reduced ? 0 : progress.current;
     if (!group.current) return;
-    group.current.rotation.x = p * 0.55;
+    // la pizza suit doucement la souris (ou l'inclinaison du téléphone)
+    const t = tilt.current;
+    t.x += ((reduced ? 0 : pointer.x) - t.x) * 0.06;
+    t.y += ((reduced ? 0 : pointer.y) - t.y) * 0.06;
+    group.current.rotation.z = -t.x * 0.18;
+    group.current.rotation.x = p * 0.55 + t.y * 0.16;
     group.current.position.y = p * 0.9;
     group.current.position.z = p * 0.6;
     camera.position.set(0, 3.15 - p * 0.6, 4.25 - p * 0.5);

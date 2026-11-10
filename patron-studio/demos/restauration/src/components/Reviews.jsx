@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { avis } from '../data/site';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { useReveal } from '../hooks/useReveal';
+import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
+import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { Arrow, Star } from './Icons';
 import SectionTitle from './SectionTitle';
 

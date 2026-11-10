@@ -1,17 +1,17 @@
 import { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { formatPrix, heroPizzas, pizzaImage, pizzas } from '../data/pizzas';
 import { restaurant } from '../data/site';
-import { getDeviceTier } from '../hooks/useDeviceTier';
-import { useInView } from '../hooks/useInView';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { gsap, ScrollTrigger } from '../lib/gsap';
+import { getDeviceTier } from '@demos/shared/hooks/useDeviceTier.js';
+import { useInView } from '@demos/shared/hooks/useInView.js';
+import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
+import { gsap, ScrollTrigger } from '@demos/shared/lib/gsap.js';
 
 // La 3D (three.js) est chargée à part, après l'affichage du texte : la page reste rapide.
 const HeroScene = lazy(() => import('../three/HeroScene'));
 
 const choix = heroPizzas.map((id) => pizzas.find((p) => p.id === id));
 
-export default function Hero() {
+export default function Hero({ onReady }) {
   const section = useRef(null);
   const stage = useRef(null);
   const progress = useRef(0);
@@ -24,10 +24,14 @@ export default function Hero() {
 
   // Chargement progressif : la 3D démarre quand le navigateur est disponible.
   useEffect(() => {
-    if (tier === 'none') return;
+    if (tier === 'none') {
+      onReady?.();
+      return;
+    }
     const start = () => setLoad3d(true);
     const id = 'requestIdleCallback' in window ? window.requestIdleCallback(start, { timeout: 1200 }) : setTimeout(start, 400);
     return () => ('cancelIdleCallback' in window ? window.cancelIdleCallback(id) : clearTimeout(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- au montage uniquement
   }, [tier]);
 
   // Défilement : la pizza accompagne la suite de la page
@@ -110,7 +114,10 @@ export default function Hero() {
                   reduced={reduced}
                   active={inView}
                   progress={progress}
-                  onReady={() => setReady(true)}
+                  onReady={() => {
+                    setReady(true);
+                    onReady?.();
+                  }}
                 />
               </Suspense>
             )}

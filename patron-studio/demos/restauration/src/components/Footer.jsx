@@ -1,3 +1,4 @@
+import { PATRON } from '@demos/shared/lib/patron.js';
 import { restaurant } from '../data/site';
 import { Logo, NAV } from './Header';
 import { Social } from './Icons';
@@ -40,7 +41,7 @@ export default function Footer() {
         </p>
         <p>
           Site démo réalisé par{' '}
-          <a href="https://xn--patrn-studio-hib.fr" className="underline-offset-4 hover:text-creme/70 hover:underline">
+          <a href={PATRON.accueil} className="underline-offset-4 hover:text-creme/70 hover:underline">
             Patrôn Studio
           </a>
         </p>

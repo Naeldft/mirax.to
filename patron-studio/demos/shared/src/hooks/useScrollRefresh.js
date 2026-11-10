@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ScrollTrigger } from '../lib/gsap';
+import { ScrollTrigger } from '../lib/gsap.js';
 
 /**
  * Recalcule les positions des animations au défilement quand la hauteur de la page change

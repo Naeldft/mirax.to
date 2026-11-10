@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react';
-import { gsap, ScrollTrigger } from '../lib/gsap';
-import { useReducedMotion } from './useReducedMotion';
+import { gsap, ScrollTrigger } from '../lib/gsap.js';
+import { useReducedMotion } from './useReducedMotion.js';
 
 /**
  * Fait apparaître en douceur les éléments [data-reveal] d'une section quand ils entrent à l'écran.

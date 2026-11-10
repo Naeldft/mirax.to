@@ -157,4 +157,6 @@ export const heroPizzas = ['margherita', 'diavola', 'quattro-formaggi', 'tartufo
 export const formatPrix = (p) =>
   p.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(p) ? 0 : 2, maximumFractionDigits: 2 }) + ' €';
 
-export const pizzaImage = (id) => `/images/pizzas/${id}.webp`;
+// BASE_URL = dossier de publication (/demos/restauration/) ; '/' quand le fichier est lu par Node.
+const BASE = import.meta.env?.BASE_URL ?? '/';
+export const pizzaImage = (id) => `${BASE}images/pizzas/${id}.webp`;

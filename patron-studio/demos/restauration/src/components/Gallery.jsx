@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { galerie } from '../data/site';
-import { useReveal } from '../hooks/useReveal';
+import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import SectionTitle from './SectionTitle';
 
 // Disposition en mosaïque (sur grand écran) : certaines images occupent deux cases.

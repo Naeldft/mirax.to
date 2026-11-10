@@ -1,8 +1,9 @@
 import { useLayoutEffect, useRef } from 'react';
+import Counter from '@demos/shared/components/Counter.jsx';
 import { histoire } from '../data/site';
-import { useReducedMotion } from '../hooks/useReducedMotion';
-import { useReveal } from '../hooks/useReveal';
-import { gsap } from '../lib/gsap';
+import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
+import { useReveal } from '@demos/shared/hooks/useReveal.js';
+import { gsap } from '@demos/shared/lib/gsap.js';
 
 /** Texte découpé en mots : chaque mot s'éclaire au fil du défilement. */
 function ScrollText({ text }) {
@@ -66,7 +67,7 @@ export default function Story() {
             <div key={c.label} data-reveal className="text-center md:text-left">
               <dt className="sr-only">{c.label}</dt>
               <dd>
-                <span className="block font-serif text-3xl font-semibold text-or-clair md:text-5xl">{c.valeur}</span>
+                <Counter value={c.valeur} suffix={c.suffixe} className="block font-serif text-3xl font-semibold text-or-clair md:text-5xl" />
                 <span className="mt-1 block text-xs leading-snug text-creme/60 md:text-sm">{c.label}</span>
               </dd>
             </div>
