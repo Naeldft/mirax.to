@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource/italiana';
+@import '@fontsource-variable/jost';
+
+/* Identité visuelle Atelier Lin : minimal, naturel, lumineux */
+@theme {
+  --color-ivoire: #f4f1ec;
+  --color-blanc: #fbfaf7;
+  --color-sable: #cbb9a0;
+  --color-lin: #e6ddcf;
+  --color-encre: #1f1f1f;
+  --color-gris: #6e6a64;
+  --color-sauge: #9aa58a;
+  --color-terre: #b8735a;
+  --font-display: 'Italiana', Georgia, serif;
+  --font-sans: 'Jost Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-ivoire); color: var(--color-encre); overflow-x: hidden; font-weight: 350; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.02em; }
+  ::selection { background: var(--color-sable); color: var(--color-encre); }
+  :focus-visible { outline: 1.5px solid var(--color-encre); outline-offset: 3px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-encre); color: var(--color-ivoire); padding: 0.6rem 1rem; }
+  .skip-link:focus { top: 1rem; }
+  .btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; min-height: 3.1rem; padding: 0.8rem 1.8rem;
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; overflow: hidden; transition: color 0.45s ease, background-color 0.45s;
+  }
+  /* micro-animation : le libellé glisse vers le haut et revient */
+  .btn span { position: relative; display: inline-block; transition: transform 0.45s cubic-bezier(0.7, 0, 0.2, 1); }
+  .btn:hover span { transform: translateY(-3em); }
+  .btn span::after { content: attr(data-t); position: absolute; left: 0; top: 3em; white-space: nowrap; }
+  .btn-encre { background: var(--color-encre); color: var(--color-ivoire); }
+  .btn-encre:hover { background: #3a3733; }
+  .btn-ligne { box-shadow: inset 0 0 0 1px var(--color-encre); }
+  .btn-ligne:hover { background: var(--color-encre); color: var(--color-ivoire); }
+  .etiquette { font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--color-gris); }
+  .section { padding: 5.5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 8rem 2rem; } }
+  .field { width: 100%; min-height: 3rem; background: var(--color-blanc); border: 1px solid var(--color-lin); padding: 0.65rem 0.9rem; font-size: 1rem; color: var(--color-encre); }
+  .field:focus { outline: none; border-color: var(--color-encre); }
+  .field[aria-invalid='true'] { border-color: #b3261e; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
