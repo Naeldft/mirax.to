@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource-variable/cormorant-garamond';
+@import '@fontsource-variable/cormorant-garamond/wght-italic.css';
+@import '@fontsource-variable/outfit';
+@import '@fontsource/caveat/600.css';
+
+/* Identité visuelle Maison Levain : papier, croûte, blé, ardoise */
+@theme {
+  --color-papier: #f5ecdc;
+  --color-farine: #fbf6ec;
+  --color-mie: #ead9bc;
+  --color-croute: #7a4a24;
+  --color-dore: #c98a3e;
+  --color-ble: #d9a441;
+  --color-encre: #2b1d12;
+  --color-ardoise: #23302a;
+  --font-serif: 'Cormorant Garamond Variable', Georgia, serif;
+  --font-sans: 'Outfit Variable', system-ui, sans-serif;
+  --font-craie: 'Caveat', cursive;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-papier); color: var(--color-encre); overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.01em; }
+  ::selection { background: var(--color-ble); color: var(--color-encre); }
+  :focus-visible { outline: 2px solid var(--color-croute); outline-offset: 3px; border-radius: 6px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-croute); color: var(--color-farine); padding: 0.6rem 1rem; border-radius: 999px; }
+  .skip-link:focus { top: 1rem; }
+  /* grain de papier */
+  .papier { background-image: radial-gradient(rgb(122 74 36 / 0.06) 1px, transparent 1px); background-size: 6px 6px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.1rem; padding: 0.8rem 1.6rem;
+    border-radius: 999px; font-weight: 600; transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1), background-color 0.25s, box-shadow 0.25s;
+  }
+  /* micro-animation : le bouton "lève" comme une pâte */
+  .btn:hover { transform: translateY(-3px) scale(1.03); }
+  .btn:active { transform: scale(0.96); }
+  .btn-croute { background: var(--color-croute); color: var(--color-farine); box-shadow: 0 10px 24px -12px rgb(122 74 36 / 0.8); }
+  .btn-croute:hover { background: #8f5a2e; }
+  .btn-ligne { box-shadow: inset 0 0 0 1.5px var(--color-croute); color: var(--color-croute); }
+  .surtitre { font-size: 0.75rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--color-dore); font-weight: 600; }
+  .craie { font-family: var(--font-craie); }
+  .section { padding: 5.5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 8rem 2rem; } }
+  .field { width: 100%; min-height: 3rem; border-radius: 14px; background: var(--color-farine); border: 1.5px solid var(--color-mie); padding: 0.65rem 0.9rem; font-size: 1rem; color: var(--color-encre); }
+  .field:focus { outline: none; border-color: var(--color-dore); }
+  .field[aria-invalid='true'] { border-color: #b3261e; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

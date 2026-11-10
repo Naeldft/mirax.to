@@ -12,7 +12,10 @@ import { pointer, usePointer } from '@demos/shared/hooks/usePointer.js';
 ------------------------------------------------------------------- */
 
 const clamp01 = (t) => Math.min(1, Math.max(0, t));
-const smooth = (t) => t * t * (3 - 2 * clamp01(t));
+const smooth = (t) => {
+  const x = clamp01(t);
+  return x * x * (3 - 2 * x);
+};
 const rnd = (i) => {
   const x = Math.sin(i * 45.17 + 3.3) * 43758.5453;
   return x - Math.floor(x);
