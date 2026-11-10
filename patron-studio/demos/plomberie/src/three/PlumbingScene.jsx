@@ -416,7 +416,7 @@ function Rig({ progress, reduced, quality }) {
     rig.current.rotation.x = 0.12 + t.y * 0.12;
     rig.current.position.y = viewport.width < 5 ? 0.15 : 0;
     // grand écran : la scène se décale à droite pour laisser le texte à gauche
-    rig.current.position.x = viewport.width > 7 ? Math.min(2.2, (viewport.width - 7) * 0.5 + 1) : 0;
+    rig.current.position.x = viewport.width > 7 ? Math.min(0.9, (viewport.width - 7) * 0.3 + 0.35) : 0;
     camera.position.z = 8 - smooth(p) * 0.8;
     camera.lookAt(0, 0.1, 0);
   });

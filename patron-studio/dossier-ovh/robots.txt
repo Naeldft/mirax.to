@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /espace-client.html
+
+Sitemap: https://xn--patrn-studio-hib.fr/sitemap.xml

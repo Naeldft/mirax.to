@@ -1,4 +1,4 @@
-/* Patrôn Studio — envoi des demandes et des maquettes via Web3Forms (POST https://api.web3forms.com/submit).
+/* Patrôn Studio — envoi des demandes (contact, devis, rappel, partenaires) via Web3Forms (POST https://api.web3forms.com/submit).
    - Une seule fenêtre d’envoi pour tout le site : boutons « Nous écrire », maquettes, flyers, estimation, partenaires.
    - Le résumé complet du brouillon (générateur ou atelier) est joint au message.
    - Réussite affichée UNIQUEMENT si Web3Forms répond { success: true }. Sinon : erreur honnête + lien mailto de secours.
@@ -14,7 +14,9 @@
     contact: { subject: SUBJECT, title: 'Écrire au studio', intro: 'Une question, un projet ? Laissez-nous un moyen de vous recontacter.' },
     question: { subject: SUBJECT + ' — question', title: 'Une question ?', intro: 'Posez-la ici, nous vous répondons rapidement.' },
     maquette: { subject: SUBJECT + ' — maquette', title: 'Envoyer votre maquette au studio', intro: 'Votre maquette part avec toutes vos réponses. Laissez-nous un moyen de vous recontacter.' },
-    partenaire: { subject: SUBJECT + ' — candidature partenaire', title: 'Devenir partenaire', intro: '' }
+    partenaire: { subject: SUBJECT + ' — candidature partenaire', title: 'Devenir partenaire', intro: '' },
+    devis: { subject: SUBJECT + ' — demande de devis', title: 'Demander un devis gratuit', intro: 'Parlez-nous de votre activité et de votre projet : nous revenons vers vous avec un devis clair, sans engagement.' },
+    appel: { subject: SUBJECT + ' — demande de rappel', title: 'Être rappelé', intro: 'Laissez votre numéro et le meilleur moment pour vous joindre : nous vous rappelons.' }
   };
 
   /* Résumé du brouillon (générateur ou atelier) ajouté aux e-mails « Nous écrire ». */
@@ -29,6 +31,7 @@
     brief: { audience: 'Public visé', offer: 'Prestations ou produits', difference: 'Ce qui me distingue', phone: 'Téléphone', email: 'E-mail', website: 'Site ou lien', address: 'Adresse ou zone', hours: 'Horaires', budget: 'Budget', deadline: 'Date souhaitée', references: 'Références appréciées', constraints: 'Contraintes et fonctions', contents: 'Contenus disponibles' }
   };
   function readDraft() {
+    return null; // générateur et atelier retirés : plus de brouillon de maquette à joindre
     var best = null;
     ['patron-generator-v1', 'patron-atelier-v1'].forEach(function (k) {
       try { var d = JSON.parse(localStorage.getItem('export:' + k) || 'null'); if (d && d.answers && Date.now() - d.at < 7 * 864e5 && (!best || d.at > best.at)) best = d; } catch (e) {}
@@ -120,6 +123,17 @@
   }
 
   function el(form, n) { return form.elements.namedItem(n); }
+  /* Pré-remplit le message quand on arrive d’une démo (« Je veux un site comme ça ») ou d’une offre. */
+  var DEMOS = { restauration: 'Forno Vivo (restauration)', plomberie: 'Ondine Plomberie (plomberie)', 'location-voitures': 'Velocità Location (location de voitures)', btp: 'Bâti Nord (BTP)' };
+  var OFFRES = { express: 'le site vitrine à 80 €', essentiel: 'l’abonnement Essentiel à 30 € par mois', surmesure: 'l’abonnement Essentiel à 30 € par mois', complet: 'l’abonnement Complet à 40 € par mois' };
+  function prefillMessage(form, params) {
+    var m = el(form, 'message'); if (!m || !params || m.value) return;
+    var demo = params.get('demo'), offre = params.get('offre'), lines = [];
+    if (demo && DEMOS[demo]) lines.push('Bonjour, j’ai vu le site démo ' + DEMOS[demo] + ' et je voudrais un site comme ça pour mon activité.');
+    else if (demo === 'autre') lines.push('Bonjour, mon métier n’est pas encore dans vos démos. Mon activité : ');
+    if (offre && OFFRES[offre]) lines.push('Je suis intéressé par ' + OFFRES[offre] + '.');
+    if (lines.length) m.value = lines.join('\n') + '\n';
+  }
   function wire(form, topic, onDone) {
     var t = TOPICS[topic] || TOPICS.contact;
     var status = form.querySelector('.psf-status');
@@ -180,6 +194,7 @@
     document.body.appendChild(d);
     var form = d.querySelector('form');
     var pre = prefillContact(); if (pre) el(form, 'contact').value = pre;
+    prefillMessage(form, opts.params);
     wire(form, withDraft ? 'maquette' : topic);
     d.querySelector('.psf-close').addEventListener('click', function () { d.close(); });
     d.addEventListener('close', function () { d.remove(); });
@@ -200,7 +215,7 @@
     var url; try { url = new URL(a.getAttribute('href'), location.href); } catch (er) { return; }
     if (url.origin !== location.origin || !/\/contact\.html$/.test(url.pathname) || /\/contact\.html$/.test(location.pathname)) return;
     e.preventDefault();
-    open({ topic: url.searchParams.get('sujet') || 'contact' });
+    open({ topic: url.searchParams.get('sujet') || 'contact', params: url.searchParams });
   });
 
   /* Page contact.html : le formulaire HTML (qui marche sans JS) est amélioré en envoi sans rechargement. */
@@ -214,6 +229,7 @@
     form.className = 'psf-form psf-page'; form.noValidate = true;
     form.innerHTML = formHtml(TOPICS[topic] || TOPICS.contact, withDraft, sum);
     host.replaceWith(form);
+    prefillMessage(form, new URLSearchParams(location.search));
     wire(form, withDraft ? 'maquette' : topic);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhancePage); else enhancePage();
