@@ -227,3 +227,17 @@ input[type=checkbox]{accent-color:var(--accent)}
 .goal-choices .choice:not(.selected) .choice-check{background:var(--bg)!important;border:2px solid var(--line)!important}
 .tool-estimate .estimate-quote{display:block;margin-top:6px;font-size:.9rem}
 @media (max-width:640px){.chat-container{display:none}}
+
+/* Pages métiers : carte vers le site démo correspondant (remplace l'ancienne maquette illustrative) */
+.demo-teaser{display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.demo-teaser-art{position:relative;display:grid;place-items:center;aspect-ratio:16/10;background:radial-gradient(110% 90% at 70% 110%,var(--d2) 0%,transparent 60%),linear-gradient(140deg,var(--d1),color-mix(in srgb,var(--d1) 70%,var(--d2)))}
+.demo-teaser-art svg{width:34%;max-width:150px;filter:drop-shadow(0 10px 18px rgb(0 0 0/.3));transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.demo-teaser-art b{position:absolute;top:12px;right:12px;padding:3px 10px;border-radius:20px;background:var(--d3);color:var(--d1);font-size:.72rem;letter-spacing:.08em}
+.demo-teaser-txt{display:flex;flex-direction:column;gap:6px;padding:18px 20px 22px}
+.demo-teaser-txt strong{font-size:1.4rem}
+.demo-teaser-txt span{color:var(--muted);line-height:1.5}
+.demo-teaser-txt .demo-teaser-go{color:inherit;font-weight:600;margin-top:4px}
+.demo-teaser:hover{transform:translateY(-5px);box-shadow:0 24px 50px -28px rgb(0 0 0/.45)}
+.demo-teaser:hover .demo-teaser-art svg{transform:scale(1.12) rotate(-6deg)}
+.demo-teaser:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+@media (prefers-reduced-motion:reduce){.demo-teaser,.demo-teaser-art svg{transition:none}.demo-teaser:hover{transform:none}}

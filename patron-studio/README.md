@@ -9,7 +9,13 @@ patron-studio/
 │   ├── restauration/         ← Forno Vivo (pizza 3D)
 │   ├── plomberie/            ← Ondine Plomberie (tuyauterie et eau en 3D)
 │   ├── location-voitures/    ← Velocità Location (voiture 3D configurable)
-│   └── btp/                  ← Bâti Nord Construction (maison qui se construit)
+│   ├── btp/                  ← Bâti Nord Construction (maison qui se construit)
+│   ├── coiffure/             ← Atelier Mèche (ciseaux 3D, réservation de créneau)
+│   ├── boulangerie/          ← Maison Levain (pain qui lève et dore, commande à retirer)
+│   ├── coach/                ← Pulse Coaching (kettlebell et battements de cœur, séance d'essai)
+│   ├── boutique/             ← Atelier Lin (chemise au vent, panier et commande)
+│   ├── photographe/          ← Lumen Studio (appareil photo, portfolio, réservation)
+│   └── association/          ← Les Racines (arbre qui pousse, agenda, bénévolat, dons, adhésion)
 ├── construire-dossier-ovh.sh ← compile les démos et assemble le dossier à envoyer
 └── dossier-ovh/              ← RÉSULTAT : à envoyer tel quel par FTP dans « www/ »
 ```
@@ -43,7 +49,7 @@ nom, slogan, téléphone, services et tarifs, avis, FAQ, horaires, zone… Les c
 `src/index.css`. Pour un vrai client, retirez `<DemoFooter />` dans `src/App.jsx` et changez la base dans
 `vite.config.js` (`base: '/'` pour un site à la racine d'un domaine).
 
-Les formulaires (devis, réservation) valident les champs mais n'envoient rien : branchez l'envoi dans la
+Les formulaires (devis, réservation, commande, dons…) valident les champs mais n'envoient rien et n'encaissent rien : branchez l'envoi dans la
 fonction `submit` du composant (Formspree, Web3Forms, e-mail…).
 
 ## Ajouter une démo (vagues suivantes)
@@ -52,3 +58,6 @@ fonction `submit` du composant (Formspree, Web3Forms, e-mail…).
 2. L'ajouter à `workspaces` dans `demos/package.json` et à la liste `DEMOS` de `construire-dossier-ovh.sh`.
 3. Ajouter sa carte dans la section `#futur-site` de `site/index.html` (et ses textes traduits dans `site/accueil.js`),
    puis son nom dans `DEMOS` de `site/contact-form.js` (message pré-rempli du devis) et dans `site/sitemap.xml`.
+
+Les « photos » du portfolio du photographe sont des illustrations dessinées en code (`photographe/src/components/Photo.jsx`) :
+remplacez-les par de vraies photos pour un client.
