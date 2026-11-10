@@ -1,0 +1,34 @@
+/* Formulaire d’envoi au studio (fenêtre et page contact.html). Couleurs autonomes : lisible sur pages claires et sombres. */
+.psf-dialog{width:min(540px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:0;border:0;border-radius:22px;background:#fbfbf6;color:#1f2a23;box-shadow:0 30px 90px #0006;font-family:Studio,Arial,sans-serif}
+.psf-dialog::backdrop{background:#0d1610b3}
+.psf-dialog .psf-form{padding:22px 22px 24px}
+.psf-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.psf-kicker{margin:0;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#315c43}
+.psf-close{width:44px;height:44px;border:1px solid #d8ddd3;border-radius:50%;background:#fff;color:#1f2a23;font-size:24px;line-height:1;cursor:pointer}
+.psf-dialog h2{margin:10px 0 8px;font-size:clamp(1.5rem,6vw,1.9rem);line-height:1.15;letter-spacing:-.03em;font-weight:600}
+.psf-intro{margin:0 0 18px;color:#4f5b53;font-size:16px;line-height:1.5}
+.psf-fields{display:grid;gap:14px}
+.psf-field{display:grid;gap:6px;font-size:15px;font-weight:600;color:#1f2a23}
+.psf-field input,.psf-field textarea{width:100%;box-sizing:border-box;min-height:48px;padding:12px 14px;border:1.5px solid #c9d0c5;border-radius:12px;background:#fff;color:#1f2a23;font:inherit;font-size:16px;font-weight:400}
+.psf-field textarea{min-height:110px;resize:vertical}
+.psf-field input:focus-visible,.psf-field textarea:focus-visible,.psf-check input:focus-visible,.psf-submit:focus-visible,.psf-close:focus-visible,.psf-draft summary:focus-visible{outline:3px solid #315c43;outline-offset:2px}
+.psf-check{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 12px;border:1.5px solid #315c43;border-radius:12px;background:#e8f0df;font-size:15px;font-weight:600;cursor:pointer}
+.psf-check input{width:22px;height:22px;margin:0;accent-color:#315c43;flex:none}
+.psf-draft summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:15px;color:#315c43;font-weight:600}
+.psf-draft pre{margin:6px 0 0;padding:12px;max-height:220px;overflow:auto;white-space:pre-wrap;word-break:break-word;background:#f0f2ea;border-radius:10px;font:14px/1.5 Studio,Arial,sans-serif;color:#1f2a23}
+.psf-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+.psf-note{margin:14px 0 0;font-size:14px;color:#5b665e}
+.psf-note a{color:#315c43}
+.psf-status{margin:12px 0 0;font-size:15px;line-height:1.5}
+.psf-status:empty{display:none}
+.psf-status.psf-ok{padding:14px;border-radius:12px;background:#e3efd6;color:#1d3a27;border:1.5px solid #315c43}
+.psf-status.psf-err{padding:14px;border-radius:12px;background:#fbe9e6;color:#6d1f14;border:1.5px solid #b3412c}
+.psf-status.psf-err a{color:#6d1f14;font-weight:600}
+.psf-actions{margin-top:16px}
+.psf-submit{width:100%;min-height:52px;border:0;border-radius:40px;background:#1f3a2b;color:#fff;font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+.psf-submit[disabled]{opacity:.7;cursor:wait}
+.psf-sent .psf-submit{background:#315c43;cursor:default}
+.psf-sent .psf-fields{opacity:.6;pointer-events:none}
+/* Page contact.html */
+.psf-page{max-width:560px;margin:0 auto;padding:22px;border-radius:22px;background:#fbfbf6;color:#1f2a23;border:1px solid #dfe3da}
+@media (max-width:420px){.psf-dialog .psf-form{padding:18px 16px 20px}.psf-page{padding:18px 14px}}

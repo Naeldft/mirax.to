@@ -1,0 +1,18 @@
+PHOTOS DE L’ACCUEIL (facultatif)
+
+Par défaut, l’écran de l’accueil affiche des illustrations dessinées (assets/illustrations/).
+Vous pouvez les remplacer par vos propres photos (Unsplash, Pexels… téléchargées par vous, sans personne reconnaissable sans autorisation).
+
+Fichiers attendus dans ce dossier (format WebP, 1200 × 1200 px, carré, moins de 200 Ko chacun) :
+  boulangerie.webp
+  coiffeur.webp
+  plombier.webp
+  coach.webp
+  boutique.webp
+  restaurant.webp
+  association.webp
+  photographe.webp
+
+Puis, dans export-config.js, indiquez les métiers dont la photo est présente, par exemple :
+  photos: ["boulangerie", "coiffeur"]
+Les métiers non listés gardent leur illustration (aucune image manquante, aucune erreur 404).
