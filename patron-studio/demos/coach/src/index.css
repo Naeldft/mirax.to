@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource/anton';
+@import '@fontsource-variable/inter';
+
+/* Identité visuelle Pulse Coaching : noir, vert acide, énergie */
+@theme {
+  --color-noir: #0b0b0c;
+  --color-graphite: #151517;
+  --color-acier: #232327;
+  --color-acide: #c6ff3d;
+  --color-blanc: #f4f4f1;
+  --color-gris: #8c8c92;
+  --font-display: 'Anton', Impact, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-noir); color: var(--color-blanc); overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; }
+  ::selection { background: var(--color-acide); color: var(--color-noir); }
+  :focus-visible { outline: 2px solid var(--color-acide); outline-offset: 3px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-acide); color: var(--color-noir); padding: 0.6rem 1rem; font-weight: 800; }
+  .skip-link:focus { top: 1rem; }
+  .btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3.2rem; padding: 0.8rem 1.7rem;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; border-radius: 6px; transition: transform 0.15s ease, box-shadow 0.3s ease;
+  }
+  /* micro-animation : impulsion lumineuse au survol */
+  .btn:hover { box-shadow: 0 0 0 4px rgb(198 255 61 / 0.25), 0 0 30px rgb(198 255 61 / 0.35); }
+  .btn:active { transform: scale(0.95); }
+  .btn-acide { background: var(--color-acide); color: var(--color-noir); }
+  .btn-ligne { box-shadow: inset 0 0 0 2px var(--color-blanc); color: var(--color-blanc); }
+  .btn-ligne:hover { box-shadow: inset 0 0 0 2px var(--color-acide), 0 0 30px rgb(198 255 61 / 0.25); color: var(--color-acide); }
+  .tag { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-acide); }
+  .section { padding: 5.5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 8rem 2rem; } }
+  .field { width: 100%; min-height: 3.1rem; background: var(--color-graphite); border: 1px solid var(--color-acier); border-radius: 6px; padding: 0.7rem 0.9rem; color: var(--color-blanc); font-size: 1rem; }
+  .field:focus { outline: none; border-color: var(--color-acide); }
+  .field[aria-invalid='true'] { border-color: #ff5a4a; }
+  .contour { -webkit-text-stroke: 1.5px var(--color-blanc); color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
