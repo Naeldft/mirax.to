@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource/lilita-one';
+@import '@fontsource-variable/rubik';
+
+/* Identité visuelle Crunch! : pop, gourmand, autocollants */
+@theme {
+  --color-creme: #fff4e0;
+  --color-moutarde: #ffc93c;
+  --color-ketchup: #e63b2e;
+  --color-cornichon: #5aa04a;
+  --color-brioche: #e0862f;
+  --color-encre: #1a1714;
+  --color-gris: #6b5f55;
+  --font-display: 'Lilita One', 'Arial Black', sans-serif;
+  --font-sans: 'Rubik Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-creme); color: var(--color-encre); overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.01em; }
+  ::selection { background: var(--color-moutarde); color: var(--color-encre); }
+  :focus-visible { outline: 3px solid var(--color-encre); outline-offset: 3px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-encre); color: var(--color-moutarde); padding: 0.6rem 1rem; border-radius: 0.5rem; }
+  .skip-link:focus { top: 1rem; }
+  /* boutons « autocollant » : bord épais et ombre décalée */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 3rem; padding: 0.7rem 1.4rem;
+    border: 3px solid var(--color-encre); border-radius: 999px; font-weight: 800; box-shadow: 4px 4px 0 var(--color-encre);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--color-encre); }
+  .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--color-encre); }
+  .btn-ketchup { background: var(--color-ketchup); color: #fff; }
+  .btn-moutarde { background: var(--color-moutarde); color: var(--color-encre); }
+  .btn-blanc { background: #fff; color: var(--color-encre); }
+  .carte-pop { border: 3px solid var(--color-encre); border-radius: 1.4rem; background: #fff; box-shadow: 5px 5px 0 var(--color-encre); }
+  .sticker { display: inline-flex; align-items: center; gap: 0.3rem; border: 2px solid var(--color-encre); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.75rem; font-weight: 800; }
+  .section { padding: 5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 7rem 2rem; } }
+  .field { width: 100%; min-height: 3rem; border: 3px solid var(--color-encre); border-radius: 0.9rem; background: #fff; padding: 0.55rem 0.9rem; font-size: 1rem; }
+  .field:focus { outline: none; box-shadow: 3px 3px 0 var(--color-moutarde); }
+  .field[aria-invalid='true'] { border-color: var(--color-ketchup); }
+  .defile { display: flex; width: max-content; animation: defile 22s linear infinite; }
+}
+
+@keyframes defile { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .defile { animation: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
