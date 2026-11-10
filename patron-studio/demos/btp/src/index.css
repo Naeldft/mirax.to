@@ -1,0 +1,68 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource/archivo-black';
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/500.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow/700.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+
+/* Identité visuelle Bâti Nord Construction (thème clair, chantier) */
+@theme {
+  --color-beton: #eceae4;
+  --color-beton-2: #e1ded6;
+  --color-papier: #f7f6f2;
+  --color-anthracite: #1d1d1b;
+  --color-graphite: #4a4a46;
+  --color-chantier: #f2b705;
+  --color-plan: #2b59c3;
+  --font-display: 'Archivo Black', system-ui, sans-serif;
+  --font-sans: 'Barlow', system-ui, sans-serif;
+  --font-cond: 'Barlow Condensed', system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-beton); color: var(--color-anthracite); overflow-x: hidden; font-size: 1.05rem; }
+  h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: -0.01em; }
+  ::selection { background: var(--color-chantier); color: var(--color-anthracite); }
+  :focus-visible { outline: 3px solid var(--color-plan); outline-offset: 3px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-chantier); color: var(--color-anthracite); padding: 0.6rem 1rem; font-weight: 700; }
+  .skip-link:focus { top: 1rem; }
+  .hachures { background-image: repeating-linear-gradient(-45deg, var(--color-chantier) 0 18px, var(--color-anthracite) 18px 36px); }
+  .quadrillage {
+    background-image: linear-gradient(rgb(43 89 195 / 0.08) 1px, transparent 1px), linear-gradient(90deg, rgb(43 89 195 / 0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+    min-height: 3.2rem; padding: 0.85rem 1.6rem; font-family: var(--font-cond); font-weight: 700; font-size: 1.1rem;
+    text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--color-anthracite);
+    box-shadow: 5px 5px 0 var(--color-anthracite); transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s;
+  }
+  /* micro-animation : le bouton s'enfonce comme un bloc */
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--color-anthracite); }
+  .btn:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--color-anthracite); }
+  .btn-jaune { background: var(--color-chantier); color: var(--color-anthracite); }
+  .btn-noir { background: var(--color-anthracite); color: var(--color-papier); box-shadow: 5px 5px 0 var(--color-chantier); }
+  .btn-noir:hover { box-shadow: 7px 7px 0 var(--color-chantier); }
+  .btn-blanc { background: var(--color-papier); color: var(--color-anthracite); }
+  .etiquette { font-family: var(--font-cond); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-plan); }
+  .section { padding: 5.5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 8rem 2rem; } }
+  .field {
+    width: 100%; min-height: 3.2rem; background: var(--color-papier); border: 2px solid var(--color-anthracite);
+    padding: 0.7rem 0.9rem; color: var(--color-anthracite); font-size: 1rem;
+  }
+  .field:focus { outline: none; box-shadow: 4px 4px 0 var(--color-chantier); }
+  .field[aria-invalid='true'] { border-color: #c0392b; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
