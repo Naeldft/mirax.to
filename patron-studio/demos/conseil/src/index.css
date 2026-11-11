@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+@source '../../shared/src';
+@import '@fontsource/instrument-serif';
+@import '@fontsource/instrument-serif/400-italic.css';
+@import '@fontsource-variable/geist';
+
+/* Identité visuelle Cap Horizon : éditorial, sobre, précis */
+@theme {
+  --color-papier: #f4f2ec;
+  --color-blanc: #fbfaf7;
+  --color-nuit: #0f1b2d;
+  --color-cobalt: #3d6bff;
+  --color-ciel: #c9d6ff;
+  --color-trait: #dcd8ce;
+  --color-gris: #5f6672;
+  --color-vert: #1f9d6b;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-sans); background: var(--color-papier); color: var(--color-nuit); overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; }
+  ::selection { background: var(--color-ciel); color: var(--color-nuit); }
+  :focus-visible { outline: 2px solid var(--color-cobalt); outline-offset: 3px; }
+}
+
+@layer components {
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-nuit); color: var(--color-papier); padding: 0.6rem 1rem; }
+  .skip-link:focus { top: 1rem; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; min-height: 3rem; padding: 0.75rem 1.4rem; border-radius: 0.6rem;
+    font-weight: 500; transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .btn .fleche { transition: transform 0.3s; }
+  .btn:hover .fleche { transform: translateX(4px); }
+  .btn-nuit { background: var(--color-nuit); color: var(--color-papier); }
+  .btn-nuit:hover { background: #1c2c46; }
+  .btn-cobalt { background: var(--color-cobalt); color: #fff; }
+  .btn-cobalt:hover { background: #2b56e6; }
+  .btn-ligne { box-shadow: inset 0 0 0 1px var(--color-nuit); }
+  .btn-ligne:hover { background: var(--color-nuit); color: var(--color-papier); }
+  .etiquette { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-gris); }
+  .section { padding: 5.5rem 1.25rem; }
+  @media (min-width: 768px) { .section { padding: 8rem 2rem; } }
+  .field { width: 100%; min-height: 3rem; border-radius: 0.6rem; background: var(--color-blanc); border: 1px solid var(--color-trait); padding: 0.6rem 0.9rem; font-size: 1rem; }
+  .field:focus { outline: none; border-color: var(--color-cobalt); box-shadow: 0 0 0 3px rgb(61 107 255 / 0.15); }
+  .field[aria-invalid='true'] { border-color: #c2412d; }
+  /* curseurs du diagnostic */
+  .curseur { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 999px; background: linear-gradient(to right, var(--color-cobalt) var(--p, 50%), var(--color-trait) var(--p, 50%)); }
+  .curseur::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 2px solid var(--color-cobalt); box-shadow: 0 2px 6px rgb(15 27 45 / 0.2); cursor: grab; }
+  .curseur::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2px solid var(--color-cobalt); cursor: grab; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
