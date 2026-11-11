@@ -15,7 +15,9 @@ patron-studio/
 │   ├── coach/                ← Pulse Coaching (kettlebell et battements de cœur, séance d'essai)
 │   ├── boutique/             ← Atelier Lin (chemise au vent, panier et commande)
 │   ├── photographe/          ← Lumen Studio (appareil photo, portfolio, réservation)
-│   └── association/          ← Les Racines (arbre qui pousse, agenda, bénévolat, dons, adhésion)
+│   ├── association/          ← Les Racines (arbre qui pousse, agenda, bénévolat, dons, adhésion)
+│   ├── snack/                ← Crunch! (burger qui s'assemble, carte filtrable, click & collect, allergènes)
+│   └── conseil/              ← Cap Horizon (croissance et boussole, diagnostic express, rendez-vous)
 ├── construire-dossier-ovh.sh ← compile les démos et assemble le dossier à envoyer
 └── dossier-ovh/              ← RÉSULTAT : à envoyer tel quel par FTP dans « www/ »
 ```

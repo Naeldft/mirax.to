@@ -124,7 +124,7 @@
 
   function el(form, n) { return form.elements.namedItem(n); }
   /* Pré-remplit le message quand on arrive d’une démo (« Je veux un site comme ça ») ou d’une offre. */
-  var DEMOS = { restauration: 'Forno Vivo (restauration)', plomberie: 'Ondine Plomberie (plomberie)', 'location-voitures': 'Velocità Location (location de voitures)', btp: 'Bâti Nord (BTP)', coiffure: 'Atelier Mèche (coiffure)', boulangerie: 'Maison Levain (boulangerie)', coach: 'Pulse Coaching (coach sportif)', boutique: 'Atelier Lin (boutique)', photographe: 'Lumen Studio (photographe)', association: 'Les Racines (association)' };
+  var DEMOS = { restauration: 'Forno Vivo (restauration)', plomberie: 'Ondine Plomberie (plomberie)', 'location-voitures': 'Velocità Location (location de voitures)', btp: 'Bâti Nord (BTP)', coiffure: 'Atelier Mèche (coiffure)', boulangerie: 'Maison Levain (boulangerie)', coach: 'Pulse Coaching (coach sportif)', boutique: 'Atelier Lin (boutique)', photographe: 'Lumen Studio (photographe)', association: 'Les Racines (association)', snack: 'Crunch! (snack)', conseil: 'Cap Horizon (conseil)' };
   var OFFRES = { express: 'le site vitrine à 80 €', essentiel: 'l’abonnement Essentiel à 30 € par mois', surmesure: 'l’abonnement Essentiel à 30 € par mois', complet: 'l’abonnement Complet à 40 € par mois' };
   function prefillMessage(form, params) {
     var m = el(form, 'message'); if (!m || !params || m.value) return;
