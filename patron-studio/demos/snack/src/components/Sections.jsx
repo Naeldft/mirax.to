@@ -1,27 +1,68 @@
-import { Suspense, lazy, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { formatEuros, telOk } from '@demos/shared/lib/validation.js';
-import { allergenes, avis, categories, chiffres, faq, formule, horaires, produits, snack } from '../data/site';
+import { allergenes, avis, categories, chiffres, faq, formule, horaires, photos, produits, snack } from '../data/site';
 
-const BurgerScene = lazy(() => import('../three/BurgerScene'));
+/* ----------------------------------------------------------------
+   Photo optimisée : WebP en plusieurs tailles (le navigateur choisit),
+   chargement différé, apparition en fondu une fois l'image reçue.
+   Les fichiers sont générés par scripts/optimiser-photos.mjs.
+---------------------------------------------------------------- */
+const LARGEURS = { accueil: [800, 1200, 1800, 2400], ambiance: [800, 1400], defaut: [480, 800, 1200] };
+const largeurs = (nom) => LARGEURS[nom.split('-')[0]] ?? LARGEURS.defaut;
+const url = (nom, w) => `${import.meta.env.BASE_URL}images/${nom}-${w}.webp`;
 
-function Titre({ tag, children, intro, id, couleur = 'bg-ketchup text-white' }) {
+export function Photo({ nom, alt, sizes, className = '', prioritaire = false, onLoad, imgRef, ...props }) {
+  const ref = useRef(null);
+  const [charge, setCharge] = useState(false);
+  const ws = largeurs(nom);
+  // image déjà en cache : l'événement load a pu passer avant le rendu
+  useEffect(() => {
+    if (ref.current?.complete && ref.current.naturalWidth) {
+      setCharge(true);
+      onLoad?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- au montage uniquement
+  }, []);
   return (
-    <div className="max-w-3xl">
-      <p className={`sticker -rotate-2 ${couleur}`} data-reveal>
+    <img
+      ref={(el) => {
+        ref.current = el;
+        if (imgRef) imgRef.current = el;
+      }}
+      src={url(nom, ws.includes(800) ? 800 : ws[0])}
+      srcSet={ws.map((w) => `${url(nom, w)} ${w}w`).join(', ')}
+      sizes={sizes}
+      alt={alt}
+      loading={prioritaire ? 'eager' : 'lazy'}
+      fetchPriority={prioritaire ? 'high' : 'auto'}
+      decoding="async"
+      onLoad={() => {
+        setCharge(true);
+        onLoad?.();
+      }}
+      className={`photo ${charge ? 'chargee' : ''} ${className}`}
+      {...props}
+    />
+  );
+}
+
+function Titre({ tag, children, intro, id, centre }) {
+  return (
+    <div className={`max-w-3xl ${centre ? 'mx-auto text-center' : ''}`}>
+      <p className="surtitre" data-reveal>
         {tag}
       </p>
-      <h2 id={id} className="mt-4 text-5xl leading-[0.95] md:text-7xl" data-reveal>
+      <h2 id={id} className="mt-4 text-[clamp(2.4rem,7vw,4.6rem)]" data-reveal>
         {children}
       </h2>
       {intro && (
-        <p className="mt-4 text-lg text-gris" data-reveal>
+        <p className="mt-5 text-lg leading-relaxed text-sable" data-reveal>
           {intro}
         </p>
       )}
@@ -29,95 +70,115 @@ function Titre({ tag, children, intro, id, couleur = 'bg-ketchup text-white' }) 
   );
 }
 
-const TAGS = {
-  veggie: ['🌱 Veggie', 'bg-cornichon text-white'],
-  piment: ['🌶 Piquant', 'bg-ketchup text-white'],
-  star: ['★ Best-seller', 'bg-moutarde'],
-};
+const TAGS = { veggie: 'Végétarien', piment: 'Épicé', star: 'Le plus commandé' };
 
 /* ---------------------------------------------------------------- */
 
 export function Hero({ onReady }) {
   const section = useRef(null);
-  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady });
+  const cadre = useRef(null);
+  const img = useRef(null);
+  const reduced = useReducedMotion();
   useLayoutEffect(() => {
     if (reduced) return;
     const ctx = gsap.context(() => {
-      gsap.from('[data-mot]', { scale: 0.3, rotate: -12, opacity: 0, duration: 0.7, stagger: 0.1, ease: 'back.out(2.5)', delay: 0.25 });
-      gsap.from('[data-in]', { y: 20, opacity: 0, stagger: 0.08, duration: 0.6, delay: 0.7 });
-      gsap.to('[data-badge]', { rotate: 360, duration: 14, repeat: -1, ease: 'none' });
+      // entrée : léger dézoom de la photo, puis le texte apparaît en fondu
+      gsap.fromTo(cadre.current, { scale: 1.12 }, { scale: 1, duration: 2.4, ease: 'power2.out' });
+      gsap.from('[data-in]', { opacity: 0, y: 26, duration: 1, stagger: 0.09, ease: 'power3.out', delay: 0.35 });
+      // au défilement : la photo zoome doucement et glisse moins vite que la page (parallaxe)
+      gsap.to(img.current, {
+        scale: 1.14,
+        yPercent: 7,
+        ease: 'none',
+        scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom top', scrub: true },
+      });
+      gsap.to('[data-texte]', {
+        yPercent: -12,
+        opacity: 0.15,
+        ease: 'none',
+        scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom top', scrub: true },
+      });
     }, section);
     return () => ctx.revert();
   }, [reduced]);
   return (
-    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[220svh]'}`} aria-label="Accueil">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-moutarde">
-        {/* points de trame façon affiche */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-20 [background:radial-gradient(#1a1714_1.2px,transparent_1.3px)_0_0/18px_18px]"
+    <section id="accueil" ref={section} className="relative h-[100svh] overflow-hidden bg-nuit md:min-h-[620px]" aria-label="Accueil">
+      {/* emplacement photo : photos.accueil (voir photos/LISEZ-MOI.md) */}
+      <div
+        ref={cadre}
+        className="absolute inset-x-0 top-14 mx-auto h-[46svh] w-[min(94vw,37svh)] [@media(max-height:720px)]:h-[42svh] [@media(max-height:720px)]:w-[min(94vw,34svh)] origin-center [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)] md:inset-y-0 md:left-[38%] md:right-0 md:top-0 md:mx-0 md:h-full md:w-auto md:[mask-image:none]"
+      >
+        <Photo
+          nom={photos.accueil}
+          imgRef={img}
+          prioritaire
+          onLoad={onReady}
+          sizes="(min-width: 768px) 62vw, 100vw"
+          alt="Double smash burger au cheddar fondu, pickles et pain brioché toasté, sur fond sombre"
+          width="1200"
+          height="1800"
+          className="h-full w-full object-cover object-[50%_40%] transition-opacity duration-700 md:object-[50%_60%]"
         />
-        {load3d && (
-          <Suspense fallback={null}>
-            <BurgerScene progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-moutarde via-moutarde/90 to-transparent md:hidden" />
-        <div className="pointer-events-none relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-8 md:justify-center md:px-8 md:pb-0">
-          <p data-in className="sticker self-start -rotate-2 bg-white">
-            📍 {snack.accroche}
-          </p>
-          <h1 className="mt-4 text-[clamp(3.6rem,15vw,9rem)] leading-[0.85]">
-            <span data-mot className="block">
-              Smash.
-            </span>
-            <span data-mot className="block text-ketchup [-webkit-text-stroke:3px_#1a1714] [paint-order:stroke_fill]">
-              Crunch.
-            </span>
-            <span data-mot className="block">
-              Miam.
-            </span>
-          </h1>
-          <p data-in className="mt-4 max-w-md text-lg font-medium max-md:hidden">
-            {snack.intro}
-          </p>
-          <div data-in className="pointer-events-auto mt-6 flex flex-wrap gap-3">
-            <a href="#commande" className="btn btn-ketchup">
-              Commander à emporter
-            </a>
-            <a href="#carte" className="btn btn-blanc">
-              Voir la carte
-            </a>
-          </div>
+        {/* fondus vers le noir pour la lisibilité du texte */}
+        <div className="absolute inset-0 max-md:hidden md:bg-gradient-to-r md:from-nuit md:via-nuit/30 md:to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-nuit/70 to-transparent max-md:hidden" />
+      </div>
+      {/* lueur de braise */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[120%] -translate-x-1/2 rounded-[100%] bg-braise/20 blur-3xl md:left-[65%] md:w-[60%]"
+      />
+      <div data-texte className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-24 md:justify-center md:px-8 md:pb-0">
+        <p data-in className="surtitre">
+          {snack.accroche}
+        </p>
+        <h1 className="mt-3 text-[clamp(3rem,12vw,8.2rem)] md:mt-4 [@media(max-height:600px)]:text-[2.5rem]">
+          <span data-in className="block">
+            Smash.
+          </span>
+          <span data-in className="block bg-gradient-to-r from-braise via-[#ff8a2b] to-flamme bg-clip-text pb-1 text-transparent">
+            Crunch.
+          </span>
+          <span data-in className="block">
+            Miam.
+          </span>
+        </h1>
+        <p data-in className="mt-5 max-w-md text-lg leading-relaxed text-creme/80 max-sm:hidden">
+          {snack.intro}
+        </p>
+        <div data-in className="mt-7 flex flex-wrap gap-3">
+          <a href="#commande" className="btn btn-braise px-8 text-lg">
+            Commander
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M4 10h11M11 5l5 5-5 5" />
+            </svg>
+          </a>
+          <a href="#carte" className="btn btn-ligne max-sm:hidden">
+            Voir la carte
+          </a>
         </div>
-        {/* badge rotatif « prêt en 15 min » */}
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-24 right-4 h-24 w-24 md:bottom-auto md:right-10 md:top-28 md:h-32 md:w-32">
-          <svg data-badge viewBox="0 0 100 100" className="h-full w-full">
-            <defs>
-              <path id="cercle" d="M50 50m-36 0a36 36 0 1 1 72 0a36 36 0 1 1-72 0" />
-            </defs>
-            <circle cx="50" cy="50" r="48" fill="#e63b2e" stroke="#1a1714" strokeWidth="3" />
-            <text fontFamily="Lilita One" fontSize="11.5" fill="#fff" letterSpacing="2">
-              <textPath href="#cercle">PRÊT EN 15 MIN · CLICK & COLLECT ·</textPath>
-            </text>
-          </svg>
-          <span className="absolute inset-0 flex items-center justify-center font-display text-3xl text-white md:text-4xl">15′</span>
-        </div>
+        <ul data-in className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-creme/70 max-md:[@media(max-height:720px)]:hidden">
+          <li>
+            <span className="text-flamme">★ 4,8</span> · 1 200 avis
+          </li>
+          <li>Prêt en {snack.retraitMinutes} min</li>
+          <li className="max-sm:hidden">Bœuf des Hauts-de-France</li>
+        </ul>
       </div>
     </section>
   );
 }
 
 export function Bandeau() {
-  const mots = ['Bœuf du Nord', 'Frites maison', 'Pain brioché local', 'Sauces maison', 'Veggie friendly'];
+  const mots = ['Bœuf du Nord', 'Frites maison', 'Pain brioché local', 'Sauces maison', 'Cuit à la minute'];
   return (
-    <div className="overflow-hidden border-y-[3px] border-encre bg-ketchup py-3 text-white" aria-hidden="true">
+    <div className="overflow-hidden border-y border-trait bg-charbon py-4" aria-hidden="true">
       <div className="defile">
         {[0, 1].map((k) => (
           <div key={k} className="flex shrink-0">
             {mots.map((m) => (
-              <span key={m} className="flex items-center gap-6 pr-6 font-display text-2xl">
-                {m} <span className="text-moutarde">✸</span>
+              <span key={m} className="titre flex items-center gap-8 pr-8 text-lg text-creme/60">
+                {m} <span className="h-1.5 w-1.5 rounded-full bg-braise" />
               </span>
             ))}
           </div>
@@ -134,25 +195,23 @@ export function Carte({ ajouter, quantites }) {
   const [cat, setCat] = useState('burgers');
   const [veggie, setVeggie] = useState(false);
   const [sansGluten, setSansGluten] = useState(false);
-  const reduced = useReducedMotion();
   useReveal(scope, [cat, veggie, sansGluten]);
   const filtres = veggie || sansGluten;
   const liste = produits.filter(
     (p) => (filtres || p.cat === cat) && (!veggie || p.tags.includes('veggie')) && (!sansGluten || !p.allergenes.includes('gluten')),
   );
-  const ajout = (p, e) => {
-    ajouter(p.id);
-    if (reduced) return;
-    gsap.fromTo(e.currentTarget, { scale: 0.85, rotate: -8 }, { scale: 1, rotate: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
-  };
   return (
-    <section id="carte" ref={scope} className="section bg-creme" aria-labelledby="carte-titre">
-      <div className="mx-auto max-w-6xl">
-        <Titre tag="La carte" id="carte-titre" intro="Tout est préparé à la minute. Ajoutez vos envies, la commande se remplit en dessous.">
-          Qu’est-ce qui te fait envie ?
+    <section id="carte" ref={scope} className="section bg-nuit" aria-labelledby="carte-titre">
+      <div className="mx-auto max-w-7xl">
+        <Titre
+          tag="La carte"
+          id="carte-titre"
+          intro="Tout est préparé à la minute, à la commande. Ajoutez vos envies : votre commande se remplit plus bas."
+        >
+          Faites-vous plaisir
         </Titre>
-        <div className="mt-8 flex flex-wrap items-center gap-2" data-reveal>
-          <div role="tablist" aria-label="Catégories" className="flex flex-wrap gap-2">
+        <div className="-mx-5 mt-10 flex gap-2 overflow-x-auto px-5 pb-2 md:mx-0 md:flex-wrap md:px-0" data-reveal>
+          <div role="tablist" aria-label="Catégories" className="flex shrink-0 gap-2">
             {categories.map((c) => (
               <button
                 key={c.id}
@@ -164,15 +223,15 @@ export function Carte({ ajouter, quantites }) {
                   setVeggie(false);
                   setSansGluten(false);
                 }}
-                className={`rounded-full border-[3px] border-encre px-4 py-1.5 font-extrabold transition-transform hover:-rotate-2 ${!filtres && cat === c.id ? 'bg-encre text-moutarde' : 'bg-white'}`}
+                className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${!filtres && cat === c.id ? 'bg-creme text-nuit' : 'border border-trait text-creme/75 hover:border-creme/40 hover:text-creme'}`}
               >
                 {c.nom}
               </button>
             ))}
           </div>
-          <span className="mx-1 hidden h-8 w-[3px] bg-encre sm:block" aria-hidden="true" />
+          <span className="mx-1 w-px shrink-0 bg-trait" aria-hidden="true" />
           {[
-            [veggie, setVeggie, '🌱 Veggie'],
+            [veggie, setVeggie, 'Végétarien'],
             [sansGluten, setSansGluten, 'Sans gluten'],
           ].map(([v, set, l]) => (
             <button
@@ -180,55 +239,67 @@ export function Carte({ ajouter, quantites }) {
               type="button"
               aria-pressed={v}
               onClick={() => set(!v)}
-              className={`rounded-full border-[3px] border-dashed border-encre px-4 py-1.5 font-extrabold ${v ? 'bg-cornichon text-white' : ''}`}
+              className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${v ? 'bg-braise text-nuit' : 'border border-dashed border-trait text-creme/75 hover:text-creme'}`}
             >
+              {v ? '✓ ' : ''}
               {l}
             </button>
           ))}
         </div>
         {filtres && (
-          <p className="mt-3 text-sm text-gris" aria-live="polite">
+          <p className="mt-3 text-sm text-sable" aria-live="polite">
             {liste.length} produit{liste.length > 1 ? 's' : ''} sur toute la carte
           </p>
         )}
-        <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {liste.map((p, i) => (
+        <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {liste.map((p) => (
             <li key={p.id} data-reveal className="min-w-0">
-              <article
-                className="carte-pop flex h-full flex-col p-5 transition-transform duration-200 hover:-rotate-1"
-                style={{ rotate: `${i % 2 ? 0.6 : -0.6}deg` }}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-2xl leading-tight">{p.nom}</h3>
-                  <p className="shrink-0 font-display text-2xl text-ketchup">{formatEuros(p.prix)}</p>
+              <article className="carte group flex h-full flex-col overflow-hidden transition-[box-shadow,border-color] duration-500 hover:border-braise/40 hover:shadow-[0_30px_60px_-30px_rgb(255_107_26/0.35)]">
+                <div className="relative aspect-[4/3] overflow-hidden bg-ardoise">
+                  {/* emplacement photo : produit.photo (voir photos/LISEZ-MOI.md) */}
+                  <Photo
+                    nom={p.photo}
+                    alt={`${p.nom} : ${p.desc}`}
+                    sizes="(min-width: 1024px) 31vw, (min-width: 640px) 47vw, 100vw"
+                    width="800"
+                    height="600"
+                    className="h-full w-full object-cover duration-700 group-hover:scale-[1.04]"
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-charbon/80 to-transparent" />
+                  {p.tags.length > 0 && (
+                    <p className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+                      {p.tags.map((t) => (
+                        <span key={t} className="rounded-full bg-nuit/70 px-2.5 py-1 text-[0.7rem] font-semibold backdrop-blur-md">
+                          {t === 'piment' ? '🌶 ' : t === 'veggie' ? '🌱 ' : '★ '}
+                          {TAGS[t]}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </div>
-                {p.tags.length > 0 && (
-                  <p className="mt-2 flex flex-wrap gap-1.5">
-                    {p.tags.map((t) => (
-                      <span key={t} className={`sticker ${TAGS[t][1]}`}>
-                        {TAGS[t][0]}
-                      </span>
-                    ))}
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="text-xl">{p.nom}</h3>
+                    <p className="shrink-0 text-lg font-bold text-flamme tabular-nums">{formatEuros(p.prix)}</p>
+                  </div>
+                  <p className="mt-2 flex-1 leading-relaxed text-sable">{p.desc}</p>
+                  <p className="mt-3 text-xs text-sable/70">
+                    Allergènes : {p.allergenes.length ? p.allergenes.map((a) => allergenes[a]).join(', ') : 'aucun des 14 majeurs'}
                   </p>
-                )}
-                <p className="mt-3 flex-1 text-gris">{p.desc}</p>
-                <p className="mt-3 text-xs text-gris">
-                  <span className="font-bold">Allergènes :</span>{' '}
-                  {p.allergenes.length ? p.allergenes.map((a) => allergenes[a]).join(', ') : 'aucun des 14 majeurs'}
-                </p>
-                <button
-                  type="button"
-                  onClick={(e) => ajout(p, e)}
-                  className="btn btn-moutarde mt-4 w-full"
-                  aria-label={`Ajouter ${p.nom} à la commande`}
-                >
-                  {quantites[p.id] ? `Ajouté × ${quantites[p.id]} · encore +1` : '+ Ajouter'}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => ajouter(p.id)}
+                    className={`btn mt-4 w-full !min-h-12 text-sm ${quantites[p.id] ? 'bg-creme text-nuit' : 'btn-ligne'}`}
+                    aria-label={`Ajouter ${p.nom} à la commande`}
+                  >
+                    {quantites[p.id] ? `Dans la commande · ${quantites[p.id]}  ＋` : 'Ajouter  ＋'}
+                  </button>
+                </div>
               </article>
             </li>
           ))}
         </ul>
-        {liste.length === 0 && <p className="mt-8 text-lg">Aucun produit ne correspond à ces filtres.</p>}
+        {liste.length === 0 && <p className="mt-8 text-lg text-sable">Aucun produit ne correspond à ces filtres.</p>}
       </div>
     </section>
   );
@@ -264,6 +335,30 @@ const valider = (v) => {
   return e;
 };
 
+const Stepper = ({ moins, plus, valeur, nom }) => (
+  <div className="flex items-center gap-1">
+    <button
+      type="button"
+      onClick={moins}
+      className="h-9 w-9 rounded-full border border-trait text-lg transition-colors hover:border-creme/50"
+      aria-label={`Un ${nom} de moins`}
+    >
+      −
+    </button>
+    <span className="w-7 text-center font-semibold tabular-nums" aria-live="polite">
+      {valeur}
+    </span>
+    <button
+      type="button"
+      onClick={plus}
+      className="h-9 w-9 rounded-full bg-creme text-lg text-nuit transition-colors hover:bg-white"
+      aria-label={`Un ${nom} de plus`}
+    >
+      +
+    </button>
+  </div>
+);
+
 export function Commande({ lignes, setQte, menus, setMenus, vider }) {
   const scope = useRef(null);
   const [ok, setOk] = useState(null);
@@ -281,110 +376,93 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
   const total = sousTotal + frais;
   const tropPeu = v.mode === 'livraison' && sousTotal < liv.minimum;
   return (
-    <section id="commande" ref={scope} className="section bg-cornichon/15" aria-labelledby="cmd-titre">
-      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.1fr]">
-        <div>
+    <section id="commande" ref={scope} className="section relative bg-charbon" aria-labelledby="cmd-titre">
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1.1fr]">
+        <div className="min-w-0">
           <Titre
             tag="Click & collect"
             id="cmd-titre"
-            couleur="bg-cornichon text-white"
-            intro={`Commandez maintenant, récupérez dans ${snack.retraitMinutes} minutes. Ou faites-vous livrer dans tout Lille.`}
+            intro={`Commandez maintenant, récupérez en ${snack.retraitMinutes} minutes. Ou faites-vous livrer dans tout Lille.`}
           >
-            Ta commande
+            Votre commande
           </Titre>
-          <div className="carte-pop mt-8 p-5" data-reveal>
+          <div className="relative mt-8 hidden aspect-[16/10] overflow-hidden rounded-2xl lg:block" data-reveal>
+            {/* emplacement photo : photos.commande */}
+            <Photo
+              nom={photos.commande}
+              alt="Smash burger et frites maison sur une planche"
+              sizes="40vw"
+              width="1400"
+              height="875"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="carte mt-6 p-5" data-reveal>
             {lignes.length === 0 ? (
-              <p className="py-6 text-center text-gris">
-                Rien pour l’instant…{' '}
-                <a href="#carte" className="font-bold text-ketchup underline">
-                  Choisis dans la carte
-                </a>{' '}
-                🍔
+              <p className="py-6 text-center text-sable">
+                Votre commande est vide.{' '}
+                <a href="#carte" className="font-semibold text-flamme underline underline-offset-4">
+                  Choisir dans la carte
+                </a>
               </p>
             ) : (
-              <ul className="divide-y-2 divide-dashed divide-encre/20">
+              <ul className="divide-y divide-trait">
                 {lignes.map(({ p, q }) => (
                   <li key={p.id} className="flex items-center gap-3 py-3">
+                    <Photo
+                      nom={p.photo}
+                      alt=""
+                      sizes="56px"
+                      width="56"
+                      height="42"
+                      className="h-11 w-14 shrink-0 rounded-lg object-cover"
+                    />
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold">{p.nom}</p>
-                      <p className="text-sm text-gris">{formatEuros(p.prix)}</p>
+                      <p className="truncate font-semibold">{p.nom}</p>
+                      <p className="text-sm text-sable">{formatEuros(p.prix)}</p>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setQte(p.id, q - 1)}
-                        className="h-9 w-9 rounded-full border-[3px] border-encre font-black"
-                        aria-label={`Retirer un ${p.nom}`}
-                      >
-                        −
-                      </button>
-                      <span className="w-7 text-center font-bold tabular-nums">{q}</span>
-                      <button
-                        type="button"
-                        onClick={() => setQte(p.id, q + 1)}
-                        className="h-9 w-9 rounded-full border-[3px] border-encre bg-moutarde font-black"
-                        aria-label={`Ajouter un ${p.nom}`}
-                      >
-                        +
-                      </button>
-                    </div>
+                    <Stepper moins={() => setQte(p.id, q - 1)} plus={() => setQte(p.id, q + 1)} valeur={q} nom={p.nom} />
                   </li>
                 ))}
               </ul>
             )}
             {burgers.length > 0 && (
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-moutarde/40 p-3">
+              <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-braise/30 bg-braise/10 p-3">
                 <p className="text-sm">
-                  <span className="font-bold">{formule.texte}</span> (+{formatEuros(formule.supplement)})
+                  <span className="font-semibold">{formule.texte}</span>{' '}
+                  <span className="text-sable">(+{formatEuros(formule.supplement)})</span>
                 </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setMenus(Math.max(0, menus - 1))}
-                    className="h-9 w-9 rounded-full border-[3px] border-encre bg-white font-black"
-                    aria-label="Un menu de moins"
-                  >
-                    −
-                  </button>
-                  <span className="w-7 text-center font-bold tabular-nums" aria-live="polite">
-                    {menus}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setMenus(
-                        Math.min(
-                          burgers.reduce((s, l) => s + l.q, 0),
-                          menus + 1,
-                        ),
-                      )
-                    }
-                    className="h-9 w-9 rounded-full border-[3px] border-encre bg-white font-black"
-                    aria-label="Un menu de plus"
-                  >
-                    +
-                  </button>
-                </div>
+                <Stepper
+                  moins={() => setMenus(Math.max(0, menus - 1))}
+                  plus={() =>
+                    setMenus(
+                      Math.min(
+                        burgers.reduce((s, l) => s + l.q, 0),
+                        menus + 1,
+                      ),
+                    )
+                  }
+                  valeur={menus}
+                  nom="menu"
+                />
               </div>
             )}
           </div>
         </div>
-        <div data-reveal className="carte-pop min-w-0 p-5 md:p-7">
+        <div data-reveal className="carte min-w-0 self-start p-5 md:p-7">
           {ok ? (
             <div role="status" className="py-8 text-center">
-              <p className="inline-block -rotate-3 rounded-2xl border-[3px] border-encre bg-moutarde px-5 py-3 font-display text-5xl">
-                n° {ok.numero}
-              </p>
-              <p className="mt-5 font-display text-3xl">Merci {ok.prenom} !</p>
-              <p className="mx-auto mt-3 max-w-sm text-gris">
+              <p className="surtitre">Commande n° {ok.numero}</p>
+              <p className="titre mt-4 text-4xl">Merci {ok.prenom} !</p>
+              <p className="mx-auto mt-4 max-w-sm leading-relaxed text-sable">
                 {ok.mode === 'retrait'
-                  ? `Ta commande (${formatEuros(ok.total)}) sera prête ${ok.jour.toLowerCase()} à ${ok.creneau}, au ${snack.adresse}. Paiement sur place.`
+                  ? `Votre commande (${formatEuros(ok.total)}) sera prête ${ok.jour.toLowerCase()} à ${ok.creneau}, au ${snack.adresse}. Paiement sur place.`
                   : `Livraison ${ok.jour.toLowerCase()} vers ${ok.creneau} au ${ok.adresse} (${formatEuros(ok.total)}). Paiement à la livraison.`}
               </p>
-              <p className="mt-4 text-xs text-gris">(Démonstration : aucune commande n’a été transmise.)</p>
+              <p className="mt-4 text-xs text-sable/70">(Démonstration : aucune commande n’a été transmise.)</p>
               <button
                 type="button"
-                className="btn btn-blanc mt-6"
+                className="btn btn-ligne mt-6"
                 onClick={() => {
                   f.reset();
                   setOk(null);
@@ -394,11 +472,11 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
               </button>
             </div>
           ) : (
-            <form ref={f.form} noValidate onSubmit={f.submit} className="grid grid-cols-1 gap-5">
-              <div role="radiogroup" aria-label="Mode" className="grid grid-cols-2 gap-2">
+            <form ref={f.form} noValidate onSubmit={f.submit} className="grid grid-cols-1 gap-6">
+              <div role="radiogroup" aria-label="Mode" className="grid grid-cols-2 gap-2 rounded-2xl bg-nuit p-1">
                 {[
-                  ['retrait', '🛍 À emporter', `Prêt en ${snack.retraitMinutes} min`],
-                  ['livraison', '🛵 Livraison', `Dès ${liv.minimum} €`],
+                  ['retrait', 'À emporter', `Prêt en ${snack.retraitMinutes} min`],
+                  ['livraison', 'Livraison', `Dès ${liv.minimum} €`],
                 ].map(([id, l, s]) => (
                   <button
                     key={id}
@@ -406,16 +484,17 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
                     role="radio"
                     aria-checked={v.mode === id}
                     onClick={() => f.setValue('mode', id)}
-                    className={`rounded-2xl border-[3px] border-encre p-3 text-left transition-transform ${v.mode === id ? '-rotate-1 bg-encre text-moutarde' : 'bg-white'}`}
+                    className={`rounded-xl p-3 text-left transition-colors duration-300 ${v.mode === id ? 'bg-ardoise' : 'text-creme/60 hover:text-creme'}`}
                   >
-                    <span className="block font-extrabold">{l}</span>
-                    <span className="text-sm opacity-80">{s}</span>
+                    <span className="block font-semibold">{l}</span>
+                    <span className="text-sm text-sable">{s}</span>
                   </button>
                 ))}
               </div>
               <fieldset className="min-w-0">
-                <legend className="mb-2 font-bold">
-                  Heure de {v.mode === 'retrait' ? 'retrait' : 'livraison'} · {creneaux.jour}
+                <legend className="mb-3 font-semibold">
+                  Heure de {v.mode === 'retrait' ? 'retrait' : 'livraison'}{' '}
+                  <span className="font-normal text-sable">· {creneaux.jour}</span>
                 </legend>
                 <div className="relative -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
                   {creneaux.liste.slice(0, 16).map((c, i) => (
@@ -429,14 +508,14 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
                         className="peer sr-only"
                         {...(i === 0 ? { id: 'creneau' } : {})}
                       />
-                      <span className="block rounded-xl border-[3px] border-encre bg-white px-3 py-2 font-bold tabular-nums peer-checked:bg-ketchup peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-3">
+                      <span className="block rounded-xl border border-trait px-3.5 py-2.5 text-sm font-semibold tabular-nums transition-colors peer-checked:border-braise peer-checked:bg-braise peer-checked:text-nuit peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-flamme">
                         {c.label}
                       </span>
                     </label>
                   ))}
                 </div>
                 {f.show('creneau') && (
-                  <p id="creneau-err" className="text-sm font-bold text-ketchup">
+                  <p id="creneau-err" className="text-sm text-[#ff7a6b]">
                     {f.errors.creneau}
                   </p>
                 )}
@@ -447,12 +526,12 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
                   ['telephone', 'Téléphone', { type: 'tel', autoComplete: 'tel', inputMode: 'tel' }],
                 ].map(([k, l, props]) => (
                   <div key={k}>
-                    <label htmlFor={k} className="mb-1.5 block font-bold">
+                    <label htmlFor={k} className="mb-1.5 block text-sm text-sable">
                       {l}
                     </label>
                     <input className="field" value={v[k]} onChange={f.set(k)} {...f.field(k)} {...props} />
                     {f.show(k) && (
-                      <p id={`${k}-err`} className="mt-1 text-sm font-bold text-ketchup">
+                      <p id={`${k}-err`} className="mt-1 text-sm text-[#ff7a6b]">
                         {f.errors[k]}
                       </p>
                     )}
@@ -461,7 +540,7 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
               </div>
               {v.mode === 'livraison' && (
                 <div>
-                  <label htmlFor="adresse" className="mb-1.5 block font-bold">
+                  <label htmlFor="adresse" className="mb-1.5 block text-sm text-sable">
                     Adresse de livraison ({liv.zone})
                   </label>
                   <input
@@ -472,37 +551,37 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
                     {...f.field('adresse')}
                   />
                   {f.show('adresse') && (
-                    <p id="adresse-err" className="mt-1 text-sm font-bold text-ketchup">
+                    <p id="adresse-err" className="mt-1 text-sm text-[#ff7a6b]">
                       {f.errors.adresse}
                     </p>
                   )}
                 </div>
               )}
-              <div className="rounded-2xl bg-creme p-4">
-                <p className="flex justify-between">
+              <div className="border-t border-trait pt-5">
+                <p className="flex justify-between text-sable">
                   <span>Sous-total</span>
                   <span className="tabular-nums">{formatEuros(sousTotal)}</span>
                 </p>
                 {v.mode === 'livraison' && (
-                  <p className="flex justify-between text-sm text-gris">
+                  <p className="mt-1 flex justify-between text-sm text-sable">
                     <span>Livraison {sousTotal >= liv.offerteDes ? '(offerte)' : `(offerte dès ${liv.offerteDes} €)`}</span>
                     <span className="tabular-nums">{formatEuros(frais)}</span>
                   </p>
                 )}
-                <p className="mt-1 flex justify-between font-display text-3xl">
+                <p className="titre mt-3 flex justify-between text-3xl">
                   <span>Total</span>
                   <span className="tabular-nums">{formatEuros(total)}</span>
                 </p>
               </div>
-              {tropPeu && sousTotal > 0 && <p className="text-sm font-bold text-ketchup">Minimum de {liv.minimum} € pour la livraison.</p>}
+              {tropPeu && sousTotal > 0 && <p className="text-sm text-flamme">Minimum de {liv.minimum} € pour la livraison.</p>}
               <button
                 type="submit"
                 disabled={lignes.length === 0 || tropPeu}
-                className="btn btn-ketchup text-lg disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn btn-braise text-base disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
               >
-                {lignes.length === 0 ? 'Ajoute d’abord un produit' : `Valider · ${formatEuros(total)}`}
+                {lignes.length === 0 ? 'Ajoutez d’abord un produit' : `Valider la commande · ${formatEuros(total)}`}
               </button>
-              <p className="-mt-2 text-center text-xs text-gris">
+              <p className="-mt-2 text-center text-xs text-sable/70">
                 Paiement sur place ou à la livraison · Démonstration : rien n’est envoyé.
               </p>
             </form>
@@ -520,31 +599,24 @@ export function Allergenes() {
   useReveal(scope);
   const utilises = Object.keys(allergenes).filter((a) => produits.some((p) => p.allergenes.includes(a)));
   return (
-    <section id="allergenes" ref={scope} className="section bg-creme" aria-labelledby="al-titre">
-      <div className="mx-auto max-w-6xl">
+    <section id="allergenes" ref={scope} className="section bg-nuit" aria-labelledby="al-titre">
+      <div className="mx-auto max-w-7xl">
         <Titre
-          tag="Infos allergènes"
+          tag="Informations allergènes"
           id="al-titre"
-          couleur="bg-moutarde"
           intro="Les 14 allergènes à déclaration obligatoire. Les colonnes absentes ne concernent aucun de nos produits."
         >
           On vous dit tout
         </Titre>
-        <div
-          className="carte-pop mt-8 overflow-x-auto"
-          data-reveal
-          tabIndex={0}
-          role="region"
-          aria-label="Tableau des allergènes (défilable)"
-        >
+        <div className="carte mt-10 overflow-x-auto" data-reveal tabIndex={0} role="region" aria-label="Tableau des allergènes (défilable)">
           <table className="w-full min-w-[42rem] border-collapse text-sm">
             <thead>
-              <tr className="bg-encre text-moutarde">
-                <th scope="col" className="sticky left-0 bg-encre p-3 text-left">
+              <tr className="border-b border-trait text-left text-sable">
+                <th scope="col" className="sticky left-0 bg-charbon p-4 font-semibold">
                   Produit
                 </th>
                 {utilises.map((a) => (
-                  <th key={a} scope="col" className="p-2 text-xs font-bold">
+                  <th key={a} scope="col" className="p-3 text-center text-xs font-semibold">
                     {allergenes[a]}
                   </th>
                 ))}
@@ -552,18 +624,14 @@ export function Allergenes() {
             </thead>
             <tbody>
               {produits.map((p) => (
-                <tr key={p.id} className="odd:bg-creme/60">
-                  <th scope="row" className="sticky left-0 bg-inherit p-3 text-left font-bold [background:inherit]">
+                <tr key={p.id} className="border-b border-trait/60 last:border-0">
+                  <th scope="row" className="sticky left-0 bg-charbon p-4 text-left font-semibold">
                     {p.nom}
                   </th>
                   {utilises.map((a) => (
-                    <td key={a} className="p-2 text-center">
+                    <td key={a} className="p-3 text-center">
                       {p.allergenes.includes(a) ? (
-                        <span
-                          className="inline-block h-4 w-4 rounded-full border-2 border-encre bg-ketchup"
-                          role="img"
-                          aria-label="Contient"
-                        />
+                        <span className="inline-block h-2.5 w-2.5 rounded-full bg-braise" role="img" aria-label="Contient" />
                       ) : (
                         <span className="sr-only">Non</span>
                       )}
@@ -574,7 +642,7 @@ export function Allergenes() {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-sm text-gris">● = contient. Traces possibles de tous les allergènes (cuisine commune).</p>
+        <p className="mt-3 text-sm text-sable">● = contient. Traces possibles de tous les allergènes (cuisine commune).</p>
       </div>
     </section>
   );
@@ -584,33 +652,45 @@ export function Avis() {
   const scope = useRef(null);
   useReveal(scope);
   return (
-    <section ref={scope} className="section bg-ketchup text-white" aria-labelledby="av-titre">
-      <div className="mx-auto max-w-6xl">
-        <h2 id="av-titre" className="text-5xl md:text-7xl" data-reveal>
-          Ils en parlent mieux que nous
-        </h2>
-        <ul className="mt-10 grid grid-cols-3 gap-4">
+    <section ref={scope} className="section relative overflow-hidden bg-nuit" aria-labelledby="av-titre">
+      {/* emplacement photo : photos.avis (fond assombri) */}
+      <div aria-hidden="true" className="absolute inset-0">
+        <Photo
+          nom={photos.avis}
+          alt=""
+          sizes="100vw"
+          width="1400"
+          height="1400"
+          className="h-full w-full object-cover object-[70%_50%] opacity-60"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-nuit via-nuit/85 to-nuit/40" />
+      </div>
+      <div className="relative mx-auto max-w-7xl">
+        <Titre tag="Ils en parlent" id="av-titre">
+          Mieux que nous
+        </Titre>
+        <ul className="mt-12 grid max-w-3xl grid-cols-3 gap-6">
           {chiffres.map((c) => (
             <li key={c.label} data-reveal className="min-w-0">
               <Counter
                 value={c.valeur}
                 decimals={c.decimales || 0}
                 suffix={c.suffixe}
-                className="block font-display text-4xl text-moutarde md:text-6xl"
+                className="titre block text-4xl text-flamme md:text-6xl"
               />
-              <p className="mt-1 text-sm text-white/85">{c.label}</p>
+              <p className="mt-2 text-sm text-sable">{c.label}</p>
             </li>
           ))}
         </ul>
-        <ul className="mt-12 grid gap-5 md:grid-cols-3">
-          {avis.map((a, i) => (
+        <ul className="mt-14 grid gap-5 md:grid-cols-3">
+          {avis.map((a) => (
             <li key={a.nom} data-reveal>
-              <figure className="carte-pop h-full p-5 text-encre" style={{ rotate: `${(i - 1) * 1.5}deg` }}>
-                <p className="text-moutarde [-webkit-text-stroke:1px_#1a1714]" aria-label="5 étoiles sur 5">
+              <figure className="h-full rounded-2xl border border-white/10 bg-nuit/60 p-6 backdrop-blur-md">
+                <p className="text-flamme" aria-label="5 étoiles sur 5">
                   ★★★★★
                 </p>
-                <blockquote className="mt-3 text-lg">« {a.texte} »</blockquote>
-                <figcaption className="mt-3 font-display text-xl">{a.nom}</figcaption>
+                <blockquote className="mt-4 text-lg leading-relaxed">« {a.texte} »</blockquote>
+                <figcaption className="mt-4 text-sm font-semibold text-sable">{a.nom}</figcaption>
               </figure>
             </li>
           ))}
@@ -624,35 +704,38 @@ export function Infos() {
   const scope = useRef(null);
   useReveal(scope);
   return (
-    <section id="infos" ref={scope} className="section bg-moutarde" aria-labelledby="inf-titre">
-      <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2">
+    <section id="infos" ref={scope} className="section relative overflow-hidden bg-charbon" aria-labelledby="inf-titre">
+      {/* emplacement photo : photos.infos (fond assombri) */}
+      <div aria-hidden="true" className="absolute inset-0">
+        <Photo nom={photos.infos} alt="" sizes="100vw" width="1400" height="930" className="h-full w-full object-cover opacity-35" />
+        <div className="absolute inset-0 bg-gradient-to-t from-charbon via-charbon/70 to-charbon/40" />
+      </div>
+      <div className="relative mx-auto grid max-w-7xl gap-10 md:grid-cols-2">
         <div>
-          <Titre tag="Horaires & accès" id="inf-titre" couleur="bg-encre text-moutarde">
-            On t’attend !
+          <Titre tag="Horaires & accès" id="inf-titre">
+            On vous attend
           </Titre>
-          <p className="mt-6 text-lg font-bold" data-reveal>
+          <p className="mt-8 text-xl font-semibold" data-reveal>
             {snack.adresse}
           </p>
-          <p className="text-gris" data-reveal>
-            🚇 {snack.acces}
-          </p>
-          <p className="mt-2 text-gris" data-reveal>
-            🛵 Livraison : {snack.livraison.zone}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3" data-reveal>
-            <a href={`tel:${snack.telephoneLien}`} className="btn btn-ketchup">
-              📞 {snack.telephone}
+          <ul className="mt-3 space-y-1 text-sable" data-reveal>
+            <li>{snack.acces}</li>
+            <li>Livraison : {snack.livraison.zone}</li>
+          </ul>
+          <div className="mt-8 flex flex-wrap gap-3" data-reveal>
+            <a href={`tel:${snack.telephoneLien}`} className="btn btn-braise">
+              Appeler · {snack.telephone}
             </a>
-            <a href={`mailto:${snack.email}`} className="btn btn-blanc">
+            <a href={`mailto:${snack.email}`} className="btn btn-ligne">
               {snack.email}
             </a>
           </div>
         </div>
-        <dl className="carte-pop self-start p-5" data-reveal>
+        <dl className="carte self-end bg-nuit/70 p-6 backdrop-blur-md" data-reveal>
           {horaires.map(([j, h]) => (
-            <div key={j} className="flex flex-wrap justify-between gap-x-4 border-b-2 border-dashed border-encre/20 py-3 last:border-0">
-              <dt className="font-extrabold">{j}</dt>
-              <dd className={h === 'Fermé' ? 'text-ketchup font-bold' : ''}>{h}</dd>
+            <div key={j} className="flex flex-wrap justify-between gap-x-4 border-b border-trait py-3.5 last:border-0">
+              <dt className="font-semibold">{j}</dt>
+              <dd className={h === 'Fermé' ? 'text-sable/70' : 'text-sable'}>{h}</dd>
             </div>
           ))}
         </dl>
@@ -665,19 +748,20 @@ export function FaqSection() {
   const scope = useRef(null);
   useReveal(scope);
   return (
-    <section id="faq" ref={scope} className="section bg-creme" aria-labelledby="faq-titre">
+    <section id="faq" ref={scope} className="section bg-nuit" aria-labelledby="faq-titre">
       <div className="mx-auto max-w-3xl">
-        <Titre tag="FAQ" id="faq-titre" couleur="bg-cornichon text-white">
-          Questions qu’on nous pose
+        <Titre tag="Questions fréquentes" id="faq-titre">
+          Bon à savoir
         </Titre>
-        <div className="mt-8 space-y-3">
+        <div className="mt-10 border-t border-trait">
           <Faq
             items={faq}
             classes={{
-              item: 'carte-pop px-5',
-              button: 'flex w-full items-center justify-between gap-4 py-4 text-left font-display text-xl',
-              icon: 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[3px] border-encre bg-moutarde text-xl',
-              answer: 'pb-4 text-gris',
+              item: 'border-b border-trait',
+              button:
+                'flex w-full items-center justify-between gap-4 py-6 text-left text-lg font-semibold transition-colors hover:text-flamme',
+              icon: 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-trait text-xl text-flamme',
+              answer: 'pb-6 leading-relaxed text-sable',
             }}
           />
         </div>

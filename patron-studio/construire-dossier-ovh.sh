@@ -14,7 +14,7 @@ echo "→ Installation des dépendances des démos"
 
 echo "→ Compilation des démos"
 for d in "${DEMOS[@]}"; do
-  (cd "demos/$d" && npx vite build --logLevel warn)
+  (cd "demos/$d" && npm run build --silent -- --logLevel warn)
 done
 
 echo "→ Assemblage de $OUT/"

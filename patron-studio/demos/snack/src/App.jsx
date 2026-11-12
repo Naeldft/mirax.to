@@ -7,11 +7,17 @@ import Header, { Logo } from './components/Header';
 import { Allergenes, Avis, Bandeau, Carte, Commande, FaqSection, Hero, Infos } from './components/Sections';
 import { formule, navigation, produits, snack } from './data/site';
 
+const Telephone = () => (
+  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
+  </svg>
+);
+
 export default function App() {
   const [ready, setReady] = useState(false);
   const [quantites, setQuantites] = useState({});
   const [menus, setMenus] = useState(0);
-  const [barre, setBarre] = useState(false);
+  const [commandeVisible, setCommandeVisible] = useState(false);
   useScrollRefresh();
 
   const ajouter = useCallback((id) => setQuantites((q) => ({ ...q, [id]: Math.min(20, (q[id] || 0) + 1) })), []);
@@ -28,24 +34,25 @@ export default function App() {
   useEffect(() => {
     if (menus > maxMenus) setMenus(maxMenus);
   }, [menus, maxMenus]);
-  // barre « ma commande » en bas de l'écran, masquée quand la section commande est visible
+  // la pastille « ma commande » (ordinateur) se cache quand la section commande est à l'écran
   useEffect(() => {
     const cible = document.getElementById('commande');
     if (!cible) return;
-    const io = new IntersectionObserver(([e]) => setBarre(!e.isIntersecting), { threshold: 0.05 });
+    const io = new IntersectionObserver(([e]) => setCommandeVisible(e.isIntersecting), { threshold: 0.05 });
     io.observe(cible);
     return () => io.disconnect();
   }, []);
 
   return (
-    <>
+    <div className="grain">
       <Loader
         ready={ready}
         name="Crunch!"
-        tagline="Ça grésille sur la plancha…"
-        fontClass="font-display"
-        colors={{ bg: '#ffc93c', fg: '#1a1714', accent: '#e63b2e' }}
-        mark={<Logo className="h-16 w-16 animate-bounce" />}
+        tagline="La plancha chauffe…"
+        fontClass="titre"
+        colors={{ bg: '#0d0b0a', fg: '#f3ece2', accent: '#ff6b1a' }}
+        mark={<span className="block h-3 w-3 animate-pulse rounded-full bg-braise shadow-[0_0_30px_8px_rgb(255_107_26/0.6)]" />}
+        maxMs={3000}
       />
       <Header />
       <main>
@@ -58,41 +65,59 @@ export default function App() {
         <Infos />
         <FaqSection />
       </main>
-      {nb > 0 && barre && (
-        <a
-          href="#commande"
-          className="btn btn-ketchup fixed inset-x-4 bottom-4 z-50 justify-between md:left-auto md:right-6 md:w-80"
-          aria-label={`Voir ma commande : ${nb} article${nb > 1 ? 's' : ''}, ${formatEuros(total)}`}
-        >
-          <span>🍔 Ma commande · {nb}</span>
+
+      {/* Mobile : appel et commande toujours à portée de pouce */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-trait bg-nuit/90 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden">
+        <div className="flex gap-3">
+          <a
+            href={`tel:${snack.telephoneLien}`}
+            className="btn btn-ligne !min-h-12 shrink-0 !px-4"
+            aria-label={`Appeler Crunch! au ${snack.telephone}`}
+          >
+            <Telephone /> <span className="max-[359px]:sr-only">Appeler</span>
+          </a>
+          <a
+            href="#commande"
+            className="btn btn-braise !min-h-12 min-w-0 flex-1 justify-between"
+            aria-label={nb ? `Commander : ${nb} article${nb > 1 ? 's' : ''}, ${formatEuros(total)}` : 'Commander'}
+          >
+            <span>{nb ? `Commander · ${nb}` : 'Commander'}</span>
+            <span className="tabular-nums">{nb ? formatEuros(total) : '→'}</span>
+          </a>
+        </div>
+      </div>
+      {/* Ordinateur : pastille de commande quand le panier n'est pas vide */}
+      {nb > 0 && !commandeVisible && (
+        <a href="#commande" className="btn btn-braise fixed bottom-6 right-6 z-50 hidden w-80 justify-between md:flex">
+          <span>Ma commande · {nb}</span>
           <span className="tabular-nums">{formatEuros(total)}</span>
         </a>
       )}
-      <footer className="border-t-[3px] border-encre bg-encre px-5 py-12 text-creme md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:justify-between">
-          <div className="flex items-center gap-3">
-            <Logo className="h-10 w-10" />
-            <div>
-              <p className="font-display text-3xl text-moutarde">{snack.nom}</p>
-              <p className="text-sm text-creme/60">{snack.adresse}</p>
-            </div>
+
+      <footer className="border-t border-trait bg-nuit px-5 py-12 md:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:justify-between">
+          <div>
+            <Logo className="!text-3xl" />
+            <p className="mt-2 text-sm text-sable">{snack.adresse}</p>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-creme/70">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-sable">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-moutarde">
+              <a key={n.href} href={n.href} className="hover:text-creme">
                 {n.label}
               </a>
             ))}
-            <a href={`tel:${snack.telephoneLien}`} className="hover:text-moutarde">
+            <a href={`tel:${snack.telephoneLien}`} className="hover:text-creme">
               {snack.telephone}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-6xl text-xs text-creme/40">
-          © {new Date().getFullYear()} {snack.nom} · {snack.mention}
+        <p className="mx-auto mt-8 max-w-7xl text-xs text-sable/60">
+          © {new Date().getFullYear()} {snack.nom} · {snack.mention} · Photos : Unsplash
         </p>
       </footer>
-      <DemoFooter demo="snack" theme={{ bg: '#e63b2e', fg: '#ffffff', accent: '#ffc93c', accentFg: '#1a1714' }} fontClass="font-display" />
-    </>
+      <DemoFooter demo="snack" theme={{ bg: '#161311', fg: '#f3ece2', accent: '#ff6b1a', accentFg: '#170a03' }} fontClass="titre" />
+      {/* espace sous le bas de page pour que la barre mobile ne cache rien */}
+      <div className="h-20 bg-nuit md:hidden" aria-hidden="true" />
+    </div>
   );
 }

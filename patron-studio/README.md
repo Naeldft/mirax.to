@@ -16,7 +16,7 @@ patron-studio/
 │   ├── boutique/             ← Atelier Lin (chemise au vent, panier et commande)
 │   ├── photographe/          ← Lumen Studio (appareil photo, portfolio, réservation)
 │   ├── association/          ← Les Racines (arbre qui pousse, agenda, bénévolat, dons, adhésion)
-│   ├── snack/                ← Crunch! (burger qui s'assemble, carte filtrable, click & collect, allergènes)
+│   ├── snack/                ← Crunch! (photos plein écran, carte filtrable, click & collect, allergènes)
 │   └── conseil/              ← Cap Horizon (croissance et boussole, diagnostic express, rendez-vous)
 ├── construire-dossier-ovh.sh ← compile les démos et assemble le dossier à envoyer
 └── dossier-ovh/              ← RÉSULTAT : à envoyer tel quel par FTP dans « www/ »
@@ -61,5 +61,6 @@ fonction `submit` du composant (Formspree, Web3Forms, e-mail…).
 3. Ajouter sa carte dans la section `#futur-site` de `site/index.html` (et ses textes traduits dans `site/accueil.js`),
    puis son nom dans `DEMOS` de `site/contact-form.js` (message pré-rempli du devis) et dans `site/sitemap.xml`.
 
+Les photos de Crunch! (snack) sont de vraies photos Unsplash : pour les remplacer, voir `demos/snack/photos/LISEZ-MOI.md`.
 Les « photos » du portfolio du photographe sont des illustrations dessinées en code (`photographe/src/components/Photo.jsx`) :
 remplacez-les par de vraies photos pour un client.
