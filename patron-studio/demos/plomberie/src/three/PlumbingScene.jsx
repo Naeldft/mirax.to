@@ -410,13 +410,13 @@ function Rig({ progress, reduced, quality }) {
     t.y += ((reduced ? 0 : pointer.y) - t.y) * 0.06;
     if (!rig.current) return;
     // largeur utile de la scène ≈ 5,2 unités : on réduit sur mobile
-    const fit = Math.min(1, viewport.width / 5.4);
+    const fit = Math.min(0.92, viewport.width / (viewport.aspect < 1 ? 7.4 : 6.6));
     rig.current.scale.setScalar(fit);
     rig.current.rotation.y = -0.55 + smooth(p) * 0.4 + t.x * 0.35;
     rig.current.rotation.x = 0.12 + t.y * 0.12;
     rig.current.position.y = viewport.width < 5 ? 0.15 : 0;
     // grand écran : la scène se décale à droite pour laisser le texte à gauche
-    rig.current.position.x = viewport.width > 7 ? Math.min(0.9, (viewport.width - 7) * 0.3 + 0.35) : 0;
+    rig.current.position.x = 0.3 * fit; // centre l'ensemble tuyaux + vasque dans sa zone (voir ScrollStory)
     camera.position.z = 8 - smooth(p) * 0.8;
     camera.lookAt(0, 0.1, 0);
   });
@@ -434,13 +434,15 @@ function Rig({ progress, reduced, quality }) {
   );
 }
 
-export default function PlumbingScene({ progress, reduced, tier, active, onReady }) {
-  const [low, setLow] = useState(tier === 'low');
+export default function PlumbingScene({ progress, reduced, tier, active, onReady, onSlow }) {
+  // téléphone : version allégée (résolution réduite, pas d'ombres)
+  const petit = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [low, setLow] = useState(tier === 'low' || petit);
   const quality = low ? 'low' : 'high';
   return (
     <Canvas
       className="!absolute inset-0"
-      dpr={low ? 1 : tier === 'high' ? 1.75 : 1.5}
+      dpr={petit ? 1.25 : low ? 1 : tier === 'high' ? 1.75 : 1.5}
       frameloop={active ? (reduced ? 'demand' : 'always') : 'never'}
       shadows={!low}
       camera={{ position: [0, 0.4, 8], fov: 35 }}
@@ -448,7 +450,7 @@ export default function PlumbingScene({ progress, reduced, tier, active, onReady
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => setLow(true)} />
+      <PerformanceMonitor onDecline={() => setLow(true)} flipflops={3} onFallback={() => onSlow?.()} />
       <hemisphereLight args={['#bfe6ff', '#08121c', 0.7]} />
       <directionalLight position={[3, 5, 4]} intensity={2.2} castShadow={!low} shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-3, 1, -2]} color="#ff9a5c" intensity={20} distance={10} />

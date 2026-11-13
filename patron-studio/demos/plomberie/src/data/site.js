@@ -97,6 +97,10 @@ export const chiffres = [
 export const realisations = [
   {
     id: 'sdb',
+    // photos : photos/realisation-sdb-apres.jpg (obligatoire) et, pour le curseur avant/après, photos/realisation-sdb-avant.jpg
+    apres: 'realisation-sdb-apres',
+    avant: null, // mettre 'realisation-sdb-avant' une fois la photo « avant » déposée
+    alt: 'Salle de bain rénovée : douche à l’italienne vitrée, carrelage blanc, meuble vasque foncé',
     titre: 'Salle de bain, Lambersart',
     texte: 'Baignoire remplacée par une douche à l’italienne, nouvelle arrivée d’eau en multicouche.',
     duree: '6 jours',
@@ -104,6 +108,10 @@ export const realisations = [
   },
   {
     id: 'chaufferie',
+    // photos : photos/realisation-chaufferie-apres.jpg (obligatoire) et, pour le curseur avant/après, photos/realisation-chaufferie-avant.jpg
+    apres: 'realisation-chaufferie-apres',
+    avant: null, // mettre 'realisation-chaufferie-avant' une fois la photo « avant » déposée
+    alt: 'Réseau de tuyauterie et vannes refait à neuf, fixé sur un mur de briques',
     titre: 'Chaufferie, Roubaix',
     texte: 'Chauffe-eau de 200 L et réseau cuivre refaits à neuf dans une maison des années 1930.',
     duree: '2 jours',
@@ -111,6 +119,10 @@ export const realisations = [
   },
   {
     id: 'cuisine',
+    // photos : photos/realisation-cuisine-apres.jpg (obligatoire) et, pour le curseur avant/après, photos/realisation-cuisine-avant.jpg
+    apres: 'realisation-cuisine-apres',
+    avant: null, // mettre 'realisation-cuisine-avant' une fois la photo « avant » déposée
+    alt: 'Cuisine blanche avec évier sous la fenêtre et crédence en carreaux hexagonaux',
     titre: 'Cuisine, Lille Vauban',
     texte: 'Évacuation déplacée et évier sous fenêtre, sans toucher au carrelage existant.',
     duree: '1 jour',

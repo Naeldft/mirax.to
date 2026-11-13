@@ -44,7 +44,7 @@ export default function Services() {
                       <Icone />
                     </span>
                     <h3 className="mt-5 text-xl font-bold">{s.titre}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-ecume/65">{s.texte}</p>
+                    <p className="mt-2 text-base leading-relaxed text-ecume/70">{s.texte}</p>
                     <p className="mt-5 flex items-baseline gap-2">
                       <span className="text-sm text-ecume/55">{s.prefixe}</span>
                       {s.prix != null && <span className="font-display text-3xl font-bold text-cuivre-clair">{formatEuros(s.prix)}</span>}
@@ -61,7 +61,7 @@ export default function Services() {
                 <dt className="sr-only">{c.label}</dt>
                 <dd>
                   <Counter value={c.valeur} suffix={c.suffixe} className="block font-display text-4xl font-bold text-eau md:text-6xl" />
-                  <span className="mt-1 block text-sm text-ecume/60">{c.label}</span>
+                  <span className="mt-1 block text-base text-ecume/65">{c.label}</span>
                 </dd>
               </div>
             ))}

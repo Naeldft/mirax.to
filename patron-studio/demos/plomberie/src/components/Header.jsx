@@ -28,7 +28,7 @@ export default function Header() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 md:h-20 md:px-8">
           <a
             href="#accueil"
-            className="flex items-center gap-2.5 font-display text-xl font-bold"
+            className="flex min-h-11 items-center gap-2.5 font-display text-xl font-bold"
             aria-label={`${entreprise.nomComplet}, retour à l’accueil`}
           >
             <Logo className="h-8 w-8" />
@@ -44,7 +44,7 @@ export default function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <a href={`tel:${entreprise.telephoneLien}`} className="btn btn-eau !min-h-0 !rounded-full !px-4 !py-2.5 text-sm">
+            <a href={`tel:${entreprise.telephoneLien}`} className="btn btn-eau !min-h-11 !rounded-full !px-4 !py-2.5 text-sm">
               <span className="pulse-dot flex h-2 w-2 rounded-full bg-alerte text-alerte" aria-hidden="true" />
               <span className="hidden sm:inline">Urgence ·</span> {entreprise.telephone}
             </a>
