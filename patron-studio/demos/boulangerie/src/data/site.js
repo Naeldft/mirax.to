@@ -28,6 +28,8 @@ export const navigation = [
 export const produits = [
   {
     id: 'tradition',
+    photo: 'pain-tradition',
+    alt: 'Baguettes et pains dorés à la croûte croustillante',
     nom: 'Baguette tradition',
     categorie: 'pain',
     prix: 1.3,
@@ -36,16 +38,38 @@ export const produits = [
   },
   {
     id: 'campagne',
+    photo: 'pain-campagne',
+    alt: 'Gros pain de campagne au levain, croûte fendue et farinée',
     nom: 'Pain de campagne au levain',
     categorie: 'pain',
     prix: 4.2,
     detail: '800 g, croûte épaisse, mie alvéolée',
     tag: 'Levain',
   },
-  { id: 'seigle', nom: 'Seigle & raisins', categorie: 'pain', prix: 3.6, detail: 'Idéal avec les fromages du Nord', tag: null },
-  { id: 'cereales', nom: 'Pain aux céréales', categorie: 'pain', prix: 3.9, detail: 'Lin, tournesol, sésame, pavot', tag: 'Bio' },
+  {
+    id: 'seigle',
+    photo: 'pain-seigle',
+    alt: 'Pains de seigle foncés avec des épis de blé',
+    nom: 'Seigle & raisins',
+    categorie: 'pain',
+    prix: 3.6,
+    detail: 'Idéal avec les fromages du Nord',
+    tag: null,
+  },
+  {
+    id: 'cereales',
+    photo: 'pain-cereales',
+    alt: 'Pain aux céréales tranché, mie dense et graines',
+    nom: 'Pain aux céréales',
+    categorie: 'pain',
+    prix: 3.9,
+    detail: 'Lin, tournesol, sésame, pavot',
+    tag: 'Bio',
+  },
   {
     id: 'croissant',
+    photo: 'viennoiserie-croissant',
+    alt: 'Croissants pur beurre dorés, saupoudrés de sucre glace',
     nom: 'Croissant pur beurre',
     categorie: 'viennoiserie',
     prix: 1.2,
@@ -54,6 +78,8 @@ export const produits = [
   },
   {
     id: 'pain-chocolat',
+    photo: 'viennoiserie-pain-chocolat',
+    alt: 'Plaque de pains au chocolat sortant du four',
     nom: 'Pain au chocolat',
     categorie: 'viennoiserie',
     prix: 1.35,
@@ -62,6 +88,7 @@ export const produits = [
   },
   {
     id: 'kouign',
+    photo: null /* à fournir : photos/kouign.jpg */,
     nom: 'Gaufre fourrée à la vergeoise',
     categorie: 'viennoiserie',
     prix: 2.2,
@@ -70,13 +97,22 @@ export const produits = [
   },
   {
     id: 'tarte-sucre',
+    photo: null /* à fournir : photos/tarte-sucre.jpg */,
     nom: 'Tarte au sucre (6 parts)',
     categorie: 'patisserie',
     prix: 14,
     detail: 'Brioche, vergeoise brune, crème',
     tag: 'Du Nord',
   },
-  { id: 'flan', nom: 'Flan pâtissier (part)', categorie: 'patisserie', prix: 3.4, detail: 'Vanille de Madagascar', tag: null },
+  {
+    id: 'flan',
+    photo: null /* à fournir : photos/flan.jpg */,
+    nom: 'Flan pâtissier (part)',
+    categorie: 'patisserie',
+    prix: 3.4,
+    detail: 'Vanille de Madagascar',
+    tag: null,
+  },
 ];
 
 export const categories = [

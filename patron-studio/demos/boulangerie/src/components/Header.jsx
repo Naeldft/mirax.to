@@ -31,7 +31,7 @@ export default function Header() {
         className={`fixed inset-x-0 top-0 z-[60] transition-colors duration-300 ${scrolled || open ? 'bg-papier/90 shadow-[0_1px_0_rgb(122_74_36/0.15)] backdrop-blur-md' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:h-20 md:px-8">
-          <a href="#accueil" className="flex items-center gap-2" aria-label={`${maison.nom}, retour à l’accueil`}>
+          <a href="#accueil" className="min-h-11 flex items-center gap-2" aria-label={`${maison.nom}, retour à l’accueil`}>
             <Logo className="h-9 w-9" />
             <span className="font-serif text-2xl font-bold">Maison Levain</span>
           </a>

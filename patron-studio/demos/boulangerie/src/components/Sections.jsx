@@ -1,8 +1,9 @@
-import { Suspense, lazy, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { lazy, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import Photo from '@demos/shared/components/Photo.jsx';
+import ScrollStory from '@demos/shared/components/ScrollStory.jsx';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
@@ -29,32 +30,42 @@ function Titre({ surtitre, children, intro, id, center }) {
   );
 }
 
+// une ambiance par étape : farine, mie, dorure, croûte
+const FONDS = [
+  ['#fbf1de', '#f0e2c6'],
+  ['#f6e6c6', '#e6cfa6'],
+  ['#f6d9a3', '#e2b26a'],
+  ['#e9c9a3', '#c9976a'],
+];
+
+/**
+ * Accueil « à faire défiler » : le pain 3D lève et dore au fil des étapes,
+ * qui présentent les pains, les viennoiseries puis les pâtisseries.
+ */
 export function Hero({ onReady }) {
-  const section = useRef(null);
-  const [cuit, setCuit] = useState(false);
-  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady, onStep: (p) => setCuit(p > 0.55) });
+  const scope = useRef(null);
+  const reduced = useReducedMotion();
   useLayoutEffect(() => {
     if (reduced) return;
     const ctx = gsap.context(() => {
       gsap.from('[data-mot]', { y: 60, opacity: 0, duration: 1.1, stagger: 0.12, ease: 'power3.out', delay: 0.3 });
       gsap.from('[data-in]', { y: 20, opacity: 0, duration: 0.9, stagger: 0.1, delay: 0.8 });
-    }, section);
+    }, scope);
     return () => ctx.revert();
   }, [reduced]);
-  return (
-    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[190svh]'}`} aria-label="Accueil">
-      <div className="papier sticky top-0 h-[100svh] overflow-hidden bg-[radial-gradient(ellipse_70%_60%_at_65%_60%,#f7dcae,transparent_70%)]">
-        {load3d && (
-          <Suspense fallback={null}>
-            <BakeryScene progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-papier via-papier/80 to-transparent md:hidden" />
-        <div className="pointer-events-none relative mx-auto flex h-full max-w-6xl flex-col justify-end px-5 pb-10 md:justify-center md:px-8 md:pb-0">
+
+  const steps = [
+    {
+      fond: FONDS[0],
+      mot: 'Levain',
+      encre: '#2b1d12',
+      motOpacite: 0.08,
+      contenu: (
+        <div ref={scope} className="max-w-xl md:max-w-[44%]">
           <p data-in className="surtitre">
             {maison.accroche}
           </p>
-          <h1 className="mt-3 text-[clamp(3.2rem,12vw,7.5rem)] leading-[0.92]">
+          <h1 className="mt-3 text-[clamp(3rem,12vw,7rem)] leading-[0.92]">
             <span data-mot className="block">
               Pétri la nuit,
             </span>
@@ -62,23 +73,59 @@ export function Hero({ onReady }) {
               doré au matin.
             </span>
           </h1>
-          <p data-in className="mt-4 max-w-sm text-croute/85 md:text-lg">
+          <p data-in className="mt-4 hidden max-w-sm text-lg text-croute/85 md:block">
             {maison.intro}
           </p>
-          <p data-in className="craie mt-3 text-2xl text-croute" aria-live="polite">
-            {cuit ? '✓ Sortie du four : encore tiède !' : 'Au four… faites défiler pour la cuisson'}
-          </p>
-          <div data-in className="pointer-events-auto mt-6 flex gap-3">
-            <a href="#commande" className="btn btn-croute">
+          <div data-in className="mt-6 flex gap-3">
+            <a href="#commande" className="btn btn-croute flex-1 md:flex-none">
               Commander
             </a>
-            <a href="#pains" className="btn btn-ligne">
+            <a href="#pains" className="btn btn-ligne flex-1 md:flex-none">
               Nos pains
             </a>
           </div>
         </div>
-      </div>
-    </section>
+      ),
+    },
+    ...categories.map((c, i) => ({
+      fond: FONDS[i + 1] ?? FONDS[0],
+      mot: c.label,
+      encre: '#2b1d12',
+      motOpacite: 0.08,
+      contenu: (
+        <div className="max-w-xl md:max-w-[42%]">
+          <p className="craie text-3xl text-croute">{['Au four…', 'Pur beurre', 'Le dimanche'][i] ?? ''}</p>
+          <h2 className="mt-1 text-[clamp(2.8rem,12vw,6.5rem)] leading-[0.92]">{c.label}</h2>
+          <ul className="mt-4 divide-y divide-croute/15 border-y border-croute/15">
+            {produits
+              .filter((p) => p.categorie === c.id)
+              .slice(0, 3)
+              .map((p) => (
+                <li key={p.id} className="flex items-baseline justify-between gap-4 py-2.5 text-base">
+                  <span>{p.nom}</span>
+                  <span className="shrink-0 font-serif text-xl font-bold text-croute">{formatEuros(p.prix)}</span>
+                </li>
+              ))}
+          </ul>
+          <a href="#commande" className="btn btn-croute mt-5">
+            Commander
+          </a>
+        </div>
+      ),
+    })),
+  ];
+
+  return (
+    <ScrollStory
+      id="accueil"
+      label="Accueil : Maison Levain, boulangerie"
+      steps={steps}
+      onReady={onReady}
+      className="papier"
+      indicateur="text-croute"
+      motClass="font-serif italic text-[clamp(5rem,24vw,22rem)] leading-none"
+      scene={(api) => <BakeryScene {...api} />}
+    />
   );
 }
 
@@ -180,14 +227,27 @@ export function Pains() {
               key={p.id}
               className="group rounded-3xl bg-papier p-5 transition-transform duration-500 hover:-translate-y-1 hover:rotate-[-0.5deg]"
             >
-              <div className="relative h-32 transition-transform duration-700 group-hover:scale-105">
-                <Dessin p={p} />
+              <div
+                className={`relative transition-transform duration-700 ${p.photo ? '-mx-5 -mt-5 mb-1 aspect-[4/3] overflow-hidden rounded-t-3xl' : 'h-32 group-hover:scale-105'}`}
+              >
+                {p.photo ? (
+                  <Photo
+                    nom={p.photo}
+                    alt={p.alt}
+                    sizes="(min-width: 1024px) 23vw, (min-width: 640px) 46vw, 100vw"
+                    width="800"
+                    height="600"
+                    className="h-full w-full object-cover duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <Dessin p={p} />
+                )}
                 {p.tag && (
-                  <span className="craie absolute left-0 top-0 -rotate-6 rounded-full bg-ble/30 px-3 text-xl text-croute">{p.tag}</span>
+                  <span className="craie absolute left-3 top-3 -rotate-6 rounded-full bg-ble/80 px-3 text-xl text-croute">{p.tag}</span>
                 )}
               </div>
               <h3 className="mt-3 text-2xl leading-tight">{p.nom}</h3>
-              <p className="mt-1 text-sm text-croute/75">{p.detail}</p>
+              <p className="mt-1 text-base text-croute/80">{p.detail}</p>
               <p className="mt-3 font-serif text-3xl font-bold text-dore">{formatEuros(p.prix)}</p>
             </li>
           ))}
@@ -371,7 +431,7 @@ export function Commande() {
                         onClick={() => pas(p.id, -1)}
                         disabled={!qte[p.id]}
                         aria-label={`Retirer un ${p.nom}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-mie text-xl font-bold text-croute transition-transform active:scale-90 disabled:opacity-40"
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-mie text-xl font-bold text-croute transition-transform active:scale-90 disabled:opacity-40"
                       >
                         −
                       </button>
@@ -382,7 +442,7 @@ export function Commande() {
                         type="button"
                         onClick={() => pas(p.id, 1)}
                         aria-label={`Ajouter un ${p.nom}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-croute text-xl font-bold text-farine transition-transform active:scale-90"
+                        className="flex h-11 w-11 items-center justify-center rounded-full bg-croute text-xl font-bold text-farine transition-transform active:scale-90"
                       >
                         +
                       </button>

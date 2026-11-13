@@ -209,13 +209,13 @@ function Rig({ progress, reduced, quality }) {
       group.current.rotation.y = -0.5 + tl.x * 0.6 + (reduced ? 0 : t * 0.08) + p * 0.8;
       group.current.rotation.x = tl.y * 0.12;
     }
-    const mobile = viewport.aspect < 1;
-    camera.position.set(0, 2.6 - p * 0.6, mobile ? 13.5 : 6.6);
-    camera.lookAt(0, mobile ? -1.6 : 0.3, 0);
+    const mobile = viewport.aspect < 0.8;
+    camera.position.set(0, 2.6 - p * 0.6, mobile ? 9 : 8.6);
+    camera.lookAt(0, 0.3, 0);
   });
 
   return (
-    <group position={[viewport.width > 7 ? 1.9 : 0, 0, 0]} scale={viewport.width > 7 ? 0.82 : 1}>
+    <group>
       <group ref={group}>
         {/* planche à pain */}
         <mesh position={[0, -0.24, 0]} receiveShadow>
@@ -234,12 +234,14 @@ function Rig({ progress, reduced, quality }) {
   );
 }
 
-export default function BakeryScene({ progress, reduced, tier, active, onReady }) {
-  const [low, setLow] = useState(tier === 'low');
+export default function BakeryScene({ progress, reduced, tier, active, onReady, onSlow }) {
+  // téléphone : version allégée (résolution réduite, pas d'ombres)
+  const petit = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [low, setLow] = useState(tier === 'low' || petit);
   return (
     <Canvas
       className="!absolute inset-0"
-      dpr={low ? 1 : tier === 'high' ? 1.75 : 1.5}
+      dpr={petit ? 1.25 : low ? 1 : tier === 'high' ? 1.75 : 1.5}
       frameloop={active ? (reduced ? 'demand' : 'always') : 'never'}
       shadows={!low}
       camera={{ position: [0, 2.6, 6.6], fov: 35 }}
@@ -247,7 +249,7 @@ export default function BakeryScene({ progress, reduced, tier, active, onReady }
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => setLow(true)} />
+      <PerformanceMonitor onDecline={() => setLow(true)} flipflops={3} onFallback={() => onSlow?.()} />
       <hemisphereLight args={['#fff4e0', '#8a5a2b', 1]} />
       <directionalLight position={[3, 6, 4]} intensity={2.4} color="#ffe2b8" castShadow={!low} shadow-mapSize={[1024, 1024]} />
       <pointLight position={[-3, 1.5, 2]} color="#ff9a4a" intensity={14} distance={9} />
