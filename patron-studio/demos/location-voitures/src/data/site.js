@@ -38,6 +38,7 @@ export const couleurs = [
 export const modeles = [
   {
     id: 'citadine',
+    photo: null, // à fournir : photos/flotte-citadine.jpg, puis mettre 'flotte-citadine'
     categorie: 'Citadine',
     nom: 'Citadine Urbana',
     exemple: 'ou équivalent',
@@ -53,6 +54,8 @@ export const modeles = [
   },
   {
     id: 'suv',
+    photo: 'flotte-suv', // photos/flotte-suv.jpg
+    alt: 'SUV blanc garé au bord d’une route enneigée',
     categorie: 'SUV',
     nom: 'SUV Altura',
     exemple: 'ou équivalent',
@@ -68,6 +71,7 @@ export const modeles = [
   },
   {
     id: 'utilitaire',
+    photo: null, // à fournir : photos/flotte-utilitaire.jpg, puis mettre 'flotte-utilitaire'
     categorie: 'Utilitaire',
     nom: 'Fourgon Cargo 12 m³',
     exemple: 'ou équivalent',
@@ -83,6 +87,8 @@ export const modeles = [
   },
   {
     id: 'premium',
+    photo: 'flotte-premium', // photos/flotte-premium.jpg
+    alt: 'Coupé noir sculpté par la lumière dans un studio sombre',
     categorie: 'Premium',
     nom: 'Coupé Gran Turismo',
     exemple: 'ou équivalent',

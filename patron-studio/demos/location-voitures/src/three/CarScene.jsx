@@ -72,7 +72,9 @@ function Wheel({ R, side, spin, mats, quality }) {
 function Car({ profilId, color, lightsOn, quality, slide, spinRefs }) {
   const { p, body, cabin } = useCarParts(profilId, quality);
   // peinture créée une seule fois avec la couleur de départ, puis animée vers la couleur choisie
-  const [paint] = useState(() => new THREE.MeshPhysicalMaterial({ color, metalness: 0.55, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.08 }));
+  const [paint] = useState(
+    () => new THREE.MeshPhysicalMaterial({ color, metalness: 0.55, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.08 }),
+  );
   const mats = useMemo(
     () => ({
       glass: new THREE.MeshPhysicalMaterial({ color: '#0d1117', metalness: 0.6, roughness: 0.05, clearcoat: 1 }),
@@ -161,6 +163,18 @@ function Showroom({ modelId, color, progress, reduced, quality, drag }) {
   const angle = useRef(-0.6);
   const { camera, viewport } = useThree();
   usePointer();
+  const fondu = useMemo(() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(64, 64, 10, 64, 64, 64);
+    grad.addColorStop(0, '#fff');
+    grad.addColorStop(0.5, '#999');
+    grad.addColorStop(0.85, '#000');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  }, []);
 
   useEffect(() => {
     if (modelId === shown) return;
@@ -206,11 +220,11 @@ function Showroom({ modelId, color, progress, reduced, quality, drag }) {
     t.x += ((reduced ? 0 : pointer.x) - t.x) * 0.05;
     t.y += ((reduced ? 0 : pointer.y) - t.y) * 0.05;
     // recul adapté à l'écran : la voiture tient en largeur sur téléphone
-    const mobile = viewport.aspect < 1;
+    const mobile = viewport.aspect < 0.8;
     const dist = mobile ? 19 : viewport.aspect < 1.3 ? 13 : 11.5;
     const e = smooth(clamp01(p * 1.4));
     camera.position.set(t.x * 1.4, 2.6 - e * 0.9 + t.y * 0.5, dist - e * (mobile ? 1 : 2.2));
-    camera.lookAt(0, viewport.aspect < 1 ? 1.1 : 0.9, 0);
+    camera.lookAt(0, mobile ? 1.1 : 0.9, 0);
   });
 
   const R = 2.9;
@@ -228,9 +242,10 @@ function Showroom({ modelId, color, progress, reduced, quality, drag }) {
         <ringGeometry args={[R + 0.02, R + 0.08, 96]} />
         <meshBasicMaterial color="#e10600" toneMapped={false} />
       </mesh>
+      {/* sol du showroom : s'efface en dégradé pour se fondre dans le fond de chaque étape */}
       <mesh position={[0, -0.09, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[14, 64]} />
-        <meshStandardMaterial color="#0b0b0c" roughness={0.5} metalness={0.3} />
+        <circleGeometry args={[5.2, 64]} />
+        <meshStandardMaterial color="#0b0b0c" roughness={0.5} metalness={0.3} transparent alphaMap={fondu} depthWrite={false} />
       </mesh>
       {quality !== 'low' && (
         <ContactShadows position={[0, 0.002, 0]} scale={9} blur={2.2} opacity={0.75} far={2.5} frames={Infinity} resolution={256} />
@@ -239,13 +254,15 @@ function Showroom({ modelId, color, progress, reduced, quality, drag }) {
   );
 }
 
-export default function CarScene({ modelId, color, progress, reduced, tier, active, onReady, drag }) {
-  const [low, setLow] = useState(tier === 'low');
+export default function CarScene({ modelId, color, progress, reduced, tier, active, onReady, onSlow, drag }) {
+  // téléphone : version allégée (résolution réduite, pas d'ombres)
+  const petit = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [low, setLow] = useState(tier === 'low' || petit);
   const quality = low ? 'low' : 'high';
   return (
     <Canvas
       className="!absolute inset-0"
-      dpr={low ? 1 : tier === 'high' ? 1.75 : 1.5}
+      dpr={petit ? 1.25 : low ? 1 : tier === 'high' ? 1.75 : 1.5}
       frameloop={active ? (reduced ? 'demand' : 'always') : 'never'}
       shadows={!low}
       camera={{ position: [0, 2.1, 8.6], fov: 32 }}
@@ -253,8 +270,7 @@ export default function CarScene({ modelId, color, progress, reduced, tier, acti
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => setLow(true)} />
-      <fog attach="fog" args={['#0a0a0b', 12, 26]} />
+      <PerformanceMonitor onDecline={() => setLow(true)} flipflops={3} onFallback={() => onSlow?.()} />
       <hemisphereLight args={['#ffffff', '#111111', 0.5]} />
       <directionalLight position={[4, 7, 5]} intensity={2.2} castShadow={!low} shadow-mapSize={[1024, 1024]} />
       <spotLight position={[-6, 5, -4]} angle={0.5} penumbra={1} intensity={60} color="#ff2a1a" distance={20} />

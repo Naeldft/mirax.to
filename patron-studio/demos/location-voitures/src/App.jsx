@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import BarreMobile from '@demos/shared/components/BarreMobile.jsx';
 import DemoFooter from '@demos/shared/components/DemoFooter.jsx';
 import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
@@ -10,6 +11,8 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import { Logo } from './components/Icons';
 import Reservation from './components/Reservation';
+
+import { agences, entreprise } from './data/site';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -25,6 +28,8 @@ export default function App() {
         fontClass="font-display"
         colors={{ bg: '#0a0a0b', fg: '#f4f2ee', accent: '#e10600' }}
         mark={<Logo className="h-12 w-20 animate-pulse" />}
+        minMs={500}
+        maxMs={2000}
       />
       <Header />
       <main>
@@ -38,9 +43,16 @@ export default function App() {
       </main>
       <Footer />
       <DemoFooter
+        grandesCibles
         demo="location-voitures"
         theme={{ bg: '#e10600', fg: '#f4f2ee', accent: '#0a0a0b', accentFg: '#f4f2ee' }}
         fontClass="font-display uppercase"
+      />
+      <BarreMobile
+        telephone={entreprise.telephone}
+        telephoneLien={entreprise.telephoneLien}
+        adresse={agences[0].adresse}
+        theme={{ bg: '#0a0a0b', fg: '#f4f2ee', accent: '#e10600', accentFg: '#f4f2ee', bord: 'rgb(244 242 238 / 0.15)' }}
       />
     </>
   );

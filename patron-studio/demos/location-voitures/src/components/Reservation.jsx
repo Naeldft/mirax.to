@@ -100,7 +100,7 @@ export default function Reservation({ model, onModel }) {
                 {ok.modele}, {ok.n} jour{ok.n > 1 ? 's' : ''}, du {parseIso(ok.depart).toLocaleDateString('fr-FR')} au{' '}
                 {parseIso(ok.retour).toLocaleDateString('fr-FR')}. Total : <strong>{ok.total} €</strong>.
               </p>
-              <p className="mt-2 text-sm text-ivoire/55">
+              <p className="mt-2 text-base text-ivoire/60">
                 Référence {ok.ref} · confirmation envoyée à {ok.email}
               </p>
               <p className="mx-auto mt-6 max-w-md bg-ivoire/5 px-4 py-3 text-xs text-ivoire/50">
@@ -180,9 +180,9 @@ export default function Reservation({ model, onModel }) {
                       return (
                         <label
                           key={o.id}
-                          className={`flex cursor-pointer items-center gap-3 border px-3 py-3 text-sm transition-colors ${on ? 'border-course bg-course/10' : 'border-ivoire/15 hover:border-ivoire/35'}`}
+                          className={`flex min-h-12 cursor-pointer items-center gap-3 border px-3 py-3 text-base transition-colors ${on ? 'border-course bg-course/10' : 'border-ivoire/15 hover:border-ivoire/35'}`}
                         >
-                          <input type="checkbox" checked={on} onChange={() => toggleOpt(o.id)} className="h-4 w-4 accent-[#e10600]" />
+                          <input type="checkbox" checked={on} onChange={() => toggleOpt(o.id)} className="h-5 w-5 accent-[#e10600]" />
                           <span>
                             {o.label}
                             <span className="block text-xs text-ivoire/50">+{o.prixJour} € / jour</span>
@@ -244,14 +244,14 @@ export default function Reservation({ model, onModel }) {
                   {err('email')}
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="flex cursor-pointer items-start gap-3 text-sm text-ivoire/80">
+                  <label className="flex cursor-pointer items-start gap-3 text-base text-ivoire/80">
                     <input
                       type="checkbox"
                       name="age"
                       checked={v.age}
                       onChange={set('age')}
                       onBlur={blur('age')}
-                      className="mt-0.5 h-4 w-4 accent-[#e10600]"
+                      className="mt-0.5 h-5 w-5 accent-[#e10600]"
                       {...aria('age')}
                     />
                     J’ai 21 ans ou plus et mon permis depuis au moins deux ans.
@@ -269,7 +269,7 @@ export default function Reservation({ model, onModel }) {
                 <div>
                   <p className="surtitre">Récapitulatif</p>
                   <p className="mt-3 font-display text-xl font-bold uppercase">{m.nom}</p>
-                  <ul className="mt-5 space-y-2 text-sm text-ivoire/70">
+                  <ul className="mt-5 space-y-2 text-base text-ivoire/70">
                     <li className="flex justify-between">
                       <span>
                         {m.prix} € × {n} jour{n > 1 ? 's' : ''}

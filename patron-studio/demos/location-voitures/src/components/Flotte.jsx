@@ -1,3 +1,4 @@
+import Photo from '@demos/shared/components/Photo.jsx';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
@@ -87,16 +88,30 @@ export default function Flotte({ model, color, onModel }) {
                     <div>
                       <p className="surtitre !text-[0.65rem]">{m.categorie}</p>
                       <h3 className="mt-1 font-display text-xl font-bold uppercase">{m.nom}</h3>
-                      <p className="text-xs text-ivoire/45">{m.exemple}</p>
+                      <p className="text-sm text-ivoire/55">{m.exemple}</p>
                     </div>
                     <p className="text-right">
                       <span className="whitespace-nowrap font-display text-3xl font-bold">{m.prix} €</span>
                       <span className="block text-xs text-ivoire/55">par jour</span>
                     </p>
                   </div>
-                  <div className="my-4 h-32 transition-transform duration-700 ease-out group-hover:translate-x-3 md:h-40">
-                    <Silhouette profil={m.profil} color={hex} />
-                  </div>
+                  {m.photo ? (
+                    <div className="-mx-6 my-4 aspect-[16/9] overflow-hidden bg-carbone">
+                      {/* emplacement photo : m.photo (photos/<nom>.jpg) */}
+                      <Photo
+                        nom={m.photo}
+                        alt={m.alt}
+                        sizes="(min-width: 1024px) 30rem, 100vw"
+                        width="800"
+                        height="450"
+                        className="h-full w-full object-cover duration-700 ease-out group-hover:scale-105"
+                      />
+                    </div>
+                  ) : (
+                    <div className="my-4 h-32 transition-transform duration-700 ease-out group-hover:translate-x-3 md:h-40">
+                      <Silhouette profil={m.profil} color={hex} />
+                    </div>
+                  )}
                   <ul className="grid grid-cols-4 gap-2 border-y border-ivoire/10 py-4 text-center text-xs text-ivoire/70">
                     <li>
                       <Places className="mx-auto mb-1 text-lg text-course-vif" />
@@ -115,17 +130,17 @@ export default function Flotte({ model, color, onModel }) {
                       {m.energie}
                     </li>
                   </ul>
-                  <ul className="mt-4 space-y-1 text-sm text-ivoire/65">
+                  <ul className="mt-4 space-y-1 text-base text-ivoire/70">
                     {m.atouts.map((a) => (
                       <li key={a}>— {a}</li>
                     ))}
                   </ul>
                   <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-                    <p className="text-xs text-ivoire/55">
+                    <p className="text-sm text-ivoire/65">
                       Week-end <strong className="text-ivoire">{m.prixWeekend} €</strong> · Semaine{' '}
                       <strong className="text-ivoire">{m.prixSemaine} €</strong>
                     </p>
-                    <button type="button" className="btn btn-ligne !min-h-0 !px-4 !py-2.5" onClick={() => choisir(m.id)}>
+                    <button type="button" className="btn btn-ligne !min-h-11 !px-4 !py-2.5" onClick={() => choisir(m.id)}>
                       Choisir
                     </button>
                   </div>
