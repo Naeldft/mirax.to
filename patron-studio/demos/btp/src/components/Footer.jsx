@@ -3,7 +3,7 @@ import { Logo } from './Icons';
 
 export default function Footer() {
   return (
-    <footer className="border-t-2 border-anthracite bg-beton px-5 py-12 md:px-8">
+    <footer className="[&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center border-t-2 border-anthracite bg-beton px-5 py-12 md:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:justify-between">
         <div>
           <p className="flex items-center gap-3 font-display text-lg uppercase">

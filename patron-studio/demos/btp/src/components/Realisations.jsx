@@ -1,3 +1,4 @@
+import Photo from '@demos/shared/components/Photo.jsx';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
@@ -124,9 +125,20 @@ export default function Realisations() {
             <li key={r.id}>
               <figure className="group border-2 border-anthracite bg-papier shadow-[6px_6px_0_#1d1d1b] transition-transform duration-300 hover:-translate-y-1">
                 <div className="aspect-[4/3] overflow-hidden border-b-2 border-anthracite">
-                  <div className="h-full transition-transform duration-700 group-hover:scale-105">
-                    <Maison d={r.dessin} />
-                  </div>
+                  {r.photo ? (
+                    <Photo
+                      nom={r.photo}
+                      alt={r.alt}
+                      sizes="(min-width: 1024px) 31vw, (min-width: 640px) 47vw, 100vw"
+                      width="800"
+                      height="600"
+                      className="h-full w-full object-cover duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full transition-transform duration-700 group-hover:scale-105">
+                      <Maison d={r.dessin} />
+                    </div>
+                  )}
                 </div>
                 <figcaption className="p-5">
                   <p className="font-cond text-sm font-bold uppercase tracking-[0.2em] text-plan">{r.lieu}</p>

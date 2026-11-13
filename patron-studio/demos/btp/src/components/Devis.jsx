@@ -147,7 +147,7 @@ export default function Devis() {
                   step="5"
                   value={v.surface}
                   onChange={set('surface')}
-                  className="h-3 w-full cursor-pointer accent-[#1d1d1b]"
+                  className="h-11 w-full cursor-pointer accent-[#1d1d1b]"
                 />
                 <p
                   className="mt-4 flex flex-wrap items-baseline justify-between gap-2 border-2 border-anthracite bg-beton px-4 py-3"

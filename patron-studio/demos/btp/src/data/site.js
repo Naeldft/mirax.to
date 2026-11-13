@@ -101,6 +101,8 @@ export const chiffres = [
 export const realisations = [
   {
     id: 1,
+    photo: 'realisation-maison-contemporaine', // photos/realisation-maison-contemporaine.jpg
+    alt: 'Maison contemporaine à bardage bois sombre et grandes baies vitrées, éclairée au crépuscule',
     type: 'maison',
     titre: 'Maison contemporaine',
     lieu: 'Bondues',
@@ -110,6 +112,8 @@ export const realisations = [
   },
   {
     id: 2,
+    photo: 'realisation-extension-cuisine', // photos/realisation-extension-cuisine.jpg
+    alt: 'Cuisine ouverte avec fenêtre au-dessus de l’évier, meubles gris anthracite',
     type: 'extension',
     titre: 'Extension cuisine',
     lieu: 'Marcq-en-Barœul',
@@ -119,6 +123,8 @@ export const realisations = [
   },
   {
     id: 3,
+    photo: 'realisation-longere', // photos/realisation-longere.jpg
+    alt: 'Maison traditionnelle en brique et pierre, pelouse au premier plan',
     type: 'renovation',
     titre: 'Longère rénovée',
     lieu: 'Templemars',
@@ -128,6 +134,8 @@ export const realisations = [
   },
   {
     id: 4,
+    photo: 'realisation-maison-familiale', // photos/realisation-maison-familiale.jpg
+    alt: 'Maison familiale à toit pentu entre les arbres, lumière du soir',
     type: 'maison',
     titre: 'Maison familiale',
     lieu: 'Villeneuve-d’Ascq',
@@ -137,6 +145,8 @@ export const realisations = [
   },
   {
     id: 5,
+    photo: 'realisation-surelevation', // photos/realisation-surelevation.jpg
+    alt: 'Volume contemporain en bardage bois posé sur une maison enduite',
     type: 'extension',
     titre: 'Surélévation',
     lieu: 'Lille Fives',
@@ -146,6 +156,8 @@ export const realisations = [
   },
   {
     id: 6,
+    photo: 'realisation-maison-de-ville', // photos/realisation-maison-de-ville.jpg
+    alt: 'Maison de ville étroite à façade enduite, entrée éclairée',
     type: 'renovation',
     titre: 'Maison de ville',
     lieu: 'Roubaix',

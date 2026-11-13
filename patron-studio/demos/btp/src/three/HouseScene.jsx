@@ -449,7 +449,7 @@ function Crane({ progress, mats, reduced }) {
 /* ---------- plan au sol (quadrillage bleu qui s'efface) ---------- */
 function Blueprint({ progress, reduced }) {
   const grid = useMemo(() => {
-    const g = new THREE.GridHelper(12, 24, '#2b59c3', '#2b59c3');
+    const g = new THREE.GridHelper(9, 18, '#2b59c3', '#2b59c3');
     g.material.transparent = true;
     g.material.opacity = 0.5;
     return g;
@@ -489,19 +489,16 @@ function Rig({ progress, reduced }) {
     const t = tilt.current;
     t.x += ((reduced ? 0 : pointer.x) - t.x) * 0.05;
     t.y += ((reduced ? 0 : pointer.y) - t.y) * 0.05;
-    const mobile = viewport.aspect < 1;
+    const mobile = viewport.aspect < 0.8;
     const az = 0.95 - p * 0.55 + t.x * 0.35;
     const dist = (mobile ? 25 : 13.5) - p * (mobile ? 1 : 1.5);
     const el = 5.2 - p * 1.4 + t.y * 0.8;
     camera.position.set(Math.sin(az) * dist, el, Math.cos(az) * dist);
     // sur téléphone, la maison est remontée dans l'écran (au-dessus du carnet de chantier)
-    camera.lookAt(mobile ? 0.8 : -0.6, mobile ? -0.7 : 1.6, 0);
+    camera.lookAt(0, 1.4, 0); // la maison est centrée dans sa zone (voir ScrollStory)
   });
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} material={mats.sol} receiveShadow>
-        <circleGeometry args={[30, 48]} />
-      </mesh>
       <Blueprint progress={progress} reduced={reduced} />
       <House progress={progress} mats={mats} reduced={reduced} />
       <Crane progress={progress} mats={mats} reduced={reduced} />
@@ -509,12 +506,14 @@ function Rig({ progress, reduced }) {
   );
 }
 
-export default function HouseScene({ progress, reduced, tier, active, onReady }) {
-  const [low, setLow] = useState(tier === 'low');
+export default function HouseScene({ progress, reduced, tier, active, onReady, onSlow }) {
+  // téléphone : version allégée (résolution réduite, pas d'ombres)
+  const petit = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [low, setLow] = useState(tier === 'low' || petit);
   return (
     <Canvas
       className="!absolute inset-0"
-      dpr={low ? 1 : tier === 'high' ? 1.75 : 1.5}
+      dpr={petit ? 1.25 : low ? 1 : tier === 'high' ? 1.75 : 1.5}
       frameloop={active ? (reduced ? 'demand' : 'always') : 'never'}
       shadows={!low}
       camera={{ position: [8, 5, 10], fov: 32, near: 0.1, far: 120 }}
@@ -522,8 +521,7 @@ export default function HouseScene({ progress, reduced, tier, active, onReady })
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => setLow(true)} />
-      <fog attach="fog" args={['#eceae4', 22, 45]} />
+      <PerformanceMonitor onDecline={() => setLow(true)} flipflops={3} onFallback={() => onSlow?.()} />
       <hemisphereLight args={['#ffffff', '#c9c2b2', 1.1]} />
       <directionalLight
         position={[6, 10, 7]}
