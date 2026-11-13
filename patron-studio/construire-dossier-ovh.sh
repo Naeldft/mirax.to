@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 DEMOS=(restauration plomberie location-voitures btp coiffure boulangerie coach boutique photographe association snack conseil)
-OUT=dossier-ovh
+OUT=site-final
 
 echo "→ Installation des dépendances des démos"
 (cd demos && npm install --no-audit --no-fund)

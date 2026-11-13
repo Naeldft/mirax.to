@@ -4,7 +4,7 @@
  */
 export const PATRON = {
   nom: 'Patrôn Studio',
-  accueil: '/',
-  futurSite: '/#futur-site',
-  devis: (demo) => `/contact.html?sujet=devis&demo=${encodeURIComponent(demo)}`,
+  accueil: '../../index.html',
+  futurSite: '../../index.html#futur-site',
+  devis: (demo) => `../../contact.html?sujet=devis&demo=${encodeURIComponent(demo)}`,
 };
