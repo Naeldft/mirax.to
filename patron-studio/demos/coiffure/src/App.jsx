@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import BarreMobile from '@demos/shared/components/BarreMobile.jsx';
 import DemoFooter from '@demos/shared/components/DemoFooter.jsx';
 import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
@@ -19,6 +20,8 @@ export default function App() {
         fontClass="font-serif italic"
         colors={{ bg: '#f7efe9', fg: '#1c1a1a', accent: '#b9746e' }}
         mark={<Logo className="h-14 w-14 animate-pulse" />}
+        minMs={500}
+        maxMs={2000}
       />
       <Header />
       <main>
@@ -30,7 +33,7 @@ export default function App() {
         <Reservation />
         <Infos />
       </main>
-      <footer className="bg-creme px-5 py-12 md:px-8">
+      <footer className="bg-creme px-5 py-12 md:px-8 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:justify-between">
           <p className="font-serif text-2xl italic">{salon.nom}</p>
           <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-taupe">
@@ -49,9 +52,16 @@ export default function App() {
         </p>
       </footer>
       <DemoFooter
+        grandesCibles
         demo="coiffure"
         theme={{ bg: '#1c1a1a', fg: '#f7efe9', accent: '#d9a5a0', accentFg: '#1c1a1a' }}
         fontClass="font-serif italic"
+      />
+      <BarreMobile
+        telephone={salon.telephone}
+        telephoneLien={salon.telephoneLien}
+        adresse={salon.adresse}
+        theme={{ bg: '#f7efe9', fg: '#1c1a1a', accent: '#1c1a1a', accentFg: '#f7efe9', bord: 'rgb(28 26 26 / 0.12)' }}
       />
     </>
   );

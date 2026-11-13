@@ -39,7 +39,7 @@ export default function Header() {
         className={`fixed inset-x-0 top-0 z-[60] transition-colors duration-500 ${scrolled || open ? 'bg-creme/90 backdrop-blur-md' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:h-20 md:px-8">
-          <a href="#accueil" className="flex items-center gap-2" aria-label={`${salon.nom}, retour à l’accueil`}>
+          <a href="#accueil" className="flex min-h-11 items-center gap-2" aria-label={`${salon.nom}, retour à l’accueil`}>
             <Logo className="h-8 w-8" />
             <span className="font-serif text-2xl italic">Atelier Mèche</span>
           </a>

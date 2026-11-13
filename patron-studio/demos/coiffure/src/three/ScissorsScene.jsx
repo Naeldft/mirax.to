@@ -45,7 +45,10 @@ function bladeGeometry() {
 
 function Scissors({ open, groupRef }) {
   const blade = useMemo(() => bladeGeometry(), []);
-  const chrome = useMemo(() => new THREE.MeshStandardMaterial({ color: '#e9ecef', metalness: 0.65, roughness: 0.18, envMapIntensity: 1.6 }), []);
+  const chrome = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#e9ecef', metalness: 0.65, roughness: 0.18, envMapIntensity: 1.6 }),
+    [],
+  );
   const handle = useMemo(() => new THREE.MeshStandardMaterial({ color: '#b9746e', metalness: 0.3, roughness: 0.35 }), []);
   const gold = useMemo(() => new THREE.MeshStandardMaterial({ color: '#d4a85a', metalness: 1, roughness: 0.25 }), []);
   const a = useRef();
@@ -219,13 +222,13 @@ function Rig({ progress, reduced, quality }) {
       cuts.current.shift();
     }
     if (scissors.current) {
-      const mobile = viewport.aspect < 1;
-      scissors.current.scale.setScalar(mobile ? 0.62 : 1);
-      scissors.current.position.set((mobile ? 0.5 : -0.2) + tl.x * 0.4, (mobile ? 1.5 : 0.4) - smooth(p) * 1.2 + Math.sin(t * 0.8) * 0.06, 0.6);
+      // les ciseaux restent au centre de leur zone et pivotent au fil des étapes
+      scissors.current.scale.setScalar(viewport.aspect < 0.8 ? 0.7 : 0.95);
+      scissors.current.position.set(-0.1 + tl.x * 0.35, 0.35 - smooth(p) * 0.35 + Math.sin(t * 0.8) * 0.06, 0.6);
       scissors.current.rotation.set(
         0.15 + tl.y * 0.25,
-        -0.3 + tl.x * 0.4 + (reduced ? 0 : Math.sin(t * 0.4) * 0.1),
-        -0.25 + smooth(p) * 0.2,
+        -0.3 + tl.x * 0.4 + (reduced ? 0 : Math.sin(t * 0.4) * 0.1) + p * Math.PI * 1.1,
+        -0.25 + smooth(p) * 0.35,
       );
     }
     const fit = Math.min(1, viewport.width / 4.6);
@@ -233,7 +236,7 @@ function Rig({ progress, reduced, quality }) {
     camera.lookAt(0, 0.2, 0);
   });
   return (
-    <group position={[viewport.width > 7 ? 1.9 : 0, viewport.width > 7 ? 0 : 0.9, 0]}>
+    <group position={[0, 0.2, 0]}>
       <Hair progress={progress} reduced={reduced} quality={quality} />
       <Scissors open={open} groupRef={scissors} />
       <Snips reduced={reduced} cuts={cuts} />
@@ -241,19 +244,21 @@ function Rig({ progress, reduced, quality }) {
   );
 }
 
-export default function ScissorsScene({ progress, reduced, tier, active, onReady }) {
-  const [low, setLow] = useState(tier === 'low');
+export default function ScissorsScene({ progress, reduced, tier, active, onReady, onSlow }) {
+  // téléphone : version allégée (résolution réduite, pas d'ombres)
+  const petit = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [low, setLow] = useState(tier === 'low' || petit);
   return (
     <Canvas
       className="!absolute inset-0"
-      dpr={low ? 1 : tier === 'high' ? 1.75 : 1.5}
+      dpr={petit ? 1.25 : low ? 1 : tier === 'high' ? 1.75 : 1.5}
       frameloop={active ? (reduced ? 'demand' : 'always') : 'never'}
       camera={{ position: [0, 0.2, 7], fov: 35 }}
       gl={{ antialias: !low, alpha: true, powerPreference: 'high-performance' }}
       onCreated={() => onReady?.()}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => setLow(true)} />
+      <PerformanceMonitor onDecline={() => setLow(true)} flipflops={3} onFallback={() => onSlow?.()} />
       <hemisphereLight args={['#fff6f0', '#d9a5a0', 1]} />
       <directionalLight position={[3, 5, 5]} intensity={2.2} />
       <pointLight position={[-3, 1, 3]} color="#ffd1c4" intensity={18} distance={10} />

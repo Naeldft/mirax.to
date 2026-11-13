@@ -82,11 +82,39 @@ export const equipe = [
 
 /** Inspirations (illustrations dessinées, remplaçables par des photos). */
 export const looks = [
-  { titre: 'Carré flou', note: 'Coupe & brushing', a: '#e8c8b8', b: '#7a4b3a' },
-  { titre: 'Balayage caramel', note: 'Couleur & soin', a: '#f1d9b6', b: '#a8693a' },
-  { titre: 'Dégradé net', note: 'Coupe & barbe', a: '#d8d3cc', b: '#2a2522' },
-  { titre: 'Chignon bohème', note: 'Événement', a: '#f3e1dc', b: '#5a3a30' },
-  { titre: 'Pixie texturé', note: 'Coupe courte', a: '#ead9cf', b: '#3b2a24' },
+  {
+    photo: 'look-carre-flou',
+    alt: 'Brushing au sèche-cheveux et à la brosse ronde sur cheveux mi-longs, vu de dos',
+    titre: 'Carré flou',
+    note: 'Coupe & brushing',
+    a: '#e8c8b8',
+    b: '#7a4b3a',
+  },
+  {
+    photo: 'look-balayage-caramel',
+    alt: 'Longs cheveux ondulés au balayage caramel, vus de dos',
+    titre: 'Balayage caramel',
+    note: 'Couleur & soin',
+    a: '#f1d9b6',
+    b: '#a8693a',
+  },
+  {
+    photo: 'look-degrade-net',
+    alt: 'Coupe homme dégradée aux ciseaux, vue de dos',
+    titre: 'Dégradé net',
+    note: 'Coupe & barbe',
+    a: '#d8d3cc',
+    b: '#2a2522',
+  },
+  {
+    photo: 'look-chignon-boheme',
+    alt: 'Mains de la coiffeuse épinglant un chignon bohème',
+    titre: 'Chignon bohème',
+    note: 'Événement',
+    a: '#f3e1dc',
+    b: '#5a3a30',
+  },
+  { photo: null /* à fournir : photos/look-pixie-texture.jpg */, titre: 'Pixie texturé', note: 'Coupe courte', a: '#ead9cf', b: '#3b2a24' },
 ];
 
 export const chiffres = [
