@@ -11,7 +11,10 @@ export default function Footer() {
           <Logo />
           <p className="mt-3 font-serif italic text-creme/60">{restaurant.slogan}</p>
         </div>
-        <nav aria-label="Liens du pied de page" className="grid grid-cols-2 gap-x-10 gap-y-3 text-sm text-creme/70">
+        <nav
+          aria-label="Liens du pied de page"
+          className="grid grid-cols-2 gap-x-10 gap-y-1 text-base text-creme/70 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center"
+        >
           {NAV.map((n) => (
             <a key={n.href} href={n.href} className="hover:text-or-clair">
               {n.label}

@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { categories, formatPrix, pizzaImage, pizzas } from '../data/pizzas';
+import Photo from '@demos/shared/components/Photo.jsx';
+import { categories, formatPrix, pizzas } from '../data/pizzas';
 import { carte } from '../data/site';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
@@ -17,16 +18,17 @@ function PizzaCard({ p }) {
         p.signature ? 'border-or/60 shadow-[0_20px_60px_-30px_rgb(201_162_74/0.6)]' : 'border-creme/10 hover:border-creme/25'
       }`}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-[radial-gradient(circle_at_50%_60%,rgb(216_67_47/0.25),transparent_65%)]">
-        <img
-          src={pizzaImage(p.id)}
-          alt={`Pizza ${p.nom}`}
+      <div className="relative aspect-[4/3] overflow-hidden bg-cendre">
+        {/* emplacement photo : p.photo (photos/<nom>.jpg) */}
+        <Photo
+          nom={p.photo}
+          alt={`Pizza ${p.nom} : ${p.ingredients.join(', ')}`}
+          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 100vw"
           width="800"
-          height="800"
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 m-auto h-[115%] w-[115%] max-w-none -translate-x-[6.5%] -translate-y-[2%] object-contain transition-transform duration-700 ease-out group-hover:rotate-12 group-hover:scale-105"
+          height="600"
+          className="h-full w-full object-cover duration-700 ease-out group-hover:scale-[1.04] [transition-property:opacity,transform]"
         />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-braise/70 to-transparent" />
         {p.signature && (
           <span className="absolute left-4 top-4 rounded-full bg-or px-3 py-1 text-xs font-bold uppercase tracking-wider text-charbon">
             Signature du chef
@@ -44,7 +46,7 @@ function PizzaCard({ p }) {
           </p>
         </div>
         <p className="mt-1 font-serif italic text-creme/75">{p.description}</p>
-        <p className="mt-3 text-sm leading-relaxed text-creme/60">{p.ingredients.join(', ')}</p>
+        <p className="mt-3 leading-relaxed text-creme/65">{p.ingredients.join(', ')}</p>
         {(veg || hot) && (
           <ul className="mt-auto flex gap-2 pt-4 text-xs font-semibold">
             {veg && (
@@ -76,7 +78,7 @@ function CarteBloc({ titre, items }) {
               <span className="flex-1 translate-y-[-3px] border-b border-dotted border-creme/25" aria-hidden="true" />
               <span className="font-semibold text-creme/90">{formatPrix(it.prix)}</span>
             </div>
-            <p className="mt-0.5 text-sm text-creme/55">{it.detail}</p>
+            <p className="mt-0.5 text-base text-creme/60">{it.detail}</p>
           </li>
         ))}
       </ul>

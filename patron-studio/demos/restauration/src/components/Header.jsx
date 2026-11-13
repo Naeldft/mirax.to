@@ -16,7 +16,7 @@ export function Logo({ className = '' }) {
   return (
     <a
       href="#accueil"
-      className={`flex items-center gap-2 font-serif text-xl font-semibold tracking-wide ${className}`}
+      className={`flex min-h-11 items-center gap-2 font-serif text-xl font-semibold tracking-wide ${className}`}
       aria-label="Forno Vivo, retour à l’accueil"
     >
       <Flame className="text-tomate-vif text-2xl" />

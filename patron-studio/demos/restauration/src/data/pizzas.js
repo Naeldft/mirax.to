@@ -12,6 +12,7 @@
 export const pizzas = [
   {
     id: 'margherita',
+    photo: 'pizza-margherita', // photo du menu : photos/pizza-margherita.jpg
     nom: 'Margherita',
     prix: 11,
     categories: ['classique', 'vegetarienne'],
@@ -25,6 +26,7 @@ export const pizzas = [
   },
   {
     id: 'regina',
+    photo: 'pizza-regina', // photo du menu : photos/pizza-regina.jpg
     nom: 'Regina',
     prix: 13.5,
     categories: ['classique'],
@@ -39,6 +41,7 @@ export const pizzas = [
   },
   {
     id: 'diavola',
+    photo: 'pizza-diavola', // photo du menu : photos/pizza-diavola.jpg
     nom: 'Diavola',
     prix: 14,
     categories: ['epicee'],
@@ -53,6 +56,7 @@ export const pizzas = [
   },
   {
     id: 'quattro-formaggi',
+    photo: 'pizza-quattro-formaggi', // photo du menu : photos/pizza-quattro-formaggi.jpg
     nom: 'Quattro Formaggi',
     prix: 15,
     categories: ['vegetarienne'],
@@ -68,6 +72,7 @@ export const pizzas = [
   },
   {
     id: 'calzone',
+    photo: 'pizza-calzone', // photo du menu : photos/pizza-calzone.jpg
     nom: 'Calzone',
     prix: 14.5,
     categories: ['classique'],
@@ -82,6 +87,7 @@ export const pizzas = [
   },
   {
     id: 'tartufo',
+    photo: 'pizza-tartufo', // photo du menu : photos/pizza-tartufo.jpg
     nom: 'Tartufo',
     prix: 18,
     categories: ['vegetarienne'],
@@ -97,6 +103,7 @@ export const pizzas = [
   },
   {
     id: 'ortolana',
+    photo: 'pizza-ortolana', // photo du menu : photos/pizza-ortolana.jpg
     nom: 'Ortolana',
     prix: 13,
     categories: ['vegetarienne'],
@@ -113,6 +120,7 @@ export const pizzas = [
   },
   {
     id: 'nduja',
+    photo: 'pizza-nduja', // photo du menu : photos/pizza-nduja.jpg
     nom: '’Nduja e Burrata',
     prix: 16,
     categories: ['epicee'],
@@ -128,6 +136,7 @@ export const pizzas = [
   },
   {
     id: 'vivo',
+    photo: 'pizza-vivo', // photo du menu : photos/pizza-vivo.jpg
     nom: 'La Vivo',
     prix: 17,
     categories: [],
@@ -151,8 +160,19 @@ export const categories = [
   { id: 'vegetarienne', label: 'Végétariennes' },
 ];
 
-/** Pizzas proposées dans le sélecteur 3D de l'accueil (dans cet ordre). */
-export const heroPizzas = ['margherita', 'diavola', 'quattro-formaggi', 'tartufo', 'calzone', 'vivo', 'regina'];
+/**
+ * Étapes de l'accueil « à faire défiler » : la pizza 3D change à chaque étape,
+ * avec la couleur de fond (centre, bord) et le mot géant affiché derrière.
+ */
+export const histoirePizzas = [
+  { id: 'margherita', fond: ['#8a2216', '#160c0a'], mot: 'Margherita' },
+  { id: 'diavola', fond: ['#a3360f', '#170806'], mot: 'Diavola' },
+  { id: 'quattro-formaggi', fond: ['#7a6326', '#15110a'], mot: 'Formaggi' },
+  { id: 'tartufo', fond: ['#4a3a2c', '#0c0a09'], mot: 'Tartufo' },
+  { id: 'vivo', fond: ['#3f5d2a', '#0d120b'], mot: 'Vivo' },
+];
+/** Ancien nom conservé pour les scripts de rendu d'images. */
+export const heroPizzas = histoirePizzas.map((h) => h.id);
 
 export const formatPrix = (p) =>
   p.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(p) ? 0 : 2, maximumFractionDigits: 2 }) + ' €';

@@ -16,7 +16,8 @@ export default function FaqSection() {
             items={faq}
             classes={{
               item: 'border-b border-creme/10',
-              button: 'flex w-full items-center justify-between gap-6 py-5 text-left font-serif text-xl font-semibold transition-colors hover:text-or-clair md:text-2xl',
+              button:
+                'flex w-full items-center justify-between gap-6 py-5 text-left font-serif text-xl font-semibold transition-colors hover:text-or-clair md:text-2xl',
               icon: 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-creme/20 font-sans text-xl text-or-clair',
               answer: 'pb-6 leading-relaxed text-creme/70',
             }}

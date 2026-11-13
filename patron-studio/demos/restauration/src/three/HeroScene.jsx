@@ -1,6 +1,6 @@
 import { ContactShadows, Environment, Lightformer, PerformanceMonitor, Sparkles } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { pointer, usePointer } from '@demos/shared/hooks/usePointer.js';
 import { Pizza3D } from './Pizza3D';
 
@@ -15,25 +15,32 @@ function FireLight({ reduced }) {
   return <pointLight ref={light} position={[-2.4, 0.9, -2.2]} color="#ff6a1f" intensity={26} distance={9} decay={1.6} />;
 }
 
-/** Mouvement lié au défilement : la pizza s'incline, monte et se rapproche. */
-function ScrollRig({ progress, children, reduced }) {
+/**
+ * Mouvement lié au défilement (section fixée) : à chaque étape la pizza fait un quart
+ * de tour et se « retourne » (elle rétrécit un instant pendant que les garnitures changent).
+ */
+function ScrollRig({ progress, step, children, reduced }) {
   const group = useRef();
   const tilt = useRef({ x: 0, y: 0 });
-  const { camera } = useThree();
+  const { camera, viewport } = useThree();
   usePointer();
   useFrame(() => {
-    const p = reduced ? 0 : progress.current;
     if (!group.current) return;
-    // la pizza suit doucement la souris (ou l'inclinaison du téléphone)
+    const s = reduced ? 0 : step.current;
+    const frac = s - Math.floor(s);
+    const pli = Math.sin(frac * Math.PI); // 0 sur une étape, 1 entre deux étapes
     const t = tilt.current;
     t.x += ((reduced ? 0 : pointer.x) - t.x) * 0.06;
     t.y += ((reduced ? 0 : pointer.y) - t.y) * 0.06;
-    group.current.rotation.z = -t.x * 0.18;
-    group.current.rotation.x = p * 0.55 + t.y * 0.16;
-    group.current.position.y = p * 0.9;
-    group.current.position.z = p * 0.6;
-    camera.position.set(0, 3.15 - p * 0.6, 4.25 - p * 0.5);
-    camera.lookAt(0, 0.05 + p * 0.5, 0);
+    group.current.rotation.y = s * (Math.PI / 2);
+    group.current.rotation.z = -t.x * 0.18 + pli * 0.25;
+    group.current.rotation.x = t.y * 0.16 + pli * 0.5;
+    group.current.scale.setScalar(1 - pli * 0.18);
+    group.current.position.y = pli * 0.25;
+    // cadrage : la pizza remplit la zone, sur téléphone comme sur ordinateur
+    const recul = viewport.aspect < 1 ? 1.12 : 1;
+    camera.position.set(0, 3.15 * recul - (reduced ? 0 : progress.current) * 0.3, 4.25 * recul);
+    camera.lookAt(0, 0.05, 0);
   });
   return <group ref={group}>{children}</group>;
 }
@@ -43,14 +50,12 @@ function ScrollRig({ progress, children, reduced }) {
  *  tier : 'low' | 'mid' | 'high' (voir useDeviceTier)
  *  active : false quand l'accueil est hors écran → rendu en pause
  */
-export default function HeroScene({ pizza, tier, reduced, active, progress, onReady }) {
-  const [degraded, setDegraded] = useState(tier === 'low');
-  const [dpr, setDpr] = useState(tier === 'high' ? 1.75 : tier === 'mid' ? 1.5 : 1);
+export default function HeroScene({ pizza, tier, reduced, active, progress, step, onReady, onSlow }) {
+  // téléphone : version allégée (résolution réduite, pas d'ombres, moins de particules)
+  const petit = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [degraded, setDegraded] = useState(tier === 'low' || petit);
+  const [dpr, setDpr] = useState(petit ? 1.25 : tier === 'high' ? 1.75 : tier === 'mid' ? 1.5 : 1);
   const quality = degraded ? 'low' : 'high';
-
-  useEffect(() => {
-    if (tier === 'low') setDegraded(true);
-  }, [tier]);
 
   return (
     <Canvas
@@ -72,6 +77,8 @@ export default function HeroScene({ pizza, tier, reduced, active, progress, onRe
           setDpr(1);
           setDegraded(true);
         }}
+        flipflops={3}
+        onFallback={() => onSlow?.()}
       />
       <hemisphereLight args={['#ffd9a8', '#2a120a', 0.7]} />
       <directionalLight
@@ -94,7 +101,7 @@ export default function HeroScene({ pizza, tier, reduced, active, progress, onRe
           <Lightformer form="ring" intensity={3} color="#ff7a2e" position={[-4, 1, -3]} scale={2} />
         </Environment>
       )}
-      <ScrollRig progress={progress} reduced={reduced}>
+      <ScrollRig progress={progress} step={step} reduced={reduced}>
         <Pizza3D pizza={pizza} quality={quality} reduced={reduced} spin={reduced ? 0 : 0.22} board={false} />
         {!degraded && <ContactShadows position={[0, -0.11, 0]} opacity={0.55} scale={6} blur={2.4} far={2} frames={1} color="#000000" />}
       </ScrollRig>

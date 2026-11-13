@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import BarreMobile from '@demos/shared/components/BarreMobile.jsx';
 import DemoFooter from '@demos/shared/components/DemoFooter.jsx';
 import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
@@ -13,6 +14,7 @@ import Menu from './components/Menu';
 import Reservation from './components/Reservation';
 import Reviews from './components/Reviews';
 import Story from './components/Story';
+import { restaurant } from './data/site';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -26,6 +28,8 @@ export default function App() {
         fontClass="font-serif"
         colors={{ bg: '#14110f', fg: '#f5ecd9', accent: '#d8432f' }}
         mark={<Flame className="animate-pulse text-6xl text-tomate-vif" />}
+        minMs={500}
+        maxMs={2000}
       />
       <Header />
       <main>
@@ -39,7 +43,18 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
-      <DemoFooter demo="restauration" theme={{ bg: '#b3261e', fg: '#f5ecd9', accent: '#f5ecd9', accentFg: '#14110f' }} fontClass="font-serif" />
+      <DemoFooter
+        grandesCibles
+        demo="restauration"
+        theme={{ bg: '#b3261e', fg: '#f5ecd9', accent: '#f5ecd9', accentFg: '#14110f' }}
+        fontClass="font-serif"
+      />
+      <BarreMobile
+        telephone={restaurant.telephone}
+        telephoneLien={restaurant.telephoneLien}
+        adresse={`${restaurant.adresse.rue}, ${restaurant.adresse.ville}`}
+        theme={{ bg: '#14110f', fg: '#f5ecd9', accent: '#d8432f', accentFg: '#f5ecd9', bord: 'rgb(245 236 217 / 0.15)' }}
+      />
     </>
   );
 }

@@ -62,13 +62,13 @@ export default function Contact() {
               <br />
               {restaurant.adresse.ville}
             </address>
-            <p className="mt-4 text-sm text-creme/55">Métro Gare Lille-Flandres, à 5 minutes à pied.</p>
+            <p className="mt-4 text-base text-creme/60">Métro Gare Lille-Flandres, à 5 minutes à pied.</p>
             <a href={`tel:${restaurant.telephoneLien}`} className="btn btn-primary mt-6 w-full">
               <Phone /> Appeler le {restaurant.telephone}
             </a>
             <a
               href={`mailto:${restaurant.email}`}
-              className="mt-4 block text-center text-sm text-creme/70 underline-offset-4 hover:text-or-clair hover:underline"
+              className="mt-4 flex min-h-11 items-center justify-center text-base text-creme/70 underline-offset-4 hover:text-or-clair hover:underline"
             >
               {restaurant.email}
             </a>
@@ -84,7 +84,7 @@ export default function Contact() {
                 return (
                   <li
                     key={h.jour}
-                    className={`flex justify-between gap-4 py-2.5 text-sm ${isToday ? 'font-semibold text-or-clair' : 'text-creme/75'}`}
+                    className={`flex justify-between gap-4 py-2.5 text-base ${isToday ? 'font-semibold text-or-clair' : 'text-creme/75'}`}
                   >
                     <span>
                       {h.nom}

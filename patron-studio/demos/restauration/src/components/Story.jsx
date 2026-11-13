@@ -67,7 +67,11 @@ export default function Story() {
             <div key={c.label} data-reveal className="text-center md:text-left">
               <dt className="sr-only">{c.label}</dt>
               <dd>
-                <Counter value={c.valeur} suffix={c.suffixe} className="block font-serif text-3xl font-semibold text-or-clair md:text-5xl" />
+                <Counter
+                  value={c.valeur}
+                  suffix={c.suffixe}
+                  className="block font-serif text-3xl font-semibold text-or-clair md:text-5xl"
+                />
                 <span className="mt-1 block text-xs leading-snug text-creme/60 md:text-sm">{c.label}</span>
               </dd>
             </div>

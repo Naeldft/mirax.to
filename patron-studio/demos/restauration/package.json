@@ -4,12 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run photos && vite",
+    "build": "npm run photos && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "images": "node scripts/render-images.mjs",
-    "format": "prettier --write \"src/**/*.{js,jsx}\""
+    "format": "prettier --write \"src/**/*.{js,jsx}\"",
+    "photos": "node ../shared/scripts/optimiser-photos.mjs ."
   },
   "dependencies": {
     "@demos/shared": "*"

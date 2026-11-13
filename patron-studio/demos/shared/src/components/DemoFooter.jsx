@@ -6,7 +6,7 @@ import { PATRON } from '../lib/patron.js';
  * theme : { bg, fg, accent, accentFg } — couleurs de la démo.
  * À retirer pour un vrai client.
  */
-export default function DemoFooter({ demo, theme, fontClass = '' }) {
+export default function DemoFooter({ demo, theme, fontClass = '', grandesCibles = false }) {
   return (
     <aside
       aria-label="À propos de ce site démo"
@@ -28,10 +28,13 @@ export default function DemoFooter({ demo, theme, fontClass = '' }) {
             →
           </span>
         </a>
-        <p className="text-sm opacity-75">
+        <p className={`${grandesCibles ? 'text-base' : 'text-sm'} opacity-75`}>
           Site démo réalisé par <strong>{PATRON.nom}</strong>
           {' · '}
-          <a href={PATRON.futurSite} className="underline underline-offset-4 hover:opacity-100">
+          <a
+            href={PATRON.futurSite}
+            className={`underline underline-offset-4 hover:opacity-100 ${grandesCibles ? 'inline-flex min-h-11 items-center' : ''}`}
+          >
             ← Retour à Patrôn Studio et aux autres démos
           </a>
         </p>

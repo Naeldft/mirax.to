@@ -106,24 +106,29 @@ export const histoire = {
   ],
 };
 
-const BASE = import.meta.env?.BASE_URL ?? '/';
-
-/** Galerie : remplacez simplement les fichiers dans public/images/galerie/ par vos photos. */
+/**
+ * Galerie : chaque entrée est un emplacement photo (fichier photos/<photo>.jpg).
+ * Pour changer une image, remplacez le fichier du même nom (voir photos/LISEZ-MOI.md).
+ */
 export const galerie = [
-  { src: BASE + 'images/galerie/four.webp', alt: 'Le four à bois de Forno Vivo, braises incandescentes', legende: 'Le four, allumé dès l’aube' },
   {
-    src: BASE + 'images/galerie/margherita.webp',
-    alt: 'Margherita sortie du four, mozzarella fondante et basilic',
-    legende: 'Margherita, l’éternelle',
+    photo: 'galerie-four',
+    alt: 'Pizza napolitaine posée devant la bouche du four à bois, braises rougeoyantes',
+    legende: 'Le four, allumé dès l’aube',
   },
-  { src: BASE + 'images/galerie/diavola.webp', alt: 'Pizza Diavola au salame piccante', legende: 'Diavola, la piquante' },
   {
-    src: BASE + 'images/galerie/ingredients.webp',
-    alt: 'Tomates, basilic et mozzarella sur le plan de travail',
-    legende: 'Des produits de Campanie',
+    photo: 'galerie-fromage',
+    alt: 'Part de pizza soulevée, la mozzarella fondue s’étire en longs fils',
+    legende: 'Fior di latte, fondante',
   },
-  { src: BASE + 'images/galerie/tartufo.webp', alt: 'Pizza Tartufo à la crème de truffe', legende: 'Tartufo, pour les grandes occasions' },
-  { src: BASE + 'images/galerie/vivo.webp', alt: 'La Vivo, pizza signature du chef à la pistache', legende: 'La Vivo, signature du chef' },
+  { photo: 'galerie-mains', alt: 'Mains du pizzaiolo déposant du basilic frais sur une pizza', legende: 'Garnie à la main' },
+  { photo: 'galerie-salle', alt: 'La salle du restaurant, tables dressées sous une lumière tamisée', legende: 'La salle, vue sur le four' },
+  { photo: 'pizza-margherita', alt: 'Margherita au basilic sur une assiette sombre', legende: 'Margherita, l’éternelle' },
+  {
+    photo: 'pizza-vivo',
+    alt: 'Pizza La Vivo garnie de charcuterie fine et de roquette, découpée en parts',
+    legende: 'La Vivo, signature du chef',
+  },
 ];
 
 /** Avis (fictifs, site démo). */
@@ -156,8 +161,20 @@ export const avis = [
 
 /** Questions fréquentes. */
 export const faq = [
-  { q: 'Faut-il réserver ?', a: 'C’est conseillé le vendredi et le samedi soir. En semaine, nous gardons toujours quelques tables pour les clients de passage.' },
-  { q: 'Proposez-vous des pizzas sans gluten ?', a: 'Oui, sur demande, avec une pâte sans gluten préparée à part. La cuisson se fait dans le même four : nous ne pouvons pas garantir l’absence totale de traces.' },
-  { q: 'Peut-on commander à emporter ?', a: 'Oui, toutes nos pizzas sont disponibles à emporter. Appelez-nous : elle sera prête en quinze minutes environ.' },
-  { q: 'Accueillez-vous les groupes ?', a: 'Jusqu’à dix personnes avec la réservation en ligne. Au-delà, et pour privatiser la salle, appelez-nous directement.' },
+  {
+    q: 'Faut-il réserver ?',
+    a: 'C’est conseillé le vendredi et le samedi soir. En semaine, nous gardons toujours quelques tables pour les clients de passage.',
+  },
+  {
+    q: 'Proposez-vous des pizzas sans gluten ?',
+    a: 'Oui, sur demande, avec une pâte sans gluten préparée à part. La cuisson se fait dans le même four : nous ne pouvons pas garantir l’absence totale de traces.',
+  },
+  {
+    q: 'Peut-on commander à emporter ?',
+    a: 'Oui, toutes nos pizzas sont disponibles à emporter. Appelez-nous : elle sera prête en quinze minutes environ.',
+  },
+  {
+    q: 'Accueillez-vous les groupes ?',
+    a: 'Jusqu’à dix personnes avec la réservation en ligne. Au-delà, et pour privatiser la salle, appelez-nous directement.',
+  },
 ];
