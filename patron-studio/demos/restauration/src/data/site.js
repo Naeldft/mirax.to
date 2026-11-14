@@ -121,14 +121,10 @@ export const galerie = [
     alt: 'Part de pizza soulevée, la mozzarella fondue s’étire en longs fils',
     legende: 'Fior di latte, fondante',
   },
-  { photo: 'galerie-mains', alt: 'Mains du pizzaiolo déposant du basilic frais sur une pizza', legende: 'Garnie à la main' },
-  { photo: 'galerie-salle', alt: 'La salle du restaurant, tables dressées sous une lumière tamisée', legende: 'La salle, vue sur le four' },
+  { photo: 'galerie-mains', alt: 'Mains du pizzaiolo déposant des herbes fraîches sur une pizza', legende: 'Garnie à la main' },
+  { photo: 'galerie-salle', alt: 'La salle du restaurant, tables dressées sous une lumière tamisée', legende: 'La salle, tables dressées' },
   { photo: 'pizza-margherita', alt: 'Margherita au basilic sur une assiette sombre', legende: 'Margherita, l’éternelle' },
-  {
-    photo: 'pizza-vivo',
-    alt: 'Pizza La Vivo garnie de charcuterie fine et de roquette, découpée en parts',
-    legende: 'La Vivo, signature du chef',
-  },
+  { photo: 'pizza-verde', alt: 'Pizza Verde vue de dessus : pousses d’épinard et burrata sur sauce tomate', legende: 'Verde, épinards et burrata' },
 ];
 
 /** Avis (fictifs, site démo). */

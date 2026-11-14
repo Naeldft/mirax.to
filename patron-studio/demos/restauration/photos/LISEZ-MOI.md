@@ -1,43 +1,52 @@
 # Photos de Forno Vivo
 
-Pour changer une photo : déposez la vôtre dans ce dossier **avec le même nom** (`.jpg`, `.png` ou `.webp`),
-puis relancez `./construire-dossier-ovh.sh`. Les versions WebP (800 px mobile, 1 600 px ordinateur) sont
-créées automatiquement dans `public/images/`.
+Règle : uniquement de vraies photos qui montrent **exactement** le produit (aucune image IA, aucun dessin, aucun rendu 3D).
+Pas de bonne photo = un emplacement neutre « Photo à venir » s'affiche, jamais une image approchante.
 
-| Emplacement | Où | Description de la photo attendue |
-|---|---|---|
-| `pizza-margherita` | Carte | Margherita napolitaine vue de dessus : sauce tomate, mozzarella fondue, basilic, bordure gonflée |
-| `pizza-regina` | Carte | Pizza jambon cuit et champignons de Paris, origan |
-| `pizza-diavola` | Carte | Pizza au salame piquant, fond sombre |
-| `pizza-quattro-formaggi` | Carte | Pizza blanche aux quatre fromages fondus (sans sauce tomate) |
-| `pizza-calzone` | Carte | **À FOURNIR** : calzone dorée (chausson) entière, éventuellement coupée pour montrer la garniture. Image provisoire : rendu 3D |
-| `pizza-tartufo` | Carte | Pizza blanche crème de truffe et champignons des bois |
-| `pizza-ortolana` | Carte | Pizza aux légumes grillés (tomates, poivrons, aubergine) et basilic |
-| `pizza-nduja` | Carte | Pizza à la ’nduja (rouge, piquante) avec une burrata au centre |
-| `pizza-vivo` | Carte | Pizza signature : mortadelle, stracciatella, éclats de pistache |
-| `galerie-four` | Galerie | Pizza devant la bouche du four à bois, braises visibles |
-| `galerie-fromage` | Galerie | Part soulevée, la mozzarella qui file |
-| `galerie-mains` | Galerie | Mains du pizzaiolo qui garnissent une pizza (sans visage) |
-| `galerie-salle` | Galerie | La salle du restaurant, plan large, sans enseigne ni texte lisible |
-| `galerie-tiramisu` | (non affichée) | **À FOURNIR si souhaité** : part de tiramisù au cacao, assiette, fond bois sombre |
-| `galerie-ingredients` | (non affichée) | **À FOURNIR si souhaité** : tomates San Marzano, basilic, mozzarella sur plan de travail fariné |
+Pour ajouter ou changer une photo de la carte : déposez-la dans ce dossier **avec le nom indiqué** (`.jpg`, `.png` ou `.webp`),
+mettez `photo: '<nom>'` sur la pizza dans `src/data/pizzas.js`, puis relancez `./construire-dossier-ovh.sh`.
+Les versions WebP (800 px mobile, 1 600 px ordinateur) sont créées automatiquement dans `public/images/`.
 
-Les images `public/images/pizzas/*.webp` sont les rendus de la pizza 3D : elles servent d'image fixe
-quand la 3D n'est pas affichée (téléphone lent, WebGL indisponible). Ne pas les supprimer.
+## Plateau tournant de l'accueil (photos vues de dessus, détourées en disque)
 
-## Origine des photos actuelles (Unsplash, licence libre, usage commercial autorisé)
+`public/images/disques/<pizza>-1024.webp` et `-512.webp` : la pizza entière vue de dessus, découpée au bord réel de la croûte
+(sans fond, sans plat), la perspective éventuelle redressée pour former un disque.
+Une pizza n'apparaît sur le plateau que si elle a un disque (`disque:` dans `src/data/pizzas.js`).
 
-| Fichier | Photo d'origine |
+| Disque | Photo d'origine (Unsplash) |
 |---|---|
-| pizza-margherita | https://images.unsplash.com/photo-1574071318508-1cdbab80d002 |
-| pizza-diavola | https://images.unsplash.com/photo-1628840042765-356cda07504e |
-| pizza-quattro-formaggi | https://images.unsplash.com/photo-1620374645498-af6bd681a0bd |
-| pizza-regina | https://images.unsplash.com/photo-1593246049226-ded77bf90326 |
-| pizza-ortolana | https://images.unsplash.com/photo-1585238342024-78d387f4a707 |
-| pizza-nduja | https://images.unsplash.com/photo-1593560708920-61dd98c46a4e |
-| pizza-tartufo | https://images.unsplash.com/photo-1599321955726-e048426594af |
-| pizza-vivo | https://images.unsplash.com/photo-1600628421055-4d30de868b8f |
+| margherita | https://images.unsplash.com/photo-1574071318508-1cdbab80d002 |
+| diavola | https://images.unsplash.com/photo-1628840042765-356cda07504e |
+| verde | https://images.unsplash.com/photo-1593560708920-61dd98c46a4e |
+
+Pour ajouter une pizza au plateau : une photo vue **exactement de dessus**, pizza entière, rien de coupé par le cadre.
+
+## Carte
+
+| Fichier | Pizza | Photo d'origine (Unsplash) |
+|---|---|---|
+| pizza-margherita | Margherita | https://images.unsplash.com/photo-1574071318508-1cdbab80d002 |
+| pizza-diavola | Diavola | https://images.unsplash.com/photo-1628840042765-356cda07504e |
+| pizza-verde | Verde | https://images.unsplash.com/photo-1593560708920-61dd98c46a4e |
+| pizza-quattro-formaggi | Quattro Formaggi | https://images.unsplash.com/photo-1620374645498-af6bd681a0bd |
+
+### Emplacements à remplir (aucune photo exacte trouvée)
+
+| Fichier attendu | Ce que la photo doit montrer |
+|---|---|
+| `pizza-regina` | Pizza tomate, mozzarella, jambon cuit et champignons de Paris, origan |
+| `pizza-calzone` | Calzone dorée (chausson) entière, éventuellement ouverte sur la garniture ricotta-jambon |
+| `pizza-tartufo` | Pizza blanche à la crème de truffe, champignons des bois, roquette et copeaux de parmesan |
+| `pizza-ortolana` | Pizza aux légumes grillés : courgette, aubergine, poivrons rôtis, basilic |
+| `pizza-vivo` | Pizza signature : mortadelle, stracciatella, pesto et éclats de pistache, zeste de citron |
+
+## Galerie
+
+| Fichier | Photo d'origine (Unsplash) |
+|---|---|
 | galerie-four | https://images.unsplash.com/photo-1579751626657-72bc17010498 |
-| galerie-mains | https://images.unsplash.com/photo-1572552635104-daf938e0aa1f |
 | galerie-fromage | https://images.unsplash.com/photo-1541745537411-b8046dc6d66c |
+| galerie-mains | https://images.unsplash.com/photo-1572552635104-daf938e0aa1f |
 | galerie-salle | https://images.unsplash.com/photo-1517248135467-4c7edcad34c4 |
+
+Licence Unsplash : usage commercial autorisé, sans attribution obligatoire.

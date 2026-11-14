@@ -174,3 +174,46 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Accueil : plateau tournant ---------- */
+.fv-fleche {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid rgb(245 236 217 / 0.28);
+  background: rgb(20 17 15 / 0.55);
+  color: var(--color-creme);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, border-color 0.2s;
+}
+.fv-fleche:hover { background: rgb(245 236 217 / 0.12); border-color: rgb(245 236 217 / 0.6); }
+.fv-fleche:focus-visible { outline: 2px solid var(--color-or-clair); outline-offset: 3px; }
+.fv-texte { animation: fv-texte 0.6s 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fv-texte { from { opacity: 0; transform: translateY(14px); } }
+.fv-mot-g { animation: fv-mot 0.9s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both; --fv-dep: 18%; }
+.fv-mot-d { animation: fv-mot 0.9s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both; --fv-dep: -18%; }
+@keyframes fv-mot { from { opacity: 0; translate: var(--fv-dep) 0; } }
+/* sans 3D : la photo arrive en roulant (rotation = distance parcourue) */
+.fv-roule-g { animation: fv-roule-g 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.fv-roule-d { animation: fv-roule-d 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fv-roule-g { from { translate: 120% 0; rotate: 300deg; opacity: 0; } 30% { opacity: 1; } }
+@keyframes fv-roule-d { from { translate: -120% 0; rotate: -300deg; opacity: 0; } 30% { opacity: 1; } }
+/* emplacement de photo (pas encore de vraie photo) */
+.photo-a-venir {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: repeating-linear-gradient(-45deg, #241e1b, #241e1b 12px, #2a2320 12px, #2a2320 24px);
+  color: rgb(245 236 217 / 0.6);
+  text-align: center;
+  font-size: 0.85rem;
+}
+.photo-a-venir strong { font-family: var(--font-serif, serif); font-size: 1.4rem; font-style: italic; color: rgb(245 236 217 / 0.85); }
+@media (prefers-reduced-motion: reduce) {
+  .fv-texte, .fv-mot-g, .fv-mot-d, .fv-roule-g, .fv-roule-d { animation: none; }
+}

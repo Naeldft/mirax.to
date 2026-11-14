@@ -17,6 +17,16 @@ Les photos détourées essayées auparavant ont été retirées à la demande du
 vraies captures d'écran des 12 sites de démonstration du dossier `demos/`, faites automatiquement.
 À refaire après chaque modification d'une démo : `node outils/captures-demos.cjs` (mode d'emploi en tête du fichier).
 
+## Démos
+
+### Forno Vivo (restauration)
+
+Détail complet (sources, emplacements à remplir) : `demos/restauration/photos/LISEZ-MOI.md`.
+- Plateau tournant de l'accueil : 3 vraies photos de pizzas vues de dessus, détourées au bord de la croûte et redressées en disque
+  (Margherita, Diavola, Verde).
+- Carte : 4 vraies photos ; 5 emplacements nommés « Photo à venir » (Regina, Calzone, Tartufo, Ortolana, La Vivo) : aucune photo exacte trouvée.
+- Retirés : la pizza dessinée en 3D, ses rendus d'image et le rendu 3D de la calzone ; les photos qui ne correspondaient pas à la recette.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

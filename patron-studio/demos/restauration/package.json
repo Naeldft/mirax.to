@@ -8,7 +8,6 @@
     "build": "npm run photos && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "images": "node scripts/render-images.mjs",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "photos": "node ../shared/scripts/optimiser-photos.mjs ."
   },
