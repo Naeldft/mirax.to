@@ -14,23 +14,81 @@
  *  Le minutage suit l'horloge (pas les images) : la durée est tenue même sur un téléphone lent.
  */
 import * as THREE from 'three';
-// vraies photos détourées (fond transparent), voir IMAGES.md
-import imgPizza from './images/tunnel-pizza.webp';
-import ombrePizza from './images/tunnel-pizza-ombre.webp';
-import imgMaison from './images/tunnel-maison.webp';
-import ombreMaison from './images/tunnel-maison-ombre.webp';
-import imgVetement from './images/tunnel-vetement.webp';
-import ombreVetement from './images/tunnel-vetement-ombre.webp';
-import imgOrdinateur from './images/tunnel-ordinateur.webp';
-import ombreOrdinateur from './images/tunnel-ordinateur-ombre.webp';
 
 const DOMAINES = [
-  // photo : [image, ombre, hauteur (unités 3D)] — le sujet dépasse au-dessus du panneau
-  { mot: 'Restaurants', cote: 1, photo: [imgPizza, ombrePizza, 1.55] },
-  { mot: 'Artisans', cote: -1, photo: [imgMaison, ombreMaison, 1.28] },
-  { mot: 'Commerces', cote: 1, photo: [imgVetement, ombreVetement, 2.05] },
-  { mot: 'Agences', cote: -1, photo: [imgOrdinateur, ombreOrdinateur, 1.5] },
+  { mot: 'Restaurants', cote: 1, icone: 'pizza' },
+  { mot: 'Artisans', cote: -1, icone: 'maison' },
+  { mot: 'Commerces', cote: 1, icone: 'cintre' },
+  { mot: 'Agences', cote: -1, icone: 'ecran' },
 ];
+
+/* Icônes « enseigne néon » : tracés vectoriels (repère 512 × 512), tous dessinés avec le même trait. */
+const ICONES = {
+  // pizza vue de dessus : croûte, garniture, 6 parts, 4 rondelles
+  pizza: [
+    'M446 256A190 190 0 1 1 66 256A190 190 0 1 1 446 256Z',
+    'M411 256A155 155 0 1 1 101 256A155 155 0 1 1 411 256Z',
+    'M256 101V411M121.8 178.5L390.2 333.5M121.8 333.5L390.2 178.5',
+    'M368 256A17 17 0 1 1 334 256A17 17 0 1 1 368 256Z',
+    'M225.5 173.7A17 17 0 1 1 191.5 173.7A17 17 0 1 1 225.5 173.7Z',
+    'M225.5 338.3A17 17 0 1 1 191.5 338.3A17 17 0 1 1 225.5 338.3Z',
+    'M300 214A14 14 0 1 1 272 214A14 14 0 1 1 300 214Z',
+  ],
+  // maison : toit, cheminée, murs, porte, fenêtre
+  maison: ['M86 252L256 104L426 252', 'M344 176V120H382V209', 'M136 216V414H376V216', 'M226 414V324H286V414', 'M166 262H220V312H166Z'],
+  // cintre : crochet et corps
+  cintre: [
+    'M256 196V174C256 150 288 142 294 116C300 90 280 70 256 70C232 70 216 86 216 106',
+    'M256 196L82 352C68 364 76 384 94 384H418C436 384 444 364 430 352Z',
+  ],
+  // écran d'ordinateur avec une courbe qui monte
+  ecran: [
+    'M92 104H420Q440 104 440 124V320Q440 340 420 340H92Q72 340 72 320V124Q72 104 92 104Z',
+    'M228 340L216 398M284 340L296 398M178 402H334',
+    'M120 290L190 236L244 266L332 176',
+    'M296 176H332V212',
+  ],
+};
+
+/** Icône néon blanche (canvas → texture) : halo large, halo serré, puis le tube lumineux. */
+function textureNeon(nom) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 640;
+  const g = c.getContext('2d');
+  g.translate(64, 64);
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+  const traits = ICONES[nom].map((d) => new Path2D(d));
+  const passe = (largeur, couleur, flou, halo) => {
+    g.lineWidth = largeur;
+    g.strokeStyle = couleur;
+    g.shadowBlur = flou;
+    g.shadowColor = halo;
+    for (const t of traits) g.stroke(t);
+  };
+  passe(26, 'rgba(255,255,255,0.16)', 64, 'rgba(255,255,255,1)');
+  passe(13, 'rgba(240,244,255,0.7)', 22, 'rgba(255,255,255,1)');
+  passe(5, '#ffffff', 4, 'rgba(255,255,255,1)');
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  return t;
+}
+
+/** Allumage d'un néon : quelques battements rapides, puis lumière fixe (dt en secondes depuis l'allumage). */
+function allumage(dt) {
+  if (dt < 0) return 0.08; // tube éteint, à peine visible
+  const sequence = [
+    [0.05, 1],
+    [0.1, 0.12],
+    [0.16, 0.9],
+    [0.21, 0.25],
+    [0.24, 1],
+    [0.29, 0.55],
+  ];
+  for (const [fin, niveau] of sequence) if (dt < fin) return niveau;
+  return 1;
+}
 const ARGENT = '#d4d7dd';
 const LARGEUR = 6;
 const HAUTEUR = 4;
@@ -68,7 +126,7 @@ function texturePanneau(mot, numero, police) {
     taille -= 8;
     g.font = `600 ${taille}px ${police}`;
   }
-  // ombre sombre puis léger éclat blanc : le mot reste lisible devant la photo
+  // ombre sombre puis léger éclat blanc : le mot reste lisible devant l'icône néon
   g.shadowColor = 'rgba(0,0,0,0.75)';
   g.shadowBlur = 34;
   g.fillText(mot, 60, 330);
@@ -113,26 +171,12 @@ const accel = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Ma
 async function lancer() {
   // police du site pour les textes du tunnel (repli : police système)
   let police = '"Studio", system-ui, sans-serif';
-  // photos détourées : chargées en même temps que la police (1,2 s maximum, sinon elles apparaissent en cours de route)
-  const chargeur = new THREE.TextureLoader();
-  const photos = DOMAINES.map((d) =>
-    d.photo.slice(0, 2).map((url) => {
-      const t = { texture: null, pret: null };
-      t.pret = new Promise((ok) => {
-        t.texture = chargeur.load(url, ok, undefined, () => ok(null));
-      });
-      t.texture.colorSpace = THREE.SRGBColorSpace;
-      return t;
-    }),
-  );
   const attente = (ms) => new Promise((r) => setTimeout(r, ms));
-  const photosPretes = Promise.race([Promise.all(photos.flat().map((t) => t.pret)), attente(1200)]);
   try {
     await Promise.race([document.fonts.load('600 100px Studio'), attente(400)]);
   } catch {
     police = 'system-ui, sans-serif';
   }
-  await photosPretes;
 
   // si le chargement a été trop long (réseau lent), on raccourcit
   const tard = performance.now() > 2600;
@@ -210,8 +254,8 @@ async function lancer() {
   }
 
   // --- domaines sur les parois ---
-  // chaque panneau : ombre douce (au fond) → photo détourée (milieu) → verre et mot (devant)
-  const calques = [];
+  // chaque panneau : icône néon (derrière) → verre et mot (devant)
+  const neons = [];
   DOMAINES.forEach((d, i) => {
     const z = -ESPACE * (i + 1) + 2;
     const m = new THREE.Mesh(
@@ -225,36 +269,27 @@ async function lancer() {
     m.renderOrder = 3;
     m.material.depthWrite = false;
     scene.add(m);
-    const [photo, ombre] = photos[i];
-    if (photo.texture.image) {
-      const h = d.photo[2];
-      const img = photo.texture.image;
-      const w = (h * img.width) / img.height;
-      const x = 0.18;
-      const y = 0.7 + 0.38 - h / 2; // dépasse au-dessus du panneau, passe derrière le mot
-      const sujet = new THREE.Mesh(
-        new THREE.PlaneGeometry(w, h),
-        new THREE.MeshBasicMaterial({ map: photo.texture, transparent: true, fog: false, depthWrite: false }),
-      );
-      sujet.position.set(x, y, -0.3);
-      sujet.renderOrder = 2;
-      m.add(sujet);
-      let portee = null;
-      if (ombre.texture.image) {
-        portee = new THREE.Mesh(
-          new THREE.PlaneGeometry(w * 1.12, h * 1.12),
-          new THREE.MeshBasicMaterial({ map: ombre.texture, color: '#000000', transparent: true, opacity: 0.75, depthWrite: false }),
-        );
-        portee.position.set(x + 0.1, y - 0.12, -0.62);
-        portee.renderOrder = 1;
-        m.add(portee);
-      }
-      calques.push({ sujet, portee, y, z, phase: i * 1.7 });
-    }
-    // lumière devant le panneau (côté couloir) : elle éclaire la photo sans faire de tache sur la paroi
-    const halo = new THREE.PointLight('#ffffff', 5, 5, 1.6);
+    // icône néon derrière la fin du mot, elle dépasse un peu au-dessus du panneau
+    const neon = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.6, 1.6),
+      new THREE.MeshBasicMaterial({
+        map: textureNeon(d.icone),
+        transparent: true,
+        opacity: 0.08,
+        fog: false,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    neon.position.set(0.86, 0.42, -0.14);
+    neon.renderOrder = 2;
+    m.add(neon);
+    // lumière du néon : elle s'allume avec lui et éclaire la paroi autour
+    const halo = new THREE.PointLight('#ffffff', 0, 5, 1.6);
     halo.position.set(d.cote * (LARGEUR / 2 - 2.4), HAUTEUR / 2 + 0.6, z + 1.2);
     scene.add(halo);
+    // instant d'allumage : un peu avant que la caméra s'arrête devant le panneau
+    neons.push({ neon, halo, allume: leMode === 'complet' ? 0.72 * (i + 1) - 0.3 : -1 });
   });
 
   // --- mur final (logotype) ---
@@ -359,14 +394,12 @@ async function lancer() {
     camera.position.set(x, HAUTEUR / 2 - 0.15, z);
     camera.rotation.set(0, lacet, 0);
     torche.position.set(0, HAUTEUR - 0.5, z - 2);
-    // la photo se détache du fond quand la caméra arrive à sa hauteur (effet de profondeur)
-    for (const c of calques) {
-      const proche = Math.max(0, 1 - Math.abs(z - (c.z + 3.2)) / 5);
-      const k = lisse(proche);
-      c.sujet.position.z = -0.34 + 0.2 * k;
-      c.sujet.position.y = c.y + 0.03 * Math.sin(sec * 1.8 + c.phase);
-      c.sujet.scale.setScalar(0.96 + 0.06 * k);
-      if (c.portee) c.portee.material.opacity = 0.55 + 0.25 * k;
+    // néons : scintillement à l'allumage, puis léger frémissement
+    for (const n of neons) {
+      const niveau = allumage(sec - n.allume);
+      const vie = niveau === 1 ? 0.96 + 0.04 * Math.sin(sec * 23 + n.allume * 7) : niveau;
+      n.neon.material.opacity = vie;
+      n.halo.intensity = 6 * vie;
     }
     // traversée du mur : il s'ouvre en lumière
     const passage = lisse((sec - tMur) / (duree - tMur));

@@ -4,19 +4,11 @@ Règle : uniquement de vraies photos de vraies choses (Unsplash, licence Unsplas
 Aucune image générée par IA, aucune illustration, aucun emoji. Quand aucune photo réaliste ne correspond exactement,
 un **emplacement nommé** est listé ici au lieu d'une image approximative.
 
-## Intro tunnel de l'accueil (photos détourées, fond transparent)
+## Intro tunnel de l'accueil
 
-Détourage : BiRefNet (rembg), petits morceaux isolés supprimés, bord resserré d'1 px puis adouci (pas de liseré clair).
-Fichiers sources : `demos/accueil/src/images/` → publiés dans `site/3d/morceaux/` (nom + empreinte).
-
-| Panneau | Fichier | Sujet | Photo d'origine |
-|---|---|---|---|
-| Restaurants | `tunnel-pizza.webp` (+ `-ombre`) | Pizza margherita, vue en plongée | https://images.unsplash.com/photo-1574071318508-1cdbab80d002 |
-| Artisans | `tunnel-maison.webp` (+ `-ombre`) | Maison blanche à véranda | https://images.unsplash.com/photo-1570129477492-45c003edd2be |
-| Commerces | `tunnel-vetement.webp` (+ `-ombre`) | Poncho en maille sur cintre en bois | https://images.unsplash.com/photo-1434389677669-e08b4cac3105 |
-| Agences | `tunnel-ordinateur.webp` (+ `-ombre`) | Ordinateur portable argent | https://images.unsplash.com/photo-1611186871348-b1ce696e52c9 |
-
-Les fichiers `-ombre` sont l'ombre portée calculée à partir de la silhouette de la photo (pas un dessin).
+Aucune image : les quatre icônes « enseigne néon » (pizza, maison, cintre, écran avec courbe) sont des tracés
+vectoriels dessinés dans le code (`demos/accueil/src/intro.js`, constante `ICONES`), tous avec le même trait.
+Les photos détourées essayées auparavant ont été retirées à la demande du client.
 
 ## Images de partage (réseaux sociaux)
 
