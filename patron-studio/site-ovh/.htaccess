@@ -1,0 +1,48 @@
+# Patrôn Studio — hébergement OVH (Apache)
+ErrorDocument 404 /404.html
+AddType application/manifest+json .webmanifest
+AddType image/svg+xml .svg
+AddType image/webp .webp
+AddType font/woff2 .woff2
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType text/css "access plus 1 week"
+  ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml application/json application/manifest+json
+</IfModule>
+
+# Anciennes pages « maquette gratuite » (générateur, atelier) : redirigées vers les démos et le devis
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^generateur(\.html)?$ /#futur-site [R=301,NE,L]
+  RewriteRule ^(atelier|renseignements)(\.html)?$ /contact.html?sujet=devis [R=301,L]
+</IfModule>
+
+# Sites démo : /demos/<metier>/ sert index.html
+DirectoryIndex index.html
+
+# ---------- Sécurité ----------
+# Fichier de réglages du formulaire : jamais servi directement
+<Files "envoi-config.php">
+  Require all denied
+</Files>
+# Pas de liste des fichiers d'un dossier
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  # Le site ne charge que ses propres fichiers (Matomo est installé sur ce même domaine).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; media-src 'self'; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+  # À activer une fois le HTTPS confirmé sur tout le domaine (certificat SSL OVH actif) :
+  # Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>

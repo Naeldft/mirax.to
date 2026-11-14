@@ -19,7 +19,7 @@ patron-studio/
 │   ├── snack/                ← Crunch! (photos plein écran, carte filtrable, click & collect, allergènes)
 │   └── conseil/              ← Cap Horizon (croissance et boussole, diagnostic express, rendez-vous)
 ├── construire-dossier-ovh.sh ← compile les démos et assemble le dossier à envoyer
-└── dossier-ovh/              ← RÉSULTAT : à envoyer tel quel par FTP dans « www/ »
+└── site-ovh/              ← RÉSULTAT : à envoyer tel quel par FTP dans « www/ »
 ```
 
 ## Construire le dossier à mettre en ligne
@@ -32,7 +32,7 @@ cd patron-studio
 ```
 
 Le script installe les dépendances, compile chaque démo pour son sous-dossier (`/demos/<métier>/`),
-copie le site et range le tout dans `dossier-ovh/` (et `dossier-ovh.zip`).
+copie le site et range le tout dans `site-ovh/` (et `site-ovh.zip`).
 
 ## Tester en local
 
@@ -64,3 +64,34 @@ fonction `submit` du composant (Formspree, Web3Forms, e-mail…).
 Les photos de Crunch! (snack) sont de vraies photos Unsplash : pour les remplacer, voir `demos/snack/photos/LISEZ-MOI.md`.
 Les « photos » du portfolio du photographe sont des illustrations dessinées en code (`photographe/src/components/Photo.jsx`) :
 remplacez-les par de vraies photos pour un client.
+
+
+## Formulaire de contact (PHP, sans service tiers)
+
+Toutes les demandes du site (contact, devis, rappel, partenaires) sont envoyées à `site/envoi.php`, qui les
+transmet par e-mail avec la fonction `mail()` de l'hébergement OVH. Réglages dans `site/envoi-config.php` :
+adresse de réception, adresse d'expédition (**obligatoirement de votre domaine**) et un « sel » à remplacer
+par un texte au hasard. Ce fichier n'est pas accessible depuis le navigateur (règle dans `.htaccess`).
+
+Protections : honeypot, envoi en moins de 3 s refusé, validation de chaque champ côté serveur, pas d'injection
+d'en-têtes, 5 envois maximum par IP et par 10 minutes. Sans JavaScript, `contact.html` envoie au même script
+puis affiche `merci.html`.
+
+## Statistiques : Matomo sans cookie
+
+Le site est prêt (`site/mesure.js`) ; il reste à installer Matomo sur l'hébergement, une seule fois :
+
+1. **Base de données** : espace client OVH → Web Cloud → Hébergements → votre domaine → onglet
+   **Bases de données** → « Créer une base de données » (MySQL). Notez le serveur, le nom, l'utilisateur et le mot de passe.
+2. **Fichiers** : téléchargez Matomo sur https://matomo.org/download/, décompressez-le et envoyez le dossier
+   `matomo` dans `www/matomo/` avec FileZilla.
+3. **Installation** : ouvrez `https://votre-domaine/matomo/` et suivez l'assistant (base de données de l'étape 1,
+   puis un compte administrateur). Ajoutez votre site : il reçoit le numéro **1**.
+4. **Réglages RGPD** (Administration → Confidentialité → Anonymiser les données) : anonymiser l'IP sur
+   **2 octets**, cocher « Utiliser aussi l'IP anonymisée pour enrichir les visites », et régler la suppression
+   automatique des anciennes données brutes sur **25 mois**.
+5. **Activer la mesure** : dans `site/export-config.js`, mettez
+   `matomoUrl: "https://xn--patrn-studio-hib.fr/matomo/"` et `matomoSiteId: "1"`, puis renvoyez ce fichier sur le serveur.
+
+Le suivi est déjà configuré sans cookie (`disableCookies`) : pas de bandeau de consentement à afficher. Les visiteurs
+peuvent refuser d'être comptés via « Mesure d'audience » en bas de page ou sur la page Confidentialité.

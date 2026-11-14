@@ -1,0 +1,1 @@
+window.PATRON_CONFIG = {};

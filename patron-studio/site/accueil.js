@@ -131,8 +131,9 @@
 
   /* ---------- 3. Thème et menu ---------- */
   function setupChrome() {
-    var dark = load('patron-theme', 'light') !== 'light';
-    root.dataset.theme = dark ? 'dark' : 'light';
+    // thème sombre sur tout le site (le bouton de thème a été retiré)
+    var dark = true;
+    root.dataset.theme = 'dark';
     var themeBtn = $('#theme');
     if (themeBtn) themeBtn.addEventListener('click', function () {
       dark = !dark; root.dataset.theme = dark ? 'dark' : 'light'; store('patron-theme', dark ? 'dark' : 'light');

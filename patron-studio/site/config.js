@@ -1,1 +1,1 @@
-window.PATRON_CONFIG = {"ga4Id": "", "clarityId": ""};
+window.PATRON_CONFIG = {};

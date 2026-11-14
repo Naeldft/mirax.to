@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr" data-theme="light">
+<html lang="fr" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="theme-color" content="#f6f6f0">
@@ -31,8 +31,9 @@
 <script>try{if(sessionStorage.getItem("ps-intro")!=="1"&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&!location.hash)document.documentElement.classList.add("ps-intro")}catch(e){}</script>
 <script src="./export-config.js"></script><script src="./contact-form.js" defer></script>
 <script src="./accueil.js" defer></script>
-</head>
+<link rel="stylesheet" href="./commun.css"><script src="./mesure.js" defer></script><script src="./commun.js" defer></script><script type="module" src="./3d/accueil-3d.js"></script></head>
 <body class="accueil">
+<div id="ps-monde" aria-hidden="true"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="ps" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 25V7h5.2a5 5 0 0 1 0 10H5"/><path d="M27 9.6A5.2 5.2 0 0 0 22.6 7h-.4c-2.6 0-4.4 1.6-4.4 3.8 0 2.4 1.9 3.4 4.6 4l.9.2c2.7.6 4.6 1.8 4.6 4.3 0 2.3-2 3.9-4.8 3.9h-.5a5.6 5.6 0 0 1-4.8-2.6"/></g></symbol>
   <symbol id="arrow" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></g></symbol>
@@ -55,7 +56,6 @@
     <select aria-label="Langue" id="lang" data-i18n-label="lang">
       <option value="fr" selected>FR</option><option value="en">EN</option><option value="es">ES</option><option value="ar">AR</option>
     </select>
-    <button class="icon-btn" type="button" id="theme" aria-label="Changer le thème" data-i18n-label="theme"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg></button>
     <button class="icon-btn mobile-menu" type="button" id="menu" aria-label="Menu" aria-expanded="false" aria-controls="nav"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg></button>
   </div>
 </header>

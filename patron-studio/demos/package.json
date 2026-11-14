@@ -15,7 +15,8 @@
     "photographe",
     "association",
     "snack",
-    "conseil"
+    "conseil",
+    "accueil"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",

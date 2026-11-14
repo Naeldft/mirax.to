@@ -1,13 +1,13 @@
-/* Patrôn Studio — envoi des demandes (contact, devis, rappel, partenaires) via Web3Forms (POST https://api.web3forms.com/submit).
+/* Patrôn Studio — envoi des demandes (contact, devis, rappel, partenaires) vers envoi.php (PHP sur l’hébergement OVH, sans service tiers).
    - Une seule fenêtre d’envoi pour tout le site : boutons « Nous écrire », maquettes, flyers, estimation, partenaires.
    - Le résumé complet du brouillon (générateur ou atelier) est joint au message.
-   - Réussite affichée UNIQUEMENT si Web3Forms répond { success: true }. Sinon : erreur honnête + lien mailto de secours.
-   - Sans JavaScript, les liens mènent à contact.html, dont le formulaire HTML envoie directement à Web3Forms. */
+   - Réussite affichée UNIQUEMENT si envoi.php répond { success: true }. Sinon : erreur honnête + lien mailto de secours.
+   - Sans JavaScript, les liens mènent à contact.html, dont le formulaire HTML envoie aussi à envoi.php. */
 (function () {
   'use strict';
   var cfg = window.PATRON_EXPORT_CONFIG || {};
-  var ENDPOINT = 'https://api.web3forms.com/submit';
-  var KEY = cfg.web3formsKey || '';
+  var ENDPOINT = './envoi.php';
+  var AFFICHE = Date.now(); // piège temporel : un robot envoie en moins de 3 s
   var MAIL = cfg.contactEmail || 'admin.ps@xn--patrn-studio-hib.fr';
   var SUBJECT = 'Nouvelle demande Patrôn Studio';
   var TOPICS = {
@@ -70,11 +70,10 @@
   function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
   function isPhone(v) { return (v.replace(/\D/g, '').length >= 8) && /^[+\d\s().-]+$/.test(v); }
 
-  /* Envoi réel. Résout seulement si Web3Forms confirme { success: true } ; sinon rejette avec une erreur lisible. */
+  /* Envoi réel. Résout seulement si envoi.php confirme { success: true } ; sinon rejette avec une erreur lisible. */
   function send(fields) {
-    if (!KEY) return Promise.reject(new Error('la clé d’envoi n’est pas configurée'));
     if (!window.fetch) return Promise.reject(new Error('votre navigateur ne permet pas l’envoi'));
-    var payload = { access_key: KEY, from_name: 'Site Patrôn Studio', subject: fields.subject || SUBJECT };
+    var payload = { subject: fields.subject || SUBJECT, _t: AFFICHE };
     Object.keys(fields).forEach(function (k) { if (k !== 'subject' && fields[k] != null && fields[k] !== '') payload[k] = fields[k]; });
     var ctrl = window.AbortController ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 20000);
@@ -87,7 +86,7 @@
       return res.json().catch(function () { return {}; }).then(function (data) {
         clearTimeout(timer);
         if (res.ok && data && data.success === true) return data;
-        throw new Error((data && data.message) ? data.message : 'le service d’envoi a répondu ' + res.status);
+        throw new Error((data && data.message) ? data.message : 'le serveur a répondu ' + res.status);
       });
     }, function (err) {
       clearTimeout(timer);

@@ -248,3 +248,11 @@ html.ps-intro::before{content:"";position:fixed;inset:0;z-index:1999;background:
 @media (max-width:1100px){.futur-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.futur-grid{gap:10px}.futur-card{gap:10px;padding:8px 8px 14px;border-radius:16px}.futur-art{border-radius:10px;aspect-ratio:4/3}.futur-3d{top:6px;right:6px;padding:2px 7px;font-size:.62rem}.futur-txt{gap:3px;padding:0 4px}.futur-txt small{font-size:.6rem;letter-spacing:.1em}.futur-txt strong{font-size:1.02rem}.futur-txt span{display:none}.futur-go{font-size:.85rem;padding:0 4px}.futur-other{flex-direction:row;align-items:center}.futur-grid li:last-child{grid-column:1/-1}.futur-other .futur-art{width:72px;flex:none;aspect-ratio:1}.futur-other .futur-txt span{display:block;font-size:.85rem}}
 @media (prefers-reduced-motion:reduce){.futur-card,.futur-art svg,.futur-go svg{transition:none}.futur-art::after{animation:none}.futur-card:hover{transform:none}}
+
+/* ---------- Espace 3D derrière l'accueil (demos/accueil → 3d/accueil-3d.js) ---------- */
+html.ps-3d{background:#070a09}
+html.ps-3d body{background:transparent}
+#ps-monde{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.2s ease;background:radial-gradient(ellipse 70% 55% at 50% 40%,#13201a,#070a09 70%)}
+#ps-monde.pret{opacity:1}
+#ps-monde canvas{display:block}
+@media (prefers-reduced-motion:reduce){#ps-monde{transition:none}}

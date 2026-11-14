@@ -27,3 +27,22 @@ AddType font/woff2 .woff2
 
 # Sites démo : /demos/<metier>/ sert index.html
 DirectoryIndex index.html
+
+# ---------- Sécurité ----------
+# Fichier de réglages du formulaire : jamais servi directement
+<Files "envoi-config.php">
+  Require all denied
+</Files>
+# Pas de liste des fichiers d'un dossier
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  # Le site ne charge que ses propres fichiers (Matomo est installé sur ce même domaine).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; media-src 'self'; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+  # À activer une fois le HTTPS confirmé sur tout le domaine (certificat SSL OVH actif) :
+  # Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
