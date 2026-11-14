@@ -15,8 +15,8 @@
 .lead{font-size:clamp(1.02rem,1.35vw,1.2rem);line-height:1.62;max-width:540px;color:var(--muted);margin:0 0 34px}
 .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px}
 .cta{display:inline-flex;align-items:center;gap:16px;min-height:58px;padding:8px 8px 8px 26px;border-radius:40px;background:var(--ink);color:var(--bg)!important;font-weight:600;font-size:.95rem;text-decoration:none}
-.cta-ico{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#bdd494;color:#1b2a20}
-.cta:hover .cta-ico{background:#cfe3a8}
+.cta-ico{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#dcdcdc;color:#262626}
+.cta:hover .cta-ico{background:#ececec}
 .sub-link{display:inline-flex;align-items:center;gap:9px;min-height:44px;font-weight:600;font-size:.92rem;text-decoration:none;border-bottom:1px solid currentColor}
 .proof{display:flex;flex-wrap:wrap;gap:10px 22px;list-style:none;padding:0;margin:30px 0 0;font-size:.82rem;color:var(--muted)}
 .proof li{display:flex;align-items:center;gap:7px}
@@ -140,15 +140,15 @@
 
 /* ---------- Intro ---------- */
 .intro{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;pointer-events:auto;animation:intro-safety 0s linear 3.2s forwards}
-.intro-half{position:absolute;top:0;bottom:0;width:50.5%;background:#050806;transition:transform .85s cubic-bezier(.77,0,.18,1)}
+.intro-half{position:absolute;top:0;bottom:0;width:50.5%;background:#070707;transition:transform .85s cubic-bezier(.77,0,.18,1)}
 .intro-half.l{left:0}.intro-half.r{right:0}
 .intro-word{position:relative;z-index:1;margin:0;color:#fff;font-size:clamp(2.6rem,9vw,7.4rem);font-weight:600;letter-spacing:-.06em;line-height:1.2;perspective:600px;white-space:nowrap;text-shadow:0 1px 0 #cfd6d0,0 2px 0 #9aa49d,0 3px 0 #6d776f,0 10px 22px #000c;transition:opacity .45s ease,transform .8s cubic-bezier(.6,0,.2,1)}
 .intro-word span{display:inline-block;opacity:0;transform:translateY(.45em) rotateX(-80deg);transform-origin:50% 100%;animation:intro-letter .62s cubic-bezier(.2,.9,.25,1) forwards}
 .intro-word .sp{width:.26em}
-.intro-word .o{color:#cfe3a8;text-shadow:0 1px 0 #9bb57a,0 2px 0 #6f8a55,0 0 28px #bdd49477}
+.intro-word .o{color:#ececec;text-shadow:0 1px 0 #bdbdbd,0 2px 0 #808080,0 0 28px #bdd49477}
 .intro-word .light{font-weight:400;font-family:Georgia,serif;font-style:italic;letter-spacing:-.03em}
 .intro-skip{position:absolute;z-index:2;right:22px;bottom:22px;min-height:42px;padding:0 18px;border-radius:30px;border:1px solid #ffffff55;background:#ffffff10;color:#fff;font:inherit;font-size:.8rem;cursor:pointer}
-.intro-skip:focus-visible{outline:3px solid #bdd494;outline-offset:3px}
+.intro-skip:focus-visible{outline:3px solid #dcdcdc;outline-offset:3px}
 .intro.is-open .intro-half.l{transform:translateX(-101%)}
 .intro.is-open .intro-half.r{transform:translateX(101%)}
 .intro.is-open .intro-word{opacity:0;transform:scale(1.12)}
@@ -157,7 +157,7 @@
 @keyframes intro-letter{to{opacity:1;transform:none}}
 @keyframes intro-safety{to{visibility:hidden;pointer-events:none}}
 html.intro-lock,html.intro-lock body{overflow:hidden}
-html.ps-intro::before{content:"";position:fixed;inset:0;z-index:1999;background:#050806;animation:intro-safety 0s linear 3s forwards}
+html.ps-intro::before{content:"";position:fixed;inset:0;z-index:1999;background:#070707;animation:intro-safety 0s linear 3s forwards}
 
 /* ---------- Responsive ---------- */
 @media (max-width:1100px){
@@ -250,23 +250,23 @@ html.ps-intro::before{content:"";position:fixed;inset:0;z-index:1999;background:
 @media (prefers-reduced-motion:reduce){.futur-card,.futur-art svg,.futur-go svg{transition:none}.futur-art::after{animation:none}.futur-card:hover{transform:none}}
 
 /* ---------- Espace 3D derrière l'accueil (demos/accueil → 3d/accueil-3d.js) ---------- */
-html.ps-3d{background:#070a09}
+html.ps-3d{background:#090909}
 html.ps-3d body{background:transparent}
-#ps-monde{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.2s ease;background:radial-gradient(ellipse 70% 55% at 50% 40%,#13201a,#070a09 70%)}
+#ps-monde{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity 1.2s ease;background:radial-gradient(ellipse 70% 55% at 50% 40%,#1d1d1d,#090909 70%)}
 #ps-monde.pret{opacity:1}
 #ps-monde canvas{display:block}
 @media (prefers-reduced-motion:reduce){#ps-monde{transition:none}}
 
 /* ---------- Intro tunnel (3d/intro-3d.js) ---------- */
 /* voile immédiat : évite tout flash du contenu avant le démarrage du tunnel ; retiré au plus tard après 6 s */
-html.ps-tunnel::before{content:"";position:fixed;inset:0;z-index:2147482000;background:radial-gradient(ellipse 50% 40% at 50% 50%,#13201a,#050806 70%);animation:ps-tunnel-secours 0s linear 6s forwards}
+html.ps-tunnel::before{content:"";position:fixed;inset:0;z-index:2147482000;background:radial-gradient(ellipse 50% 40% at 50% 50%,#1d1d1d,#070707 70%);animation:ps-tunnel-secours 0s linear 6s forwards}
 html.ps-tunnel-pret::before{display:none}
 html.ps-tunnel,html.ps-tunnel body{overflow:hidden}
-#ps-tunnel{position:fixed;inset:0;z-index:2147482001;background:#050806;transition:opacity .6s ease;--eclat:0}
+#ps-tunnel{position:fixed;inset:0;z-index:2147482001;background:#070707;transition:opacity .6s ease;--eclat:0}
 #ps-tunnel canvas{display:block;width:100%;height:100%}
-#ps-tunnel::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,#f3fbe8,#b9d98f 45%,transparent 75%);opacity:calc(var(--eclat) * .85)}
+#ps-tunnel::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,#ffffff,#dfdfdf 45%,transparent 75%);opacity:calc(var(--eclat) * .85)}
 #ps-tunnel.ps-tunnel-fin{opacity:0;pointer-events:none}
 .ps-tunnel-passer{position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));right:16px;min-height:44px;padding:0 18px;border:1px solid rgb(255 255 255 / .28);border-radius:999px;background:rgb(5 8 6 / .45);color:#f3f4f5;font:500 15px/1 system-ui,-apple-system,sans-serif;letter-spacing:.02em;backdrop-filter:blur(6px);cursor:pointer;transition:background .3s,border-color .3s}
 .ps-tunnel-passer:hover{background:rgb(255 255 255 / .1);border-color:rgb(255 255 255 / .5)}
-.ps-tunnel-passer:focus-visible{outline:3px solid #b9d98f;outline-offset:3px}
+.ps-tunnel-passer:focus-visible{outline:3px solid #dfdfdf;outline-offset:3px}
 @keyframes ps-tunnel-secours{to{visibility:hidden}}

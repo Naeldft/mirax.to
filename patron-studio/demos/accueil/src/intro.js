@@ -14,14 +14,24 @@
  *  Le minutage suit l'horloge (pas les images) : la durée est tenue même sur un téléphone lent.
  */
 import * as THREE from 'three';
+// vraies photos détourées (fond transparent), voir IMAGES.md
+import imgPizza from './images/tunnel-pizza.webp';
+import ombrePizza from './images/tunnel-pizza-ombre.webp';
+import imgMaison from './images/tunnel-maison.webp';
+import ombreMaison from './images/tunnel-maison-ombre.webp';
+import imgVetement from './images/tunnel-vetement.webp';
+import ombreVetement from './images/tunnel-vetement-ombre.webp';
+import imgOrdinateur from './images/tunnel-ordinateur.webp';
+import ombreOrdinateur from './images/tunnel-ordinateur-ombre.webp';
 
 const DOMAINES = [
-  { mot: 'Restaurants', cote: 1 },
-  { mot: 'Artisans', cote: -1 },
-  { mot: 'Commerces', cote: 1 },
-  { mot: 'Agences', cote: -1 },
+  // photo : [image, ombre, hauteur (unités 3D)] — le sujet dépasse au-dessus du panneau
+  { mot: 'Restaurants', cote: 1, photo: [imgPizza, ombrePizza, 1.55] },
+  { mot: 'Artisans', cote: -1, photo: [imgMaison, ombreMaison, 1.28] },
+  { mot: 'Commerces', cote: 1, photo: [imgVetement, ombreVetement, 2.05] },
+  { mot: 'Agences', cote: -1, photo: [imgOrdinateur, ombreOrdinateur, 1.5] },
 ];
-const VERT = '#b9d98f';
+const ARGENT = '#d4d7dd';
 const LARGEUR = 6;
 const HAUTEUR = 4;
 const ESPACE = 9; // distance entre deux domaines
@@ -39,14 +49,16 @@ function texturePanneau(mot, numero, police) {
   c.height = 512;
   const g = c.getContext('2d');
   const grad = g.createLinearGradient(0, 0, 1024, 512);
-  grad.addColorStop(0, 'rgba(185,217,143,0.10)');
-  grad.addColorStop(1, 'rgba(185,217,143,0.02)');
+  grad.addColorStop(0, 'rgba(255,255,255,0.09)');
+  grad.addColorStop(1, 'rgba(255,255,255,0.015)');
   g.fillStyle = grad;
   g.fillRect(0, 0, 1024, 512);
-  g.strokeStyle = 'rgba(185,217,143,0.55)';
-  g.lineWidth = 4;
+  g.strokeStyle = 'rgba(255,255,255,0.6)';
+  g.lineWidth = 3;
   g.strokeRect(6, 6, 1012, 500);
-  g.fillStyle = VERT;
+  g.fillStyle = ARGENT;
+  g.shadowColor = 'rgba(0,0,0,0.7)';
+  g.shadowBlur = 16;
   g.font = `600 44px ${police}`;
   g.fillText(`${String(numero).padStart(2, '0')}  ·  Des sites pour les`, 64, 120);
   g.fillStyle = '#f3f4f5';
@@ -56,8 +68,12 @@ function texturePanneau(mot, numero, police) {
     taille -= 8;
     g.font = `600 ${taille}px ${police}`;
   }
-  g.shadowColor = 'rgba(185,217,143,0.65)';
-  g.shadowBlur = 36;
+  // ombre sombre puis léger éclat blanc : le mot reste lisible devant la photo
+  g.shadowColor = 'rgba(0,0,0,0.75)';
+  g.shadowBlur = 34;
+  g.fillText(mot, 60, 330);
+  g.shadowColor = 'rgba(255,255,255,0.35)';
+  g.shadowBlur = 22;
   g.fillText(mot, 60, 330);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
@@ -72,18 +88,18 @@ function textureMur(police) {
   c.height = 512;
   const g = c.getContext('2d');
   const r = g.createRadialGradient(512, 256, 10, 512, 256, 520);
-  r.addColorStop(0, '#16251c');
-  r.addColorStop(1, '#070a09');
+  r.addColorStop(0, '#2c2d30');
+  r.addColorStop(1, '#060606');
   g.fillStyle = r;
   g.fillRect(0, 0, 1024, 512);
   g.textAlign = 'center';
   g.fillStyle = '#f3f4f5';
   g.font = `600 150px ${police}`;
-  g.shadowColor = 'rgba(185,217,143,0.7)';
+  g.shadowColor = 'rgba(255,255,255,0.55)';
   g.shadowBlur = 40;
   g.fillText('patrôn', 512, 280);
   g.shadowBlur = 0;
-  g.fillStyle = VERT;
+  g.fillStyle = ARGENT;
   g.font = `500 40px ${police}`;
   g.fillText('STUDIO  ·  LILLE', 512, 360);
   const t = new THREE.CanvasTexture(c);
@@ -97,11 +113,26 @@ const accel = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Ma
 async function lancer() {
   // police du site pour les textes du tunnel (repli : police système)
   let police = '"Studio", system-ui, sans-serif';
+  // photos détourées : chargées en même temps que la police (1,2 s maximum, sinon elles apparaissent en cours de route)
+  const chargeur = new THREE.TextureLoader();
+  const photos = DOMAINES.map((d) =>
+    d.photo.slice(0, 2).map((url) => {
+      const t = { texture: null, pret: null };
+      t.pret = new Promise((ok) => {
+        t.texture = chargeur.load(url, ok, undefined, () => ok(null));
+      });
+      t.texture.colorSpace = THREE.SRGBColorSpace;
+      return t;
+    }),
+  );
+  const attente = (ms) => new Promise((r) => setTimeout(r, ms));
+  const photosPretes = Promise.race([Promise.all(photos.flat().map((t) => t.pret)), attente(1200)]);
   try {
-    await Promise.race([document.fonts.load('600 100px Studio'), new Promise((r) => setTimeout(r, 400))]);
+    await Promise.race([document.fonts.load('600 100px Studio'), attente(400)]);
   } catch {
     police = 'system-ui, sans-serif';
   }
+  await photosPretes;
 
   // si le chargement a été trop long (réseau lent), on raccourcit
   const tard = performance.now() > 2600;
@@ -119,17 +150,18 @@ async function lancer() {
   const rendu = new THREE.WebGLRenderer({ antialias: !petit, powerPreference: 'high-performance' });
   rendu.setPixelRatio(Math.min(devicePixelRatio, petit ? 1.25 : 1.75));
   rendu.setSize(innerWidth, innerHeight);
-  rendu.setClearColor('#050806');
+  rendu.setClearColor('#000000');
   voile.prepend(rendu.domElement);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog('#050806', 5, 30);
+  scene.fog = new THREE.Fog('#000000', 9, 44);
   const camera = new THREE.PerspectiveCamera(innerWidth / innerHeight < 1 ? 78 : 62, innerWidth / innerHeight, 0.1, 80);
 
   // --- couloir ---
   const longueur = -Z_MUR + 12;
-  const paroi = new THREE.MeshStandardMaterial({ color: '#0c110f', roughness: 0.55, metalness: 0.5 });
-  const sol = new THREE.MeshStandardMaterial({ color: '#0a0e0c', roughness: 0.22, metalness: 0.85 });
+  // parois gris anthracite satinées et sol laqué : les lumières blanches s'y reflètent (effet argent)
+  const paroi = new THREE.MeshStandardMaterial({ color: '#1c1d20', roughness: 0.3, metalness: 0.45 });
+  const sol = new THREE.MeshStandardMaterial({ color: '#101113', roughness: 0.12, metalness: 0.6 });
   const plan = (w, h, mat, pos, rot) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
     m.position.set(...pos);
@@ -144,8 +176,19 @@ async function lancer() {
   plan(longueur, HAUTEUR, paroi, [LARGEUR / 2, HAUTEUR / 2, zMilieu], [0, -Math.PI / 2, 0]);
 
   // lignes lumineuses au sol et au plafond, et cadres réguliers (sensation de vitesse)
-  const lumiere = new THREE.MeshBasicMaterial({ color: VERT });
-  const blanc = new THREE.MeshBasicMaterial({ color: '#dfe8ff', transparent: true, opacity: 0.55 });
+  const lumiere = new THREE.MeshBasicMaterial({ color: '#ffffff' });
+  const blanc = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.7 });
+  // bandeau lumineux blanc au plafond, et son reflet adouci au sol
+  const bandeau = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.02, longueur), lumiere);
+  bandeau.position.set(0, HAUTEUR - 0.012, zMilieu);
+  scene.add(bandeau);
+  const reflet = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.5, longueur),
+    new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.12, depthWrite: false }),
+  );
+  reflet.rotation.x = -Math.PI / 2;
+  reflet.position.set(0, 0.005, zMilieu);
+  scene.add(reflet);
   for (const x of [-LARGEUR / 2 + 0.05, LARGEUR / 2 - 0.05]) {
     for (const y of [0.02, HAUTEUR - 0.02]) {
       const l = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.02, longueur), lumiere);
@@ -167,6 +210,8 @@ async function lancer() {
   }
 
   // --- domaines sur les parois ---
+  // chaque panneau : ombre douce (au fond) → photo détourée (milieu) → verre et mot (devant)
+  const calques = [];
   DOMAINES.forEach((d, i) => {
     const z = -ESPACE * (i + 1) + 2;
     const m = new THREE.Mesh(
@@ -177,9 +222,38 @@ async function lancer() {
     m.position.set(d.cote * (LARGEUR / 2 - 1.3), HAUTEUR / 2, z);
     m.rotation.y = -d.cote * 0.62; // presque face à la caméra quand elle se tourne vers lui
     if (portrait) m.scale.setScalar(0.74); // écran vertical : panneaux un peu plus petits
+    m.renderOrder = 3;
+    m.material.depthWrite = false;
     scene.add(m);
-    const halo = new THREE.PointLight(VERT, 6, 6, 1.6);
-    halo.position.set(d.cote * (LARGEUR / 2 - 1), HAUTEUR / 2, z);
+    const [photo, ombre] = photos[i];
+    if (photo.texture.image) {
+      const h = d.photo[2];
+      const img = photo.texture.image;
+      const w = (h * img.width) / img.height;
+      const x = 0.18;
+      const y = 0.7 + 0.38 - h / 2; // dépasse au-dessus du panneau, passe derrière le mot
+      const sujet = new THREE.Mesh(
+        new THREE.PlaneGeometry(w, h),
+        new THREE.MeshBasicMaterial({ map: photo.texture, transparent: true, fog: false, depthWrite: false }),
+      );
+      sujet.position.set(x, y, -0.3);
+      sujet.renderOrder = 2;
+      m.add(sujet);
+      let portee = null;
+      if (ombre.texture.image) {
+        portee = new THREE.Mesh(
+          new THREE.PlaneGeometry(w * 1.12, h * 1.12),
+          new THREE.MeshBasicMaterial({ map: ombre.texture, color: '#000000', transparent: true, opacity: 0.75, depthWrite: false }),
+        );
+        portee.position.set(x + 0.1, y - 0.12, -0.62);
+        portee.renderOrder = 1;
+        m.add(portee);
+      }
+      calques.push({ sujet, portee, y, z, phase: i * 1.7 });
+    }
+    // lumière devant le panneau (côté couloir) : elle éclaire la photo sans faire de tache sur la paroi
+    const halo = new THREE.PointLight('#ffffff', 5, 5, 1.6);
+    halo.position.set(d.cote * (LARGEUR / 2 - 2.4), HAUTEUR / 2 + 0.6, z + 1.2);
     scene.add(halo);
   });
 
@@ -192,8 +266,9 @@ async function lancer() {
   scene.add(mur);
 
   // lumières qui suivent la caméra
-  scene.add(new THREE.AmbientLight('#ffffff', 0.35));
-  const torche = new THREE.PointLight('#dfe8ff', 14, 14, 1.5);
+  scene.add(new THREE.AmbientLight('#ffffff', 0.45));
+  scene.add(new THREE.HemisphereLight('#ffffff', '#0a0a0a', 0.55));
+  const torche = new THREE.PointLight('#ffffff', 22, 15, 1.4);
   scene.add(torche);
 
   // --- trajectoire : un arrêt face à chaque domaine, puis la traversée du mur ---
@@ -232,7 +307,7 @@ async function lancer() {
   let debut = performance.now();
   // test : ?tunnel-fige=1.4 fige l'intro à 1,4 s (vérification du cadrage)
   const parametre = new URLSearchParams(location.search).get('tunnel-fige');
-  const fige = parametre === null ? null : Number(parametre);
+  let fige = parametre === null ? null : Number(parametre);
   let fini = false;
 
   const terminer = (vite) => {
@@ -284,13 +359,29 @@ async function lancer() {
     camera.position.set(x, HAUTEUR / 2 - 0.15, z);
     camera.rotation.set(0, lacet, 0);
     torche.position.set(0, HAUTEUR - 0.5, z - 2);
+    // la photo se détache du fond quand la caméra arrive à sa hauteur (effet de profondeur)
+    for (const c of calques) {
+      const proche = Math.max(0, 1 - Math.abs(z - (c.z + 3.2)) / 5);
+      const k = lisse(proche);
+      c.sujet.position.z = -0.34 + 0.2 * k;
+      c.sujet.position.y = c.y + 0.03 * Math.sin(sec * 1.8 + c.phase);
+      c.sujet.scale.setScalar(0.96 + 0.06 * k);
+      if (c.portee) c.portee.material.opacity = 0.55 + 0.25 * k;
+    }
     // traversée du mur : il s'ouvre en lumière
     const passage = lisse((sec - tMur) / (duree - tMur));
     mur.material.opacity = 1 - passage;
     mur.scale.setScalar(1 + passage * 0.6);
     voile.style.setProperty('--eclat', passage.toFixed(3));
     rendu.render(scene, camera);
-    if (fige !== null) return;
+    if (fige !== null) {
+      // test : image par image (vidéo de contrôle)
+      window.psTunnelImage = (t) => {
+        fige = t;
+        image();
+      };
+      return;
+    }
     if (sec >= duree) terminer(false);
     else boucle = requestAnimationFrame(image);
   };

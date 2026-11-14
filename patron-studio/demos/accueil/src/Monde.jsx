@@ -13,7 +13,7 @@ import { defilement } from './defilement.js';
 ------------------------------------------------------------------- */
 
 const LONGUEUR = 120; // profondeur de l'espace parcourue du haut au bas de la page
-const VERT = new THREE.Color('#b9d98f');
+const VERT = new THREE.Color('#dfdfdf');
 
 /** Sol sombre et brillant : reflets doux de la lumière (texture de rugosité légère). */
 function Sol({ qualite }) {
@@ -21,10 +21,10 @@ function Sol({ qualite }) {
     const c = document.createElement('canvas');
     c.width = c.height = 256;
     const g = c.getContext('2d');
-    g.fillStyle = '#0a0f0d';
+    g.fillStyle = '#0e0e0e';
     g.fillRect(0, 0, 256, 256);
     // lignes de dalles très discrètes
-    g.strokeStyle = 'rgba(185,217,143,0.06)';
+    g.strokeStyle = 'rgba(223,223,223,0.06)';
     g.lineWidth = 2;
     g.strokeRect(1, 1, 254, 254);
     const t = new THREE.CanvasTexture(c);
@@ -99,7 +99,7 @@ function Poussiere({ n, reduit }) {
   });
   return (
     <points ref={ref} geometry={geo}>
-      <pointsMaterial color="#e9f1dc" size={0.035} transparent opacity={0.55} depthWrite={false} sizeAttenuation />
+      <pointsMaterial color="#ffffff" size={0.035} transparent opacity={0.55} depthWrite={false} sizeAttenuation />
     </points>
   );
 }
@@ -137,8 +137,8 @@ function Scene({ tier, reduit, actif }) {
       camera={{ position: [0, 0.2, 6], fov: 55, near: 0.1, far: 80 }}
       gl={{ antialias: !petit, alpha: false, powerPreference: 'high-performance' }}
       onCreated={({ gl, scene }) => {
-        gl.setClearColor('#070a09');
-        scene.fog = new THREE.FogExp2('#070a09', 0.055);
+        gl.setClearColor('#090909');
+        scene.fog = new THREE.FogExp2('#090909', 0.055);
       }}
     >
       <PerformanceMonitor onDecline={() => setQualite('normale')} />
