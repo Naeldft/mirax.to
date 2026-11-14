@@ -25,12 +25,12 @@
 /* ---------- Stage : ordinateur + téléphone en perspective ---------- */
 .stage{position:relative;perspective:1400px;min-width:0}
 .rig{position:relative;transform-style:preserve-3d;transform:rotateX(var(--rx,6deg)) rotateY(var(--ry,-12deg));transition:transform .5s cubic-bezier(.2,.8,.2,1);padding:0 7% 12% 0;will-change:transform}
-.laptop{margin:0;transform:translateZ(0);filter:drop-shadow(0 40px 50px #1f3a2b2e)}
+.laptop{margin:0;transform:translateZ(0);filter:drop-shadow(0 40px 50px #3333332e)}
 .laptop-screen{background:#191d1a;border-radius:14px 14px 4px 4px;padding:10px 10px 12px;aspect-ratio:16/10.4;position:relative}
 .laptop-screen::before{content:"";position:absolute;top:4px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#3b423d}
 .laptop-base{height:16px;margin:0 -6%;background:linear-gradient(#d9dcd5,#b9bdb5);border-radius:2px 2px 14px 14px;position:relative}
 .laptop-base::before{content:"";position:absolute;left:42%;right:42%;top:0;height:5px;border-radius:0 0 6px 6px;background:#a7aba3}
-.phone{position:absolute;right:0;bottom:2%;width:27%;margin:0;transform:translateZ(70px);filter:drop-shadow(0 30px 34px #1f3a2b40)}
+.phone{position:absolute;right:0;bottom:2%;width:27%;margin:0;transform:translateZ(70px);filter:drop-shadow(0 30px 34px #33333340)}
 .phone-screen{background:#191d1a;border-radius:24px;padding:7px;aspect-ratio:9/18.5}
 .phone-screen .site{border-radius:18px}
 
@@ -145,7 +145,7 @@
 .intro-word{position:relative;z-index:1;margin:0;color:#fff;font-size:clamp(2.6rem,9vw,7.4rem);font-weight:600;letter-spacing:-.06em;line-height:1.2;perspective:600px;white-space:nowrap;text-shadow:0 1px 0 #cfd6d0,0 2px 0 #9aa49d,0 3px 0 #6d776f,0 10px 22px #000c;transition:opacity .45s ease,transform .8s cubic-bezier(.6,0,.2,1)}
 .intro-word span{display:inline-block;opacity:0;transform:translateY(.45em) rotateX(-80deg);transform-origin:50% 100%;animation:intro-letter .62s cubic-bezier(.2,.9,.25,1) forwards}
 .intro-word .sp{width:.26em}
-.intro-word .o{color:#ececec;text-shadow:0 1px 0 #bdbdbd,0 2px 0 #808080,0 0 28px #bdd49477}
+.intro-word .o{color:#ececec;text-shadow:0 1px 0 #bdbdbd,0 2px 0 #808080,0 0 28px #cacaca77}
 .intro-word .light{font-weight:400;font-family:Georgia,serif;font-style:italic;letter-spacing:-.03em}
 .intro-skip{position:absolute;z-index:2;right:22px;bottom:22px;min-height:42px;padding:0 18px;border-radius:30px;border:1px solid #ffffff55;background:#ffffff10;color:#fff;font:inherit;font-size:.8rem;cursor:pointer}
 .intro-skip:focus-visible{outline:3px solid #dcdcdc;outline-offset:3px}
@@ -303,3 +303,22 @@ html:not(.ps-3d) .ps-ensemble{background:#060606}
   .ps-ensemble-sous{flex-basis:100%;font-size:.74rem}
 }
 @media (prefers-reduced-motion:reduce){.ps-ensemble[open]{animation:none}.ps-ensemble-carte{transition:none}}
+
+/* ---------- Phase 4 : maquette avec les vraies captures des démos ---------- */
+.laptop{filter:drop-shadow(0 40px 50px rgb(0 0 0 / .55))}
+.phone{filter:drop-shadow(0 30px 34px rgb(0 0 0 / .6))}
+.laptop-screen{background:#0c0c0d;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .16)}
+.laptop-screen::before{background:#2a2b2e;z-index:1}
+.phone-screen{background:#0c0c0d;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .18)}
+.laptop-screen .capture,.phone-screen .capture{display:block;width:100%;height:100%;object-fit:cover;object-position:top center;background:#111;transition:opacity .32s ease}
+.laptop-screen .capture{border-radius:6px 6px 2px 2px}
+.phone-screen .capture{border-radius:18px}
+.rig.is-switching .capture{opacity:0}
+#trade-sector{color:var(--muted)}
+#trade-link{color:inherit;text-underline-offset:3px}
+/* cartes des démos : capture plein cadre */
+.futur-art{background:#111}
+.futur-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}
+.futur-art .futur-3d{z-index:1}
+@media (prefers-reduced-motion:reduce){.laptop-screen .capture,.phone-screen .capture{transition:none}}
+.laptop-base{background:linear-gradient(#d6d8dc,#a7aab0)}.laptop-base::before{background:#96999f}

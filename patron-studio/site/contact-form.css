@@ -1,6 +1,6 @@
 /* Formulaire d’envoi au studio (fenêtre et page contact.html). Couleurs autonomes : lisible sur pages claires et sombres. */
 .psf-dialog{width:min(540px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:0;border:0;border-radius:22px;background:#fbfbf6;color:#272727;box-shadow:0 30px 90px #0006;font-family:Studio,Arial,sans-serif}
-.psf-dialog::backdrop{background:#0d1610b3}
+.psf-dialog::backdrop{background:#141414b3}
 .psf-dialog .psf-form{padding:22px 22px 24px}
 .psf-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .psf-kicker{margin:0;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#515151}

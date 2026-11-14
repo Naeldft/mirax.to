@@ -149,36 +149,44 @@
   }
 
   /* ---------- 4. Un site, tous les métiers ---------- */
+  /* Les 12 démos : captures réelles (desktop et mobile) dans assets/captures/ (voir IMAGES.md). */
   var TRADES = [
-    {id:'boulangerie', name:'Maison Farine', initials:'MF', city:'Lille', title:'Le bon pain, chaque matin.', text:'Levain maison, viennoiseries et gâteaux sur commande.', cta:'Voir nos horaires', bg:'#f6efe3', ink:'#3a2a1c', accent:'#a9662f', soft:'#ead8bd'},
-    {id:'coiffeur', name:'Atelier Mèche', initials:'AM', city:'Roubaix', title:'Votre style, notre savoir-faire.', text:'Coupes, couleurs et soins, avec ou sans rendez-vous.', cta:'Prendre rendez-vous', bg:'#f7eff0', ink:'#35242a', accent:'#9c4f63', soft:'#efd9de'},
-    {id:'plombier', name:'Clé de Douze', initials:'CD', city:'Tourcoing', title:'Une fuite ? On arrive vite.', text:'Dépannage, installation et entretien dans la métropole.', cta:'Appeler maintenant', bg:'#eaf1f5', ink:'#142a38', accent:'#1d6690', soft:'#d3e3ec'},
-    {id:'coach', name:'Élan Coaching', initials:'ÉC', city:'Lille', title:'L’énergie, séance après séance.', text:'Coaching individuel, en salle ou en extérieur.', cta:'Réserver une séance', bg:'#eef4e6', ink:'#1d2b1a', accent:'#467a26', soft:'#d9e7c8'},
-    {id:'boutique', name:'Comptoir Linné', initials:'CL', city:'Lille', title:'Des objets choisis avec soin.', text:'Déco, papeterie et idées cadeaux, en boutique et en ligne.', cta:'Découvrir la boutique', bg:'#f4efe8', ink:'#2b2621', accent:'#85563a', soft:'#e7dccd'},
-    {id:'restaurant', name:'La Table d’Opale', initials:'TO', city:'Lille', title:'Une cuisine de saison, à deux pas.', text:'Le midi en semaine, le soir du jeudi au samedi.', cta:'Voir la carte', bg:'#f8f1ea', ink:'#2d1f1a', accent:'#a8402b', soft:'#efd9cc'},
-    {id:'association', name:'Les Mains Vertes', initials:'MV', city:'Villeneuve-d’Ascq', title:'Ensemble, faisons pousser le quartier.', text:'Jardins partagés, ateliers et rencontres toute l’année.', cta:'Nous rejoindre', bg:'#edf4ee', ink:'#18301f', accent:'#2c6f41', soft:'#d5e7d9'},
-    {id:'photographe', name:'Studio Grain', initials:'SG', city:'Lille', title:'Vos plus beaux moments, en lumière.', text:'Portraits, mariages et photos pour les entreprises.', cta:'Voir le portfolio', bg:'#1d1e1c', ink:'#f1efe9', accent:'#c99a3c', soft:'#34352f', img:'photographe-2'}
+    {id:'restauration', name:'Forno Vivo', key:'futurRestoS'},
+    {id:'plomberie', name:'Ondine Plomberie', key:'futurPlombS'},
+    {id:'location-voitures', name:'Velocità Location', key:'futurAutoS'},
+    {id:'btp', name:'Bâti Nord', key:'futurBtpS'},
+    {id:'coiffure', name:'Atelier Mèche', key:'futurCoifS'},
+    {id:'boulangerie', name:'Maison Levain', key:'futurBoulS'},
+    {id:'coach', name:'Pulse Coaching', key:'futurCoachS'},
+    {id:'boutique', name:'Atelier Lin', key:'futurBoutS'},
+    {id:'photographe', name:'Lumen Studio', key:'futurPhotoS'},
+    {id:'association', name:'Les Racines', key:'futurAssoS'},
+    {id:'snack', name:'Crunch!', key:'futurSnackS'},
+    {id:'conseil', name:'Cap Horizon', key:'futurConseilS'}
   ];
-  var photos = ((window.PATRON_EXPORT_CONFIG || {}).photos) || [];
   var current = 0, timer = null, paused = false, rig, refreshTrades;
+  var CAP = './assets/captures/';
 
-  function imageFor(tr) {
-    if (photos.indexOf(tr.id) !== -1) return './assets/photos/' + tr.id + '.webp';
-    return './assets/illustrations/' + (tr.img || tr.id) + '.svg';
+  function srcs(tr) {
+    return { ordi: CAP + tr.id + '-ordi-1200.webp', ordiSet: CAP + tr.id + '-ordi-640.webp 640w, ' + CAP + tr.id + '-ordi-1200.webp 1200w', mobile: CAP + tr.id + '-mobile.webp' };
   }
+  function precharger(tr) { var u = srcs(tr); var a = new Image(); a.sizes = '(max-width: 900px) 88vw, 620px'; a.srcset = u.ordiSet; a.src = u.ordi; var m = new Image(); m.src = u.mobile; }
   function show(i, instant) {
     current = (i + TRADES.length) % TRADES.length;
     var tr = TRADES[current];
     function fill() {
-      rig.style.setProperty('--bg', tr.bg); rig.style.setProperty('--ink', tr.ink); rig.style.setProperty('--accent', tr.accent); rig.style.setProperty('--soft', tr.soft);
+      var u = srcs(tr);
       $$('[data-f]', rig).forEach(function (el) {
         var f = el.getAttribute('data-f');
-        if (f === 'img') { el.src = imageFor(tr); return; }
-        el.textContent = f === 'label' ? FR_TRADES[tr.id] + ' · ' + tr.city : tr[f];
+        if (f === 'ordi') { el.srcset = u.ordiSet; el.src = u.ordi; }
+        else if (f === 'mobile') el.src = u.mobile;
       });
-      var n = $('#trade-name'); if (n) n.textContent = tradeLabel(tr.id);
+      var n = $('#trade-name'); if (n) n.textContent = tr.name;
+      var sec = $('#trade-sector'); if (sec) sec.textContent = '(' + t(tr.key) + ')';
+      var l = $('#trade-link'); if (l) l.href = './demos/' + tr.id + '/';
       $$('#trades button').forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === current)); });
       rig.classList.remove('is-switching');
+      precharger(TRADES[(current + 1) % TRADES.length]); // la suivante est prête à temps
     }
     if (instant || reduce.matches) { fill(); return; }
     rig.classList.add('is-switching');
@@ -187,16 +195,15 @@
   function schedule() {
     clearInterval(timer);
     if (paused || reduce.matches) return;
-    timer = setInterval(function () { if (!document.hidden) show(current + 1); }, 3200);
+    timer = setInterval(function () { if (!document.hidden) show(current + 1); }, 3600);
   }
   function setupTrades() {
     rig = $('#rig'); if (!rig) return;
-    TRADES.forEach(function (tr) { var im = new Image(); im.src = imageFor(tr); });
     var box = $('#trades');
     box.innerHTML = TRADES.map(function (tr, k) { return '<button type="button" aria-pressed="' + (k === 0) + '" data-k="' + k + '"></button>'; }).join('');
     refreshTrades = function () {
-      $$('#trades button').forEach(function (b, k) { b.textContent = tradeLabel(TRADES[k].id); });
-      var n = $('#trade-name'); if (n) n.textContent = tradeLabel(TRADES[current].id);
+      $$('#trades button').forEach(function (b, k) { b.textContent = TRADES[k].name; b.title = t(TRADES[k].key); });
+      var sec = $('#trade-sector'); if (sec) sec.textContent = '(' + t(TRADES[current].key) + ')';
       var p = $('#pause span'); if (p) p.textContent = paused || reduce.matches ? t('play') : t('pause');
     };
     refreshTrades();

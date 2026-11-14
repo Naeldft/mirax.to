@@ -189,18 +189,21 @@ function Portail({ index, n, nom, cadre }) {
     const cam = defilement.zCamera;
     // dans la galerie : visible seulement pendant l'approche, puis il s'efface avant qu'on le traverse
     const devant = cam - zCouloir;
-    const approche = THREE.MathUtils.clamp((devant - 3.2) / 3, 0, 1) * THREE.MathUtils.clamp((13.5 - devant) / 4, 0, 1);
+    // écran vertical : portails plus petits et effacés plus tôt (sinon plus larges que l'écran)
+    const portrait = innerWidth / innerHeight < 1;
+    const base = portrait ? 0.5 : 1;
+    const approche = THREE.MathUtils.clamp((devant - (portrait ? 5 : 3.4)) / 3, 0, 1) * THREE.MathUtils.clamp((13.5 - devant) / 4, 0, 1);
     const visible = index === 0 ? 0 : approche * 0.8;
     const survole = m > 0.5 && defilement.survol === index;
     const k = visible + (1 - visible) * m;
     // dans la galerie : cadre néon bien visible, vitre plus discrète (le texte de la page reste lisible)
-    vitre.current.opacity = k * (0.55 + 0.45 * m);
+    vitre.current.opacity = k * (0.22 + 0.78 * m); // nom gravé discret dans la galerie, lisible dans la vue d'ensemble
     neon.current.opacity = Math.min(1, (visible * 1.25 + (1 - visible) * m) * (survole || m < 0.5 ? 1 : 0.75));
     // trajet entre la galerie et la rangée de la vue d'ensemble
     const e = placeEnsemble(index, n, cam);
     const g = groupe.current;
     g.position.set(e.x * m, Y_PORTAIL + (e.y - Y_PORTAIL) * m, zCouloir + (e.z - zCouloir) * m);
-    const echelle = 1 + (e.echelle * (survole ? 1.18 : 1) - 1) * m;
+    const echelle = base + (e.echelle * (survole ? 1.18 : 1) - base) * m;
     g.scale.setScalar(g.scale.x + (echelle - g.scale.x) * 0.25);
     g.rotation.y = -e.x * 0.04 * m;
     g.visible = k > 0.003;
