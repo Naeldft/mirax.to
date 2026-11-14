@@ -29,10 +29,26 @@ export const navigation = [
 ];
 
 /** Étapes affichées pendant l'assemblage 3D de l'accueil. */
+/** Les 3 étapes de l'accueil, chacune avec sa vraie photo (le texte décrit ce que montre la photo). */
 export const etapesHero = [
-  { titre: 'On diagnostique', texte: 'Recherche de fuite sans casse, caméra et détection.' },
-  { titre: 'On répare', texte: 'Pièces de qualité, raccords en cuivre, travail propre.' },
-  { titre: 'Ça coule de source', texte: 'Tout est testé devant vous avant notre départ.' },
+  {
+    titre: 'On diagnostique',
+    texte: 'On remonte le réseau vanne après vanne, eau comme gaz, pour trouver la panne sans casser.',
+    photo: 'hero-reseau',
+    alt: 'Réseau de canalisations avec vannes, détendeur et compteur, fixé sur un mur de briques',
+  },
+  {
+    titre: 'On répare',
+    texte: 'Le bon outil pour chaque raccord, et un chantier laissé propre.',
+    photo: 'hero-outils',
+    alt: 'Outils posés sur un établi en bois : marteau, pince, tournevis, clés hexagonales et mètre ruban',
+  },
+  {
+    titre: 'Ça coule de source',
+    texte: 'On ouvre le robinet devant vous : tout est testé avant notre départ.',
+    photo: 'hero-essai',
+    alt: 'Une main ouvre un robinet de cuisine, l’eau jaillit dans un verre posé dans l’évier',
+  },
 ];
 
 export const services = [
@@ -107,15 +123,15 @@ export const realisations = [
     scene: 'salle-de-bain',
   },
   {
-    id: 'chaufferie',
-    // photos : photos/realisation-chaufferie-apres.jpg (obligatoire) et, pour le curseur avant/après, photos/realisation-chaufferie-avant.jpg
-    apres: 'realisation-chaufferie-apres',
-    avant: null, // mettre 'realisation-chaufferie-avant' une fois la photo « avant » déposée
-    alt: 'Réseau de tuyauterie et vannes refait à neuf, fixé sur un mur de briques',
-    titre: 'Chaufferie, Roubaix',
-    texte: 'Chauffe-eau de 200 L et réseau cuivre refaits à neuf dans une maison des années 1930.',
-    duree: '2 jours',
-    scene: 'chaufferie',
+    id: 'baignoire',
+    // photos : photos/realisation-baignoire-apres.jpg (obligatoire) et, pour le curseur avant/après, photos/realisation-baignoire-avant.jpg
+    apres: 'realisation-baignoire-apres',
+    avant: null, // mettre 'realisation-baignoire-avant' une fois la photo « avant » déposée
+    alt: 'Salle de bain blanche : baignoire îlot, vasque à poser et robinetterie murale encastrée',
+    titre: 'Salle de bain, Roubaix',
+    texte: 'Baignoire îlot et vasque à poser, robinetterie murale encastrée dans la cloison.',
+    duree: '4 jours',
+    scene: 'salle-de-bain',
   },
   {
     id: 'cuisine',
@@ -145,11 +161,11 @@ export const zone = {
     { nom: 'Roubaix', x: 74, y: 30 },
     { nom: 'Tourcoing', x: 66, y: 18 },
     { nom: 'Villeneuve-d’Ascq', x: 72, y: 60 },
-    { nom: 'Marcq-en-Barœul', x: 56, y: 38 },
-    { nom: 'Lambersart', x: 36, y: 46 },
-    { nom: 'La Madeleine', x: 50, y: 46 },
+    { nom: 'Marcq-en-Barœul', x: 44, y: 35 },
+    { nom: 'Lambersart', x: 28, y: 45 },
+    { nom: 'La Madeleine', x: 52, y: 47 },
     { nom: 'Wasquehal', x: 66, y: 42 },
-    { nom: 'Croix', x: 70, y: 36 },
+    { nom: 'Croix', x: 74, y: 37 },
     { nom: 'Lomme', x: 30, y: 58 },
     { nom: 'Mons-en-Barœul', x: 60, y: 54 },
     { nom: 'Loos', x: 38, y: 70 },

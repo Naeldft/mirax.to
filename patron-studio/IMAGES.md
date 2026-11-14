@@ -28,6 +28,14 @@ Détail complet (sources, emplacements à remplir) : `demos/restauration/photos/
 - Règle de la phase 6 : jamais d'emplacement vide visible ; on adapte le produit à la photo, ou on le retire.
 - Retirés : la pizza dessinée en 3D, ses rendus d'image et le rendu 3D de la calzone ; les photos qui ne correspondaient pas à la recette.
 
+### Ondine Plomberie
+
+Détail complet : `demos/plomberie/photos/LISEZ-MOI.md`.
+- Accueil : 4 vraies photos (robinet où l'on plonge, réseau de canalisations, outils, robinet ouvert sur un verre) ;
+  textes des 3 étapes adaptés à ce que montrent les photos (dont « eau comme gaz » pour le réseau).
+- Réalisations : 3 vraies photos ; la « chaufferie » (photo qui montrait un réseau de gaz) devient une salle de bain avec baignoire îlot.
+- Retirés : la tuyauterie dessinée en 3D.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).
