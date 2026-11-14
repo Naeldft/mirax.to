@@ -32,10 +32,10 @@ html { color-scheme: dark; background: #0c0c0c; }
   font: 600 15px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
   letter-spacing: 0.01em;
   text-decoration: none;
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18) inset, 0 18px 40px -12px rgb(185 217 143 / 0.55), 0 6px 18px rgb(0 0 0 / 0.45);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18) inset, 0 18px 40px -12px rgb(223 223 223 / 0.55), 0 6px 18px rgb(0 0 0 / 0.45);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s;
 }
-.ps-cta:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25) inset, 0 24px 48px -12px rgb(185 217 143 / 0.7), 0 8px 22px rgb(0 0 0 / 0.5); }
+.ps-cta:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25) inset, 0 24px 48px -12px rgb(223 223 223 / 0.7), 0 8px 22px rgb(0 0 0 / 0.5); }
 .ps-cta span, .ps-cta svg { color: #131313; }
 .ps-cta:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .ps-cta svg { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -82,9 +82,9 @@ html { color-scheme: dark; background: #0c0c0c; }
 .offer *, .status-grid article *, .resource-card *, .expertise-links a * { color: inherit; }
 .project-open { background: #dfdfdf !important; color: #131313 !important; }
 .light .eyebrow, .eyebrow { color: #c4c4c4; }
-/* bandeau de fin de page : sombre avec un halo vert plutôt qu'un aplat vert */
+/* bandeau de fin de page : sombre avec un halo de lumière blanche */
 .closing {
-  background: radial-gradient(ellipse 70% 90% at 80% 100%, rgb(143 195 108 / 0.28), transparent 70%), #121212 !important;
+  background: radial-gradient(ellipse 70% 90% at 80% 100%, rgb(255 255 255 / 0.10), transparent 70%), #121212 !important;
   color: #f3f4f5 !important;
 }
 .closing em { color: #dfdfdf !important; }
