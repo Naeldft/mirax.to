@@ -6,46 +6,74 @@ import { gsap } from '@demos/shared/lib/gsap.js';
 import { disqueImage, formatPrix, pizzasPlateau } from '../data/pizzas';
 import { restaurant } from '../data/site';
 
-// La 3D (three.js) est chargée à part, après l'affichage du texte et de la photo : la page reste rapide.
-const Plateau3D = lazy(() => import('../three/Plateau3D'));
+// La scène 3D (three.js, modèles, textures) est chargée à part, après l'affichage du texte.
+const Pizzeria = lazy(() => import('../three/Pizzeria'));
 
 const CATEGORIE = { classique: 'Classique', epicee: 'Épicée', vegetarienne: 'Végétarienne' };
 const N = pizzasPlateau.length;
+const FIN = 0.82; // à partir d'ici, la caméra est sur la pizza : on peut la manipuler
 
 /**
- * Accueil Forno Vivo : une vraie photo de pizza, vue de dessus, posée sur un plateau qui tourne.
- *  - flèches, pastilles, ou glisser vite vers la gauche / la droite (téléphone) : pizza suivante / précédente ;
- *    le plateau roule alors hors de l'écran comme une roue et le suivant arrive en roulant ;
- *  - glisser lentement (doigt ou souris) : on fait pivoter la pizza pour voir les ingrédients ;
- *  - « Voir la carte » : va directement à la carte.
- * Sans WebGL : la même photo, en image fixe qui tourne doucement (CSS).
+ * Accueil Forno Vivo : une vraie scène 3D (la pizzeria, le four à bois, le comptoir).
+ * Le défilement fait avancer la caméra : elle entre, pivote vers les ardoises, puis descend sur la pizza.
+ * Là : flèches, pastilles, glisser vite (téléphone) pour changer de pizza ; glisser lentement pour la faire pivoter ;
+ * « Voir la carte » mène à la carte. La section est haute (le défilement pilote la caméra), la scène reste fixée.
+ * Animations réduites : la caméra est directement sur la pizza, rien ne défile.
  */
 export default function Hero({ onReady }) {
   const reduit = useReducedMotion();
-  const scope = useRef(null);
+  const section = useRef(null);
   const scene = useRef(null);
-  const enVue = useInView(scene, '0px');
+  const intro = useRef(null);
+  const progres = useRef(0);
+  const enVue = useInView(section, '0px');
   const [tier] = useState(getDeviceTier);
   const [charger3d, setCharger3d] = useState(false);
   const [pret3d, setPret3d] = useState(false);
+  const [etape, setEtape] = useState(reduit ? 2 : 0); // 0 entrée, 1 visite, 2 sur la pizza
   const [etat, setEtat] = useState({ index: 0, direction: 1 });
   const geste = useRef({ spin: 0, tilt: 0 });
   const glisse = useRef(null);
   const pizza = pizzasPlateau[etat.index];
   const avec3d = tier !== 'none';
+  const leger = tier === 'low';
+  const surPizza = etape === 2 || !avec3d;
 
   const changer = useCallback((pas) => setEtat((e) => ({ index: (e.index + pas + N) % N, direction: pas })), []);
   const aller = useCallback((i) => setEtat((e) => (i === e.index ? e : { index: i, direction: i > e.index ? 1 : -1 })), []);
 
-  // la 3D se charge quand le navigateur est libre ; l'écran de chargement n'attend jamais plus de 1,6 s
+  // le défilement dans la section pilote la caméra (progres 0 → 1)
+  useEffect(() => {
+    if (reduit) {
+      progres.current = 1;
+      return;
+    }
+    const maj = () => {
+      const s = section.current;
+      if (!s) return;
+      const r = s.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
+      progres.current = p;
+      setEtape(p < 0.1 ? 0 : p < FIN ? 1 : 2);
+    };
+    maj();
+    addEventListener('scroll', maj, { passive: true });
+    addEventListener('resize', maj);
+    return () => {
+      removeEventListener('scroll', maj);
+      removeEventListener('resize', maj);
+    };
+  }, [reduit]);
+
+  // la 3D se charge quand le navigateur est libre ; l'écran de chargement n'attend jamais plus de 2,5 s
   useEffect(() => {
     if (!avec3d) {
       onReady?.();
       return;
     }
     const go = () => setCharger3d(true);
-    const t = 'requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 700 }) : setTimeout(go, 200);
-    const garde = setTimeout(() => onReady?.(), 1600);
+    const t = 'requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 600 }) : setTimeout(go, 150);
+    const garde = setTimeout(() => onReady?.(), 2500);
     return () => {
       'cancelIdleCallback' in window ? cancelIdleCallback(t) : clearTimeout(t);
       clearTimeout(garde);
@@ -57,25 +85,23 @@ export default function Hero({ onReady }) {
     onReady?.();
   }, [onReady]);
 
-  // entrée du texte
   useLayoutEffect(() => {
     if (reduit) return;
     const ctx = gsap.context(() => {
-      gsap.from('[data-hero-in]', { y: 30, opacity: 0, duration: 1, stagger: 0.08, ease: 'power3.out', delay: 0.15 });
-    }, scope);
+      gsap.from('[data-hero-in]', { y: 30, opacity: 0, duration: 1, stagger: 0.08, ease: 'power3.out', delay: 0.2 });
+    }, intro);
     return () => ctx.revert();
   }, [reduit]);
 
-  /* ----- gestes : glisser lentement = pivoter ; glisser vite = changer de pizza ----- */
+  /* ----- gestes sur la pizza : glisser lentement = pivoter ; glisser vite = changer ----- */
   const down = (e) => {
-    if (e.button > 0) return;
+    if (!surPizza || e.button > 0) return;
     glisse.current = {
       x0: e.clientX,
       y0: e.clientY,
       t0: performance.now(),
       spin0: geste.current.spin,
       tilt0: geste.current.tilt,
-      souris: e.pointerType === 'mouse',
       vx: 0,
       xp: e.clientX,
       tp: performance.now(),
@@ -89,7 +115,7 @@ export default function Hero({ onReady }) {
     const dx = e.clientX - g.x0;
     const dy = e.clientY - g.y0;
     geste.current.spin = g.spin0 + dx * 0.012;
-    if (g.souris) geste.current.tilt = Math.max(-0.35, Math.min(0.5, g.tilt0 + dy * 0.004));
+    if (e.pointerType === 'mouse') geste.current.tilt = Math.max(-0.35, Math.min(0.45, g.tilt0 + dy * 0.004));
     const t = performance.now();
     if (t > g.tp) g.vx = (e.clientX - g.xp) / (t - g.tp);
     g.xp = e.clientX;
@@ -101,13 +127,10 @@ export default function Hero({ onReady }) {
     if (!g) return;
     const dx = e.clientX - g.x0;
     const dy = e.clientY - g.y0;
-    const duree = performance.now() - g.t0;
-    // geste vif et horizontal : on change de pizza (vers la gauche = la suivante)
-    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.2 && duree < 420) {
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.2 && performance.now() - g.t0 < 420) {
       changer(dx < 0 ? 1 : -1);
       return;
     }
-    // sinon : élan, puis l'inclinaison revient doucement
     if (!reduit) gsap.to(geste.current, { spin: geste.current.spin + g.vx * 0.32, duration: 1.1, ease: 'power3.out' });
     gsap.to(geste.current, { tilt: 0, duration: 0.9, ease: 'elastic.out(1, 0.6)' });
   };
@@ -119,74 +142,117 @@ export default function Hero({ onReady }) {
   };
 
   return (
-    <section id="accueil" aria-label="Accueil : Forno Vivo et nos pizzas" className="relative overflow-hidden bg-charbon text-creme">
-      {/* fonds : un par pizza, en fondu enchaîné */}
-      {pizzasPlateau.map((p, i) => (
-        <div
-          key={p.id}
-          aria-hidden="true"
-          className="absolute inset-0 transition-opacity duration-700"
-          style={{
-            background: `radial-gradient(ellipse 75% 65% at 66% 42%, ${p.fond[0]}, ${p.fond[1]} 78%)`,
-            opacity: i === etat.index ? 1 : 0,
-          }}
-        />
-      ))}
-      {/* nom géant derrière le plateau */}
-      <p
-        key={`mot-${pizza.id}`}
-        aria-hidden="true"
-        className={`pointer-events-none absolute left-0 top-[24%] w-max select-none whitespace-nowrap px-4 font-serif text-[clamp(7rem,34vw,26rem)] italic leading-none text-creme/[0.07] md:top-1/2 md:-translate-y-1/2 ${reduit ? '' : etat.direction > 0 ? 'fv-mot-g' : 'fv-mot-d'}`}
-      >
-        {pizza.nom}
-      </p>
-
-      <div className="relative mx-auto flex min-h-[100svh] max-w-7xl flex-col px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-16 md:grid md:grid-cols-[minmax(0,44%)_1fr] md:items-center md:gap-6 md:px-12 md:pb-16 md:pt-24">
-        {/* plateau tournant */}
-        <div className="relative order-first h-[36svh] min-h-[230px] md:order-last md:h-[80svh]">
-          <div
-            ref={scene}
-            role="group"
-            aria-roledescription="carrousel"
-            aria-label={`Nos pizzas : ${pizza.nom}. Flèches gauche et droite pour changer.`}
-            tabIndex={0}
-            onKeyDown={touche}
-            onPointerDown={down}
-            onPointerMove={move}
-            onPointerUp={up}
-            onPointerCancel={() => (glisse.current = null)}
-            className="absolute inset-0 cursor-grab touch-pan-y select-none rounded-3xl outline-none focus-visible:ring-2 focus-visible:ring-or-clair active:cursor-grabbing"
-          >
-            {/* photo fixe : avant la 3D, ou à la place de la 3D */}
+    <section
+      id="accueil"
+      ref={section}
+      aria-label="Accueil : Forno Vivo et nos pizzas"
+      className="relative bg-charbon text-creme"
+      style={{ height: reduit || !avec3d ? '100svh' : '520svh' }}
+    >
+      <div className="sticky top-0 h-[100svh] overflow-hidden">
+        {/* la scène 3D (ou, sans 3D, la vraie photo de la pizza) */}
+        <div className="absolute inset-0 bg-charbon">
+          {(!avec3d || !pret3d) && (
             <img
-              key={`poster-${pizza.id}`}
               src={disqueImage(pizza.disque, 512)}
-              srcSet={`${disqueImage(pizza.disque, 512)} 512w, ${disqueImage(pizza.disque, 1024)} 1024w`}
-              sizes="(min-width: 768px) 40vw, 80vw"
               alt=""
-              draggable="false"
-              fetchPriority="high"
-              className={`pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[min(78%,52svh)] -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_30px_40px_rgb(0_0_0/0.55)] transition-opacity duration-500 md:w-[min(76%,62svh)] ${
+              className={`absolute left-1/2 top-[34%] aspect-square w-[min(70vw,46svh)] -translate-x-1/2 -translate-y-1/2 transition-opacity duration-700 md:left-[66%] md:top-1/2 md:w-[min(40vw,60svh)] ${
                 pret3d ? 'opacity-0' : 'opacity-100'
-              } ${reduit ? '' : etat.direction > 0 ? 'fv-roule-g' : 'fv-roule-d'}`}
+              }`}
             />
-            {charger3d && (
-              <Suspense fallback={null}>
-                <Plateau3D
-                  pizzas={pizzasPlateau}
-                  index={etat.index}
-                  direction={etat.direction}
-                  geste={geste}
-                  reduit={reduit}
-                  actif={enVue}
-                  onReady={pret}
-                />
-              </Suspense>
-            )}
+          )}
+          {avec3d && charger3d && (
+            <Suspense fallback={null}>
+              <Pizzeria
+                progres={progres}
+                pizzas={pizzasPlateau}
+                index={etat.index}
+                direction={etat.direction}
+                geste={geste}
+                reduit={reduit}
+                leger={leger}
+                actif={enVue}
+                onReady={pret}
+              />
+            </Suspense>
+          )}
+          {/* voile pour la lisibilité du texte */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-charbon/85 via-transparent to-charbon/40 md:bg-gradient-to-r md:from-charbon/80 md:via-charbon/10 md:to-transparent" />
+        </div>
+
+        {/* zone de manipulation de la pizza (active quand la caméra est dessus) */}
+        <div
+          ref={scene}
+          role="group"
+          aria-roledescription="carrousel"
+          aria-label={`Nos pizzas : ${pizza.nom}. Flèches gauche et droite pour changer.`}
+          tabIndex={surPizza ? 0 : -1}
+          onKeyDown={touche}
+          onPointerDown={down}
+          onPointerMove={move}
+          onPointerUp={up}
+          onPointerCancel={() => (glisse.current = null)}
+          className={`absolute inset-x-0 top-[12%] h-[48%] touch-pan-y select-none outline-none md:left-[40%] md:top-[15%] md:h-[70%] ${
+            surPizza ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'
+          }`}
+        />
+
+        {/* 1. l'entrée : le nom de la pizzeria */}
+        <div
+          ref={intro}
+          className={`absolute inset-x-0 bottom-0 px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] transition-opacity duration-500 md:inset-y-0 md:flex md:max-w-[52%] md:flex-col md:justify-center md:px-12 md:pb-0 ${
+            etape === 0 ? 'opacity-100' : 'pointer-events-none opacity-0'
+          }`}
+        >
+          <p data-hero-in className="eyebrow">
+            {restaurant.accroche}
+          </p>
+          <h1 data-hero-in className="mt-2 text-[clamp(3.4rem,15vw,8.5rem)] font-semibold leading-[0.88]">
+            Forno <em className="font-medium text-or-clair">Vivo</em>
+          </h1>
+          <p data-hero-in className="mt-3 font-serif text-xl italic text-creme/85 md:text-3xl">
+            {restaurant.slogan}
+          </p>
+          <p data-hero-in className="mt-6 text-sm uppercase tracking-[0.25em] text-creme/60" aria-hidden="true">
+            Faites défiler · on entre ↓
+          </p>
+        </div>
+
+        {/* ce qu'affichent les ardoises, pour les lecteurs d'écran et Google */}
+        <ul className="sr-only">
+          <li>Notre pâte maturée 48 heures, farine italienne, tomates San Marzano.</li>
+          <li>Cuite au feu de bois à 450 °C en 90 secondes, comme à Naples.</li>
+        </ul>
+
+        {/* 3. sur la pizza : nom, prix, flèches, « Voir la carte » */}
+        <div
+          className={`absolute inset-x-0 bottom-0 px-5 pb-[calc(6.2rem+env(safe-area-inset-bottom))] transition-opacity duration-500 md:inset-y-0 md:flex md:max-w-[40%] md:flex-col md:justify-center md:px-12 md:pb-0 ${
+            surPizza ? 'opacity-100' : 'pointer-events-none opacity-0'
+          }`}
+          aria-hidden={!surPizza}
+        >
+          <div aria-live="polite">
+            <div key={pizza.id} className={reduit ? '' : 'fv-texte'}>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-or-clair">
+                N° {String(etat.index + 1).padStart(2, '0')} / {String(N).padStart(2, '0')} ·{' '}
+                {pizza.categories.map((c) => CATEGORIE[c]).join(' · ')}
+              </p>
+              <div className="mt-1 flex items-baseline justify-between gap-4">
+                <h2 className="text-4xl font-semibold md:text-6xl">{pizza.nom}</h2>
+                <span className="whitespace-nowrap font-serif text-2xl text-or-clair md:text-4xl">{formatPrix(pizza.prix)}</span>
+              </div>
+              <p className="mt-1 font-serif text-base italic text-creme/85 md:mt-2 md:text-xl">{pizza.description}</p>
+              <p className="mt-1 hidden text-sm leading-relaxed text-creme/65 md:block md:text-base">{pizza.ingredients.join(' · ')}</p>
+            </div>
           </div>
-          {/* flèches */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-1 flex items-center justify-between md:bottom-[10%] md:justify-center md:gap-28">
-            <button type="button" onClick={() => changer(-1)} className="fv-fleche pointer-events-auto" aria-label="Pizza précédente">
+          <div className="mt-4 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => changer(-1)}
+              className="fv-fleche"
+              aria-label="Pizza précédente"
+              tabIndex={surPizza ? 0 : -1}
+            >
               <svg
                 width="22"
                 height="22"
@@ -200,10 +266,23 @@ export default function Hero({ onReady }) {
                 <path d="M15 5l-7 7 7 7" />
               </svg>
             </button>
-            <p className="hidden text-xs uppercase tracking-[0.25em] text-creme/55 md:block" aria-hidden="true">
-              Glissez pour tourner
-            </p>
-            <button type="button" onClick={() => changer(1)} className="fv-fleche pointer-events-auto" aria-label="Pizza suivante">
+            <div className="hidden flex-wrap gap-2 md:flex" role="group" aria-label="Choisir une pizza">
+              {pizzasPlateau.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => aller(i)}
+                  aria-pressed={i === etat.index}
+                  tabIndex={surPizza ? 0 : -1}
+                  className={`min-h-11 rounded-full border px-4 text-sm font-semibold transition-colors ${
+                    i === etat.index ? 'border-or-clair bg-or-clair text-charbon' : 'border-creme/25 text-creme/80 hover:border-creme/60'
+                  }`}
+                >
+                  {p.nom}
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={() => changer(1)} className="fv-fleche" aria-label="Pizza suivante" tabIndex={surPizza ? 0 : -1}>
               <svg
                 width="22"
                 height="22"
@@ -217,57 +296,15 @@ export default function Hero({ onReady }) {
                 <path d="M9 5l7 7-7 7" />
               </svg>
             </button>
+            <span className="ml-2 text-xs uppercase tracking-[0.2em] text-creme/55 md:hidden" aria-hidden="true">
+              Glissez pour tourner
+            </span>
           </div>
-        </div>
-
-        {/* texte */}
-        <div ref={scope} className="relative mt-4 md:mt-0">
-          <p data-hero-in className="eyebrow">
-            {restaurant.accroche}
-          </p>
-          <h1 data-hero-in className="mt-1 text-[clamp(2.6rem,11vw,7.5rem)] font-semibold leading-[0.9] md:mt-2">
-            Forno <em className="font-medium text-or-clair">Vivo</em>
-          </h1>
-          <p data-hero-in className="mt-2 hidden font-serif text-lg italic text-creme/80 md:block md:text-2xl">
-            {restaurant.slogan}
-          </p>
-
-          <div data-hero-in className="mt-3 border-t border-creme/15 pt-3 md:mt-8 md:pt-6" aria-live="polite">
-            <div key={pizza.id} className={reduit ? '' : 'fv-texte'}>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-or-clair">
-                N° {String(etat.index + 1).padStart(2, '0')} / {String(N).padStart(2, '0')} ·{' '}
-                {pizza.categories.map((c) => CATEGORIE[c]).join(' · ')}
-              </p>
-              <div className="mt-1 flex items-baseline justify-between gap-4">
-                <h2 className="text-3xl font-semibold md:text-6xl">{pizza.nom}</h2>
-                <span className="font-serif text-2xl text-or-clair md:text-4xl">{formatPrix(pizza.prix)}</span>
-              </div>
-              <p className="mt-1 font-serif text-base italic text-creme/85 md:mt-2 md:text-xl">{pizza.description}</p>
-              <p className="mt-1 hidden text-sm leading-relaxed text-creme/65 md:block md:text-base">{pizza.ingredients.join(' · ')}</p>
-            </div>
-            {/* pastilles */}
-            <div className="mt-4 hidden flex-wrap gap-2 md:flex" role="group" aria-label="Choisir une pizza">
-              {pizzasPlateau.map((p, i) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => aller(i)}
-                  aria-pressed={i === etat.index}
-                  className={`min-h-11 rounded-full border px-4 text-sm font-semibold transition-colors ${
-                    i === etat.index ? 'border-or-clair bg-or-clair text-charbon' : 'border-creme/25 text-creme/80 hover:border-creme/60'
-                  }`}
-                >
-                  {p.nom}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div data-hero-in className="mt-4 flex gap-3 md:mt-6">
-            <a href="#menu" className="btn btn-primary flex-1 md:flex-none">
+          <div className="mt-4 flex gap-3">
+            <a href="#menu" className="btn btn-primary flex-1 md:flex-none" tabIndex={surPizza ? 0 : -1}>
               Voir la carte
             </a>
-            <a href="#reservation" className="btn btn-ghost flex-1 md:flex-none">
+            <a href="#reservation" className="btn btn-ghost flex-1 md:flex-none" tabIndex={surPizza ? 0 : -1}>
               Réserver
             </a>
           </div>

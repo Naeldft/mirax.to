@@ -21,12 +21,32 @@ vraies captures d'écran des 12 sites de démonstration du dossier `demos/`, fai
 
 ### Forno Vivo (restauration)
 
-Détail complet (sources, emplacements à remplir) : `demos/restauration/photos/LISEZ-MOI.md`.
-- Plateau tournant de l'accueil : 4 vraies photos de pizzas vues de dessus, détourées au bord de la croûte et redressées en disque
-  (Margherita, Diavola, Verde, Rustica).
+Détail complet des photos : `demos/restauration/photos/LISEZ-MOI.md`.
+- Intro : vraie scène 3D (pizzeria, four à bois, comptoir), construite en code dans `src/three/Pizzeria.jsx`.
+- Pizzas de la scène : 4 vraies photos vues de dessus, détourées en disque (Margherita, Diavola, Verde, Rustica),
+  posées sur un disque 3D avec une bordure en relief texturée avec la vraie croûte de chaque photo (`images/disques/*-bord.webp`).
 - Carte : 9 pizzas, chacune avec sa vraie photo ; recettes et noms adaptés à ce que montre la photo. Calzone retirée (aucune photo).
-- Règle de la phase 6 : jamais d'emplacement vide visible ; on adapte le produit à la photo, ou on le retire.
-- Retirés : la pizza dessinée en 3D, ses rendus d'image et le rendu 3D de la calzone ; les photos qui ne correspondaient pas à la recette.
+
+Modèles 3D, textures et lumière d'ambiance : **Poly Haven, licence CC0** (domaine public, usage commercial libre, sans attribution
+obligatoire), compressés pour le téléphone (textures 512 px WebP, géométrie compressée) dans `demos/restauration/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Ardoises sur pied | `modeles/standing_chalkboard_01.glb` | https://polyhaven.com/a/standing_chalkboard_01 |
+| Panier en osier | `modeles/wicker_basket_01.glb` | https://polyhaven.com/a/wicker_basket_01 |
+| Citrons | `modeles/lemon.glb` | https://polyhaven.com/a/lemon |
+| Planche à découper | `modeles/wooden_cutting_board.glb` | https://polyhaven.com/a/wooden_cutting_board |
+| Caisse en bois | `modeles/wooden_crate_01.glb` | https://polyhaven.com/a/wooden_crate_01 |
+| Suspensions | `modeles/hanging_industrial_lamp.glb` | https://polyhaven.com/a/hanging_industrial_lamp |
+| Briques du four | `textures/castle_brick_02_red-*` | https://polyhaven.com/a/castle_brick_02_red |
+| Briques réfractaires (bouche) | `textures/brown_brick_02-*` | https://polyhaven.com/a/brown_brick_02 |
+| Enduit des murs | `textures/clay_plaster-*` | https://polyhaven.com/a/clay_plaster |
+| Sol en briques | `textures/brick_floor_02-*` | https://polyhaven.com/a/brick_floor_02 |
+| Bois du comptoir, poutres, pelle | `textures/wood_table_001-*` | https://polyhaven.com/a/wood_table_001 |
+| Lumière et reflets (photo 360°) | `ambiance-1024.jpg`, `ambiance-512.jpg` | https://polyhaven.com/a/warm_restaurant_night |
+
+Construits en code (pas d'image) : le four (voûte, façade en arche, bouche, braises, flammes animées, conduit),
+le comptoir, la pelle, la salle (murs, sol, plafond, poutres), les appliques.
 
 ### Ondine Plomberie
 
