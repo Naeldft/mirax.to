@@ -3,17 +3,18 @@
  *  Intro « tunnel » de l'accueil Patrôn Studio (three.js seul, sans React : démarrage rapide).
  * ============================================================
  *  La caméra file dans un couloir lumineux. Elle se tourne vers la droite : un domaine
- *  s'affiche sur la paroi ; puis vers la gauche : un autre… puis elle traverse le dernier
- *  mur et l'on entre dans le site.
+ *  s'affiche sur la paroi ; puis vers la gauche : un autre… puis elle s'arrête devant un
+ *  appareil photo au bout du tunnel qui déclenche : l'éclair du flash révèle le site.
  *
  *  Modes (choisis par le petit script en tête de index.html, attribut data-tunnel) :
  *   - « complet » : 1re visite, 3,8 s ;
- *   - « court »   : visiteur qui revient, 0,9 s (seulement la traversée du mur) ;
+ *   - « court »   : visiteur qui revient, 0,95 s (seulement l'éclair du flash et l'apparition du site) ;
  *   - pas d'intro si « réduire les animations » est activé ou si l'on arrive sur une ancre.
  *  Bouton « Passer » (et touche Échap). Le bouton « Demander mon site » reste au-dessus.
  *  Le minutage suit l'horloge (pas les images) : la durée est tenue même sur un téléphone lent.
  */
 import * as THREE from 'three';
+import { creerReflex, declic } from './reflex.js';
 
 const DOMAINES = [
   { mot: 'Restaurants', cote: 1, icone: 'pizza' },
@@ -93,8 +94,14 @@ const ARGENT = '#d4d7dd';
 const LARGEUR = 6;
 const HAUTEUR = 4;
 const ESPACE = 9; // distance entre deux domaines
-const Z_MUR = -(DOMAINES.length * ESPACE + 6); // mur final
-const DUREE = { complet: 3.9, court: 0.95 };
+const Z_MUR = -(DOMAINES.length * ESPACE + 6); // bout du tunnel (appareil photo)
+const DUREE = { complet: 3.95, court: 0.95 };
+const ETAPE = 0.64; // temps entre deux panneaux
+// fin de l'intro (secondes) : l'appareil photo s'allume, se tourne vers nous, déclenche ; l'éclair révèle le site
+const FIN = {
+  complet: { allume: 2.5, tourne: [2.85, 3.2], appui: [3.18, 3.3], flash: 3.3, plein: 3.38, revele: 3.42 },
+  court: { allume: -1, tourne: [0, 0], appui: [-1, -1], flash: 0.1, plein: 0.18, revele: 0.24 },
+};
 const CLE = 'ps-tunnel-vu';
 
 const racine = document.documentElement;
@@ -139,32 +146,6 @@ function texturePanneau(mot, numero, police) {
   return t;
 }
 
-/** Logotype sur le mur final. */
-function textureMur(police) {
-  const c = document.createElement('canvas');
-  c.width = 1024;
-  c.height = 512;
-  const g = c.getContext('2d');
-  const r = g.createRadialGradient(512, 256, 10, 512, 256, 520);
-  r.addColorStop(0, '#2c2d30');
-  r.addColorStop(1, '#060606');
-  g.fillStyle = r;
-  g.fillRect(0, 0, 1024, 512);
-  g.textAlign = 'center';
-  g.fillStyle = '#f3f4f5';
-  g.font = `600 150px ${police}`;
-  g.shadowColor = 'rgba(255,255,255,0.55)';
-  g.shadowBlur = 40;
-  g.fillText('patrôn', 512, 280);
-  g.shadowBlur = 0;
-  g.fillStyle = ARGENT;
-  g.font = `500 40px ${police}`;
-  g.fillText('STUDIO  ·  LILLE', 512, 360);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
 const lisse = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 const accel = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
@@ -202,7 +183,7 @@ async function lancer() {
   const camera = new THREE.PerspectiveCamera(innerWidth / innerHeight < 1 ? 78 : 62, innerWidth / innerHeight, 0.1, 80);
 
   // --- couloir ---
-  const longueur = -Z_MUR + 12;
+  const longueur = -Z_MUR + 50; // le tunnel continue derrière l'appareil photo et se perd dans le brouillard
   // parois gris anthracite satinées et sol laqué : les lumières blanches s'y reflètent (effet argent)
   const paroi = new THREE.MeshStandardMaterial({ color: '#1c1d20', roughness: 0.3, metalness: 0.45 });
   const sol = new THREE.MeshStandardMaterial({ color: '#101113', roughness: 0.12, metalness: 0.6 });
@@ -245,7 +226,7 @@ async function lancer() {
     [new THREE.BoxGeometry(0.03, HAUTEUR, 0.03), [-LARGEUR / 2 + 0.02, HAUTEUR / 2]],
     [new THREE.BoxGeometry(0.03, HAUTEUR, 0.03), [LARGEUR / 2 - 0.02, HAUTEUR / 2]],
   ];
-  for (let z = 2; z > Z_MUR; z -= 3) {
+  for (let z = 2; z > Z_MUR - 38; z -= 3) {
     for (const [geo, [x, y]] of cadreGeo) {
       const m = new THREE.Mesh(geo, blanc);
       m.position.set(x, y, z);
@@ -289,16 +270,22 @@ async function lancer() {
     halo.position.set(d.cote * (LARGEUR / 2 - 2.4), HAUTEUR / 2 + 0.6, z + 1.2);
     scene.add(halo);
     // instant d'allumage : un peu avant que la caméra s'arrête devant le panneau
-    neons.push({ neon, halo, allume: leMode === 'complet' ? 0.72 * (i + 1) - 0.3 : -1 });
+    neons.push({ neon, halo, allume: leMode === 'complet' ? ETAPE * (i + 1) - 0.3 : -1 });
   });
 
-  // --- mur final (logotype) ---
-  const mur = new THREE.Mesh(
-    new THREE.PlaneGeometry(LARGEUR, HAUTEUR),
-    new THREE.MeshBasicMaterial({ map: textureMur(police), transparent: true, fog: false }),
-  );
-  mur.position.set(0, HAUTEUR / 2, Z_MUR);
-  scene.add(mur);
+  // --- au bout du tunnel : l'appareil photo reflex en néon ---
+  const fin = FIN[leMode];
+  const reflex = creerReflex();
+  reflex.groupe.position.set(0, HAUTEUR / 2 - 0.1, Z_MUR);
+  reflex.groupe.scale.setScalar(portrait ? 0.62 : 1);
+  scene.add(reflex.groupe);
+  const lueur = new THREE.PointLight('#ffffff', 0, 7, 1.6); // lumière du néon sur les parois
+  lueur.position.set(0, HAUTEUR / 2, Z_MUR + 1.2);
+  scene.add(lueur);
+  const eclair = new THREE.PointLight('#ffffff', 0, 14, 1.2); // le flash éclaire le tunnel
+  eclair.position.set(0, HAUTEUR / 2 + 0.6, Z_MUR + 0.6);
+  scene.add(eclair);
+  let declenche = false;
 
   // lumières qui suivent la caméra
   scene.add(new THREE.AmbientLight('#ffffff', 0.45));
@@ -306,27 +293,25 @@ async function lancer() {
   const torche = new THREE.PointLight('#ffffff', 22, 15, 1.4);
   scene.add(torche);
 
-  // --- trajectoire : un arrêt face à chaque domaine, puis la traversée du mur ---
+  // --- trajectoire : un arrêt face à chaque domaine, puis face à l'appareil photo ---
   // chaque étape : [instant (s), z, décalage x, lacet] ; la caméra ralentit à chaque arrêt (pas de vitesse brusque)
   const etapes =
     leMode === 'complet'
       ? [
           [0, 4, 0, 0],
           ...DOMAINES.map((d, i) => [
-            0.72 * (i + 1),
+            ETAPE * (i + 1),
             -ESPACE * (i + 1) + 2 + (portrait ? 3.4 : 3.1),
             -d.cote * (portrait ? 0.55 : 0.35),
             -d.cote * (portrait ? 0.62 : 0.78),
           ]),
-          [0.72 * DOMAINES.length + 0.42, Z_MUR + 1.4, 0, 0],
-          [duree, Z_MUR - 2.5, 0, 0],
+          [2.95, Z_MUR + 3.4, 0, 0], // arrêt face à l'appareil photo
+          [duree, Z_MUR + 2.9, 0, 0], // très lente avancée jusqu'au déclenchement
         ]
       : [
-          [0, Z_MUR + 7, 0, 0],
-          [0.55, Z_MUR + 1.4, 0, 0],
-          [duree, Z_MUR - 2.5, 0, 0],
+          [0, Z_MUR + 3.2, 0, 0],
+          [duree, Z_MUR + 3, 0, 0],
         ];
-  const tMur = etapes[etapes.length - 2][0];
   const position = (sec) => {
     let n = 1;
     while (n < etapes.length - 1 && sec > etapes[n][0]) n++;
@@ -401,11 +386,37 @@ async function lancer() {
       n.neon.material.opacity = vie;
       n.halo.intensity = 6 * vie;
     }
-    // traversée du mur : il s'ouvre en lumière
-    const passage = lisse((sec - tMur) / (duree - tMur));
-    mur.material.opacity = 1 - passage;
-    mur.scale.setScalar(1 + passage * 0.6);
-    voile.style.setProperty('--eclat', passage.toFixed(3));
+    // appareil photo : allumage du néon, puis il se tourne vers nous
+    const niveau = allumage(sec - fin.allume);
+    const vie = niveau === 1 ? 0.97 + 0.03 * Math.sin(sec * 19) : niveau;
+    for (const m of reflex.couches) m.opacity = vie;
+    lueur.intensity = 7 * vie;
+    const tour = lisse((sec - fin.tourne[0]) / (fin.tourne[1] - fin.tourne[0]));
+    reflex.groupe.rotation.set(0.1 * (1 - tour) + 0.03, 0.42 * (1 - tour), 0);
+    // le déclencheur s'enfonce puis remonte
+    const appui = (sec - fin.appui[0]) / (fin.appui[1] - fin.appui[0]);
+    reflex.declencheur.position.y = reflex.yDeclencheur - (appui > 0 && appui < 1 ? 0.026 * Math.sin(appui * Math.PI) : 0);
+    // le flash part : petit bruit (si le son est autorisé) et éclair blanc sur tout l'écran
+    if (sec >= fin.flash && !declenche && fige === null) {
+      declenche = true;
+      declic();
+    }
+    const eclat = sec < fin.flash ? 0 : Math.exp(-(sec - fin.flash) * 12);
+    reflex.flash.material.opacity = eclat;
+    eclair.intensity = 80 * eclat;
+    // écran blanc : montée rapide, court palier, puis il se dissout en douceur sur la page d'accueil
+    const blanc =
+      sec < fin.flash
+        ? 0
+        : sec < fin.plein
+          ? lisse((sec - fin.flash) / (fin.plein - fin.flash))
+          : 1 - lisse((sec - fin.revele) / (duree - fin.revele));
+    voile.style.setProperty('--eclat', blanc.toFixed(3));
+    voile.classList.toggle('ps-tunnel-eclair', sec >= fin.flash); // le bouton « Passer » s'efface
+    // derrière le blanc, le tunnel laisse place au site (pas de coupure visible)
+    const revele = sec >= (fin.plein + fin.revele) / 2;
+    rendu.domElement.style.visibility = revele || leMode === 'court' ? 'hidden' : 'visible';
+    voile.style.background = revele ? 'transparent' : '';
     rendu.render(scene, camera);
     if (fige !== null) {
       // test : image par image (vidéo de contrôle)

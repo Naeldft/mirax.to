@@ -262,11 +262,12 @@ html.ps-3d body{background:transparent}
 html.ps-tunnel::before{content:"";position:fixed;inset:0;z-index:2147482000;background:radial-gradient(ellipse 50% 40% at 50% 50%,#1d1d1d,#070707 70%);animation:ps-tunnel-secours 0s linear 6s forwards}
 html.ps-tunnel-pret::before{display:none}
 html.ps-tunnel,html.ps-tunnel body{overflow:hidden}
-#ps-tunnel{position:fixed;inset:0;z-index:2147482001;background:#070707;transition:opacity .6s ease;--eclat:0}
+#ps-tunnel{position:fixed;inset:0;z-index:2147482001;background:#000;transition:opacity .6s ease;--eclat:0}
 #ps-tunnel canvas{display:block;width:100%;height:100%}
-#ps-tunnel::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,#ffffff,#dfdfdf 45%,transparent 75%);opacity:calc(var(--eclat) * .85)}
+#ps-tunnel::after{content:"";position:absolute;inset:0;pointer-events:none;background:#fff;opacity:var(--eclat)}
 #ps-tunnel.ps-tunnel-fin{opacity:0;pointer-events:none}
 .ps-tunnel-passer{position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));right:16px;min-height:44px;padding:0 18px;border:1px solid rgb(255 255 255 / .28);border-radius:999px;background:rgb(5 8 6 / .45);color:#f3f4f5;font:500 15px/1 system-ui,-apple-system,sans-serif;letter-spacing:.02em;backdrop-filter:blur(6px);cursor:pointer;transition:background .3s,border-color .3s}
 .ps-tunnel-passer:hover{background:rgb(255 255 255 / .1);border-color:rgb(255 255 255 / .5)}
 .ps-tunnel-passer:focus-visible{outline:3px solid #dfdfdf;outline-offset:3px}
 @keyframes ps-tunnel-secours{to{visibility:hidden}}
+.ps-tunnel-eclair .ps-tunnel-passer{opacity:0;pointer-events:none;transition:opacity .2s}

@@ -8,6 +8,7 @@ un **emplacement nommé** est listé ici au lieu d'une image approximative.
 
 Aucune image : les quatre icônes « enseigne néon » (pizza, maison, cintre, écran avec courbe) sont des tracés
 vectoriels dessinés dans le code (`demos/accueil/src/intro.js`, constante `ICONES`), tous avec le même trait.
+L'appareil photo reflex de la fin est lui aussi tracé dans le code (`demos/accueil/src/reflex.js`), sans image.
 Les photos détourées essayées auparavant ont été retirées à la demande du client.
 
 ## Images de partage (réseaux sociaux)
