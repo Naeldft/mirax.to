@@ -14,9 +14,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 1200,
     modulePreload: false,
     rollupOptions: {
-      input: resolve(__dirname, 'src/main.jsx'),
+      input: { 'accueil-3d': resolve(__dirname, 'src/main.jsx'), 'intro-3d': resolve(__dirname, 'src/intro.js') },
       output: {
-        entryFileNames: 'accueil-3d.js',
+        entryFileNames: '[name].js',
         chunkFileNames: 'morceaux/[name]-[hash].js',
         assetFileNames: 'morceaux/[name]-[hash][extname]',
       },

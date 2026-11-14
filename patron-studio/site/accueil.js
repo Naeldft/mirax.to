@@ -263,7 +263,7 @@
     try { applyLocale(load('patron-locale', 'fr')); } catch (e) {}
     try { setupTilt(); } catch (e) {}
     try { setupBand(); } catch (e) {}
-    try { intro(); } catch (e) { root.classList.remove('intro-lock'); }
+    // l'ancienne intro est remplacée par l'intro tunnel (3d/intro-3d.js)
     root.classList.remove('ps-intro');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

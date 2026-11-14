@@ -256,3 +256,17 @@ html.ps-3d body{background:transparent}
 #ps-monde.pret{opacity:1}
 #ps-monde canvas{display:block}
 @media (prefers-reduced-motion:reduce){#ps-monde{transition:none}}
+
+/* ---------- Intro tunnel (3d/intro-3d.js) ---------- */
+/* voile immédiat : évite tout flash du contenu avant le démarrage du tunnel ; retiré au plus tard après 6 s */
+html.ps-tunnel::before{content:"";position:fixed;inset:0;z-index:2147482000;background:radial-gradient(ellipse 50% 40% at 50% 50%,#13201a,#050806 70%);animation:ps-tunnel-secours 0s linear 6s forwards}
+html.ps-tunnel-pret::before{display:none}
+html.ps-tunnel,html.ps-tunnel body{overflow:hidden}
+#ps-tunnel{position:fixed;inset:0;z-index:2147482001;background:#050806;transition:opacity .6s ease;--eclat:0}
+#ps-tunnel canvas{display:block;width:100%;height:100%}
+#ps-tunnel::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,#f3fbe8,#b9d98f 45%,transparent 75%);opacity:calc(var(--eclat) * .85)}
+#ps-tunnel.ps-tunnel-fin{opacity:0;pointer-events:none}
+.ps-tunnel-passer{position:absolute;z-index:2;top:max(16px,env(safe-area-inset-top));right:16px;min-height:44px;padding:0 18px;border:1px solid rgb(255 255 255 / .28);border-radius:999px;background:rgb(5 8 6 / .45);color:#f3f4f5;font:500 15px/1 system-ui,-apple-system,sans-serif;letter-spacing:.02em;backdrop-filter:blur(6px);cursor:pointer;transition:background .3s,border-color .3s}
+.ps-tunnel-passer:hover{background:rgb(255 255 255 / .1);border-color:rgb(255 255 255 / .5)}
+.ps-tunnel-passer:focus-visible{outline:3px solid #b9d98f;outline-offset:3px}
+@keyframes ps-tunnel-secours{to{visibility:hidden}}
