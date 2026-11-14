@@ -27,7 +27,7 @@ const brut = fs.mkdtempSync(path.join(os.tmpdir(), 'captures-'));
       const p = await ctx.newPage();
       await p.goto(`${BASE}/demos/${d}/`, { waitUntil: 'networkidle' });
       await p.waitForTimeout(8000); // la 3D et les animations d'entrée se posent
-      await p.screenshot({ path: path.join(brut, `${d}-${n}.png`) });
+      await p.screenshot({ path: path.join(brut, `${d}-${n}.png`), timeout: 240000 });
       await p.close();
       console.log('capturé', d, n);
     }
