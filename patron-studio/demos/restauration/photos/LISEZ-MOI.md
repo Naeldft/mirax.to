@@ -1,7 +1,8 @@
 # Photos de Forno Vivo
 
 Règle : uniquement de vraies photos qui montrent **exactement** le produit (aucune image IA, aucun dessin, aucun rendu 3D).
-Pas de bonne photo = un emplacement neutre « Photo à venir » s'affiche, jamais une image approchante.
+Jamais d'emplacement vide sur le site : une pizza sans vraie photo n'est pas affichée. Si une photo ne montre pas
+exactement la recette, on adapte la recette (ou le nom) à la photo, ou on retire la pizza.
 
 Pour ajouter ou changer une photo de la carte : déposez-la dans ce dossier **avec le nom indiqué** (`.jpg`, `.png` ou `.webp`),
 mettez `photo: '<nom>'` sur la pizza dans `src/data/pizzas.js`, puis relancez `./construire-dossier-ovh.sh`.
@@ -18,6 +19,7 @@ Une pizza n'apparaît sur le plateau que si elle a un disque (`disque:` dans `sr
 | margherita | https://images.unsplash.com/photo-1574071318508-1cdbab80d002 |
 | diavola | https://images.unsplash.com/photo-1628840042765-356cda07504e |
 | verde | https://images.unsplash.com/photo-1593560708920-61dd98c46a4e |
+| rustica | https://images.unsplash.com/photo-1604382354936-07c5d9983bd3 |
 
 Pour ajouter une pizza au plateau : une photo vue **exactement de dessus**, pizza entière, rien de coupé par le cadre.
 
@@ -29,16 +31,15 @@ Pour ajouter une pizza au plateau : une photo vue **exactement de dessus**, pizz
 | pizza-diavola | Diavola | https://images.unsplash.com/photo-1628840042765-356cda07504e |
 | pizza-verde | Verde | https://images.unsplash.com/photo-1593560708920-61dd98c46a4e |
 | pizza-quattro-formaggi | Quattro Formaggi | https://images.unsplash.com/photo-1620374645498-af6bd681a0bd |
+| pizza-rustica | Rustica | https://images.unsplash.com/photo-1604382354936-07c5d9983bd3 |
+| pizza-capricciosa | Capricciosa | https://images.unsplash.com/photo-1593246049226-ded77bf90326 |
+| pizza-funghi-rucola | Funghi e Rucola | https://images.unsplash.com/photo-1590947132387-155cc02f3212 |
+| pizza-ortolana | Ortolana | https://images.unsplash.com/photo-1617470702892-e01504297e84 |
+| pizza-vivo | La Vivo | https://images.unsplash.com/photo-1600628421055-4d30de868b8f |
 
-### Emplacements à remplir (aucune photo exacte trouvée)
-
-| Fichier attendu | Ce que la photo doit montrer |
-|---|---|
-| `pizza-regina` | Pizza tomate, mozzarella, jambon cuit et champignons de Paris, origan |
-| `pizza-calzone` | Calzone dorée (chausson) entière, éventuellement ouverte sur la garniture ricotta-jambon |
-| `pizza-tartufo` | Pizza blanche à la crème de truffe, champignons des bois, roquette et copeaux de parmesan |
-| `pizza-ortolana` | Pizza aux légumes grillés : courgette, aubergine, poivrons rôtis, basilic |
-| `pizza-vivo` | Pizza signature : mortadelle, stracciatella, pesto et éclats de pistache, zeste de citron |
+Recettes adaptées aux photos : Diavola (trois charcuteries), Verde (épinards, burrata), Rustica, Capricciosa,
+Funghi e Rucola (remplace la Tartufo : la truffe ne se voit sur aucune photo), Ortolana et La Vivo (prosciutto, roquette, poivrons grillés).
+La Calzone a été retirée de la carte : aucune vraie photo de calzone disponible.
 
 ## Galerie
 

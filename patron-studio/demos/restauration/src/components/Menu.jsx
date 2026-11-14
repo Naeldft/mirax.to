@@ -19,22 +19,15 @@ function PizzaCard({ p }) {
       }`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-cendre">
-        {/* photo : photos/<p.photo>.jpg ; sans vraie photo, un emplacement neutre (voir photos/LISEZ-MOI.md) */}
-        {p.photo ? (
-          <Photo
-            nom={p.photo}
-            alt={`Pizza ${p.nom} : ${p.ingredients.join(', ')}`}
-            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 100vw"
-            width="800"
-            height="600"
-            className="h-full w-full object-cover duration-700 ease-out group-hover:scale-[1.04] [transition-property:opacity,transform]"
-          />
-        ) : (
-          <div className="photo-a-venir" role="img" aria-label={`Photo de la pizza ${p.nom} à venir`}>
-            <strong>{p.nom}</strong>
-            <span>Photo à venir</span>
-          </div>
-        )}
+        {/* vraie photo : photos/<p.photo>.jpg */}
+        <Photo
+          nom={p.photo}
+          alt={`Pizza ${p.nom} : ${p.ingredients.join(', ')}`}
+          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 100vw"
+          width="800"
+          height="600"
+          className="h-full w-full object-cover duration-700 ease-out group-hover:scale-[1.04] [transition-property:opacity,transform]"
+        />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-braise/70 to-transparent" />
         {p.signature && (
           <span className="absolute left-4 top-4 rounded-full bg-or px-3 py-1 text-xs font-bold uppercase tracking-wider text-charbon">
@@ -100,7 +93,9 @@ export default function Menu() {
   const reduced = useReducedMotion();
   useReveal(scope);
 
-  const liste = filtre === 'toutes' ? pizzas : pizzas.filter((p) => p.categories.includes(filtre));
+  // règle : une pizza sans vraie photo n'apparaît pas (jamais d'emplacement vide)
+  const avecPhoto = pizzas.filter((p) => p.photo);
+  const liste = filtre === 'toutes' ? avecPhoto : avecPhoto.filter((p) => p.categories.includes(filtre));
 
   // animation des cartes à chaque changement de filtre
   useLayoutEffect(() => {

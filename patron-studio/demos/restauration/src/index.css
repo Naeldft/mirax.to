@@ -200,20 +200,6 @@
 .fv-roule-d { animation: fv-roule-d 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes fv-roule-g { from { translate: 120% 0; rotate: 300deg; opacity: 0; } 30% { opacity: 1; } }
 @keyframes fv-roule-d { from { translate: -120% 0; rotate: -300deg; opacity: 0; } 30% { opacity: 1; } }
-/* emplacement de photo (pas encore de vraie photo) */
-.photo-a-venir {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: repeating-linear-gradient(-45deg, #241e1b, #241e1b 12px, #2a2320 12px, #2a2320 24px);
-  color: rgb(245 236 217 / 0.6);
-  text-align: center;
-  font-size: 0.85rem;
-}
-.photo-a-venir strong { font-family: var(--font-serif, serif); font-size: 1.4rem; font-style: italic; color: rgb(245 236 217 / 0.85); }
 @media (prefers-reduced-motion: reduce) {
   .fv-texte, .fv-mot-g, .fv-mot-d, .fv-roule-g, .fv-roule-d { animation: none; }
 }

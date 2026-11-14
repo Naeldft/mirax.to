@@ -22,9 +22,10 @@ vraies captures d'écran des 12 sites de démonstration du dossier `demos/`, fai
 ### Forno Vivo (restauration)
 
 Détail complet (sources, emplacements à remplir) : `demos/restauration/photos/LISEZ-MOI.md`.
-- Plateau tournant de l'accueil : 3 vraies photos de pizzas vues de dessus, détourées au bord de la croûte et redressées en disque
-  (Margherita, Diavola, Verde).
-- Carte : 4 vraies photos ; 5 emplacements nommés « Photo à venir » (Regina, Calzone, Tartufo, Ortolana, La Vivo) : aucune photo exacte trouvée.
+- Plateau tournant de l'accueil : 4 vraies photos de pizzas vues de dessus, détourées au bord de la croûte et redressées en disque
+  (Margherita, Diavola, Verde, Rustica).
+- Carte : 9 pizzas, chacune avec sa vraie photo ; recettes et noms adaptés à ce que montre la photo. Calzone retirée (aucune photo).
+- Règle de la phase 6 : jamais d'emplacement vide visible ; on adapte le produit à la photo, ou on le retire.
 - Retirés : la pizza dessinée en 3D, ses rendus d'image et le rendu 3D de la calzone ; les photos qui ne correspondaient pas à la recette.
 
 ## Images de partage (réseaux sociaux)
