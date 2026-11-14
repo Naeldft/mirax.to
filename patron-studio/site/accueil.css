@@ -322,3 +322,8 @@ html:not(.ps-3d) .ps-ensemble{background:#060606}
 .futur-art .futur-3d{z-index:1}
 @media (prefers-reduced-motion:reduce){.laptop-screen .capture,.phone-screen .capture{transition:none}}
 .laptop-base{background:linear-gradient(#d6d8dc,#a7aab0)}.laptop-base::before{background:#96999f}
+
+/* ---------- Phase 5 : transition carte → plein écran → démo ---------- */
+#ps-transition{position:fixed;inset:0;z-index:2147483600;pointer-events:none}
+.ps-tr-vignette{position:absolute;overflow:hidden;background:#000;box-shadow:0 30px 80px rgb(0 0 0 / .6)}
+.ps-tr-vignette img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center}

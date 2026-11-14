@@ -31,7 +31,8 @@
 <script>/* intro tunnel : « complet » à la 1re visite, « court » ensuite, aucune si animations réduites ou arrivée sur une ancre */try{var r=document.documentElement,m=null;if(!matchMedia("(prefers-reduced-motion: reduce)").matches&&!location.hash){var c=document.createElement("canvas");if(c.getContext("webgl2")||c.getContext("webgl")){var v=null;try{v=localStorage.getItem("ps-tunnel-vu")}catch(e){}m=v?"court":"complet"}}if(m){r.dataset.tunnel=m;r.classList.add("ps-tunnel")}}catch(e){}</script>
 <script src="./export-config.js"></script><script src="./contact-form.js" defer></script>
 <script src="./accueil.js" defer></script>
-<link rel="stylesheet" href="./commun.css"><script src="./mesure.js" defer></script><script src="./commun.js" defer></script><script type="module" src="./3d/intro-3d.js"></script><script type="module" src="./3d/accueil-3d.js"></script></head>
+<link rel="stylesheet" href="./commun.css"><script src="./mesure.js" defer></script><script src="./commun.js" defer></script><script type="module" src="./3d/intro-3d.js"></script><script type="module" src="./3d/accueil-3d.js"></script><script src="./transition.js" defer></script>
+</head>
 <body class="accueil">
 <div id="ps-monde" aria-hidden="true"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">

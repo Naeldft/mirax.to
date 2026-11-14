@@ -3,6 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script>
+      /* Arrivée depuis l'accueil Patrôn Studio : la page démarre sur la même capture plein écran
+         que la fin de la transition (l'écran de chargement de la démo reste caché), puis la capture
+         s'efface en fondu dès que la démo est prête (signal « ps-demo-prete » du Loader). */
+      (function () {
+        try {
+          var v = sessionStorage.getItem('ps-arrivee');
+          if (!v) return;
+          sessionStorage.removeItem('ps-arrivee');
+          var p = v.split('|');
+          if (!/^[a-z-]+$/.test(p[0]) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          window.psArrivee = true;
+          var d = document.createElement('div');
+          d.setAttribute('aria-hidden', 'true');
+          d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;pointer-events:none;transition:opacity .45s ease,filter .45s ease;background:#000 url("../../assets/captures/' + p[0] + (p[1] === 'mobile' ? '-mobile' : '-ordi-1200') + '.webp") top center/cover no-repeat';
+          document.documentElement.appendChild(d);
+          // au-dessus de tout ce que la démo affichera (même niveau d'empilement : le dernier gagne)
+          document.addEventListener('DOMContentLoaded', function () { document.body.appendChild(d); });
+          var t0 = Date.now(), fini = false;
+          var fin = function () {
+            if (fini) return;
+            fini = true;
+            setTimeout(function () {
+              d.style.opacity = '0';
+              d.style.filter = 'blur(8px)'; // les mises en page peuvent différer un peu selon la taille d'écran : pas d'image fantôme
+              setTimeout(function () { d.remove(); }, 550);
+            }, Math.max(900, 350 - (Date.now() - t0))); // laisse les animations d'entrée de la démo se poser
+          };
+          addEventListener('ps-demo-prete', fin);
+          setTimeout(fin, 4000); // sécurité
+        } catch (e) { /* pas de stockage : rien à faire */ }
+      })();
+    </script>
     <meta name="theme-color" content="#f4f2ec" />
     <title>Cap Horizon — Conseil en stratégie pour TPE et PME à Lille</title>
     <meta name="description" content="Cap Horizon accompagne les dirigeants de TPE et PME des Hauts-de-France : stratégie, finance, organisation, numérique. Diagnostic express gratuit en ligne, premier rendez-vous offert." />

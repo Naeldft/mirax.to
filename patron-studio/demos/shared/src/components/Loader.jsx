@@ -9,7 +9,12 @@ import { gsap } from '../lib/gsap.js';
  *  colors  : { bg, fg, accent }
  *  minMs   : durée minimale d'affichage (évite un flash)
  *  maxMs   : sécurité : le loader disparaît quoi qu'il arrive
+ *
+ * Arrivée depuis l'accueil Patrôn Studio (window.psArrivee, posé par le script en tête de index.html) :
+ * la capture plein écran de la transition remplace l'écran de chargement, qui reste invisible.
+ * Dans tous les cas, l'événement « ps-demo-prete » est envoyé quand la page est prête.
  */
+const arrivee = typeof window !== 'undefined' && window.psArrivee === true;
 export default function Loader({ ready, name, tagline, mark, colors, minMs = 900, maxMs = 4500, fontClass = '' }) {
   const root = useRef(null);
   const bar = useRef(null);
@@ -48,6 +53,15 @@ export default function Loader({ ready, name, tagline, mark, colors, minMs = 900
 
   const done = (ready && minDone) || forced;
   useEffect(() => {
+    if (done) window.dispatchEvent(new Event('ps-demo-prete'));
+  }, [done]);
+  useEffect(() => {
+    if (arrivee && done) {
+      document.documentElement.style.overflow = '';
+      setGone(true);
+    }
+  }, [done]);
+  useEffect(() => {
     if (!done || !root.current) return;
     document.documentElement.style.overflow = '';
     if (pct.current) pct.current.textContent = '100';
@@ -63,6 +77,12 @@ export default function Loader({ ready, name, tagline, mark, colors, minMs = 900
   }, [done, reduced]);
 
   if (gone) return null;
+  if (arrivee)
+    return (
+      <span className="sr-only" role="status">
+        Chargement de la page
+      </span>
+    );
   return (
     <div
       ref={root}
