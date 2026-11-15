@@ -83,38 +83,37 @@ export const equipe = [
 /** Inspirations (illustrations dessinées, remplaçables par des photos). */
 export const looks = [
   {
-    photo: 'look-carre-flou',
+    photo: 'look-brushing-souple',
     alt: 'Brushing au sèche-cheveux et à la brosse ronde sur cheveux mi-longs, vu de dos',
-    titre: 'Carré flou',
+    titre: 'Brushing souple',
     note: 'Coupe & brushing',
-    a: '#e8c8b8',
-    b: '#7a4b3a',
+    texte: 'La brosse ronde, le geste précis : un mouvement souple qui tient toute la journée.',
+    prix: 'Coupe, shampooing, brushing · 52 €',
   },
   {
     photo: 'look-balayage-caramel',
     alt: 'Longs cheveux ondulés au balayage caramel, vus de dos',
     titre: 'Balayage caramel',
     note: 'Couleur & soin',
-    a: '#f1d9b6',
-    b: '#a8693a',
+    texte: 'Des reflets peints à la main, mèche par mèche, avec des produits d’origine naturelle.',
+    prix: 'Balayage sur mesure · 120 €',
   },
   {
     photo: 'look-degrade-net',
     alt: 'Coupe homme dégradée aux ciseaux, vue de dos',
     titre: 'Dégradé net',
     note: 'Coupe & barbe',
-    a: '#d8d3cc',
-    b: '#2a2522',
+    texte: 'Tondeuse et ciseaux pour un dégradé propre, finitions au rasoir.',
+    prix: 'Coupe & barbe · 45 €',
   },
   {
     photo: 'look-chignon-boheme',
     alt: 'Mains de la coiffeuse épinglant un chignon bohème',
     titre: 'Chignon bohème',
     note: 'Événement',
-    a: '#f3e1dc',
-    b: '#5a3a30',
+    texte: 'Mariage, cérémonie : un chignon souple, épinglé à la main, qui tient jusqu’au bout de la nuit.',
+    prix: 'Chignon & coiffure d’événement · 65 €',
   },
-  { photo: null /* à fournir : photos/look-pixie-texture.jpg */, titre: 'Pixie texturé', note: 'Coupe courte', a: '#ead9cf', b: '#3b2a24' },
 ];
 
 export const chiffres = [

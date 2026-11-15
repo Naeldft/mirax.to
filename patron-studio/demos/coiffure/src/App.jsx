@@ -5,7 +5,8 @@ import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
 import Header, { Logo } from './components/Header';
 import Reservation from './components/Reservation';
-import { Avis, Equipe, Hero, Infos, Looks, Prestations } from './components/Sections';
+import Hero from './components/Hero';
+import { Avis, Equipe, Infos, Looks, Prestations } from './components/Sections';
 import { navigation, salon } from './data/site';
 
 export default function App() {

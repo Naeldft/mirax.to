@@ -1,14 +1,11 @@
-import { lazy, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import Photo from '@demos/shared/components/Photo.jsx';
-import ScrollStory from '@demos/shared/components/ScrollStory.jsx';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { avis, chiffres, equipe, faq, horaires, looks, prestations, salon } from '../data/site';
-
-const ScissorsScene = lazy(() => import('../three/ScissorsScene'));
 
 function Titre({ numero, children, intro, id }) {
   return (
@@ -25,104 +22,6 @@ function Titre({ numero, children, intro, id }) {
         </p>
       )}
     </div>
-  );
-}
-
-/** Accueil : ciseaux et mèches en 3D, titre éditorial. */
-// une ambiance par étape : poudre, taupe, caramel, crème, menthe
-const FONDS = [
-  ['#f6dcd5', '#efe3da'],
-  ['#f3cfc9', '#e8d6cc'],
-  ['#ddd3cb', '#c9bdb3'],
-  ['#f1d8b8', '#e2c29b'],
-  ['#e3eee2', '#cfe0cf'],
-];
-
-/**
- * Accueil « à faire défiler » : les ciseaux 3D coupent et pivotent au centre,
- * puis chaque étape présente une famille de prestations avec ses prix.
- */
-export function Hero({ onReady }) {
-  const scope = useRef(null);
-  const reduced = useReducedMotion();
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      gsap.from('[data-mot]', { yPercent: 120, rotate: 4, duration: 1.2, stagger: 0.08, ease: 'power4.out', delay: 0.3 });
-      gsap.from('[data-in]', { opacity: 0, y: 20, duration: 1, stagger: 0.1, delay: 0.8, ease: 'power3.out' });
-    }, scope);
-    return () => ctx.revert();
-  }, [reduced]);
-
-  const steps = [
-    {
-      fond: FONDS[0],
-      mot: 'Mèche',
-      encre: '#1c1a1a',
-      motOpacite: 0.07,
-      contenu: (
-        <div ref={scope} className="max-w-xl md:max-w-[44%]">
-          <p data-in className="text-sm uppercase tracking-[0.3em] text-taupe">
-            {salon.accroche}
-          </p>
-          <h1 className="mt-3 text-[clamp(2.9rem,12vw,7rem)] leading-[0.9]">
-            {['Une coupe', 'qui vous', 'ressemble.'].map((l, i) => (
-              <span key={l} className="block overflow-hidden pb-2">
-                <span data-mot className={`block ${i === 2 ? 'italic text-poudre-fonce' : ''}`}>
-                  {l}
-                </span>
-              </span>
-            ))}
-          </h1>
-          <p data-in className="mt-4 hidden max-w-sm text-lg text-taupe md:block">
-            {salon.intro}
-          </p>
-          <div data-in className="mt-6 flex gap-3">
-            <a href="#reserver" className="btn btn-encre flex-1 md:flex-none">
-              Réserver
-            </a>
-            <a href="#prestations" className="btn btn-ligne flex-1 md:flex-none">
-              Les tarifs
-            </a>
-          </div>
-        </div>
-      ),
-    },
-    ...prestations.map((c, i) => ({
-      fond: FONDS[i + 1] ?? FONDS[0],
-      mot: c.categorie,
-      encre: '#1c1a1a',
-      motOpacite: 0.07,
-      contenu: (
-        <div className="max-w-xl md:max-w-[42%]">
-          <p className="numero text-lg">{['i.', 'ii.', 'iii.', 'iv.'][i]}</p>
-          <h2 className="mt-1 text-[clamp(3rem,13vw,7rem)] leading-[0.9]">{c.categorie}</h2>
-          <ul className="mt-4 divide-y divide-encre/10 border-y border-encre/10">
-            {c.items.slice(0, 3).map((it) => (
-              <li key={it.id} className="flex items-baseline justify-between gap-4 py-2.5 text-base">
-                <span>{it.nom}</span>
-                <span className="shrink-0 font-display text-xl">{it.prix} €</span>
-              </li>
-            ))}
-          </ul>
-          <a href="#reserver" className="btn btn-encre mt-5">
-            Réserver
-          </a>
-        </div>
-      ),
-    })),
-  ];
-
-  return (
-    <ScrollStory
-      id="accueil"
-      label="Accueil : Atelier Mèche, salon de coiffure"
-      steps={steps}
-      onReady={onReady}
-      indicateur="text-encre"
-      motClass="font-display italic text-[clamp(6rem,28vw,24rem)] leading-none"
-      scene={(api) => <ScissorsScene {...api} />}
-    />
   );
 }
 
@@ -287,57 +186,19 @@ export function Looks() {
         </h2>
       </div>
       <ul ref={track} className="mt-12 flex w-max gap-5 pl-5 md:pl-[max(2rem,calc((100vw-72rem)/2+2rem))]">
-        {looks.map((l, i) => (
+        {looks.map((l) => (
           <li key={l.titre} className="w-64 shrink-0 md:w-80" data-reveal>
             <figure className="group">
-              {l.photo ? (
-                <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-lin">
-                  {/* emplacement photo : l.photo (photos/<nom>.jpg) */}
-                  <Photo
-                    nom={l.photo}
-                    alt={l.alt}
-                    sizes="(min-width: 768px) 20rem, 16rem"
-                    width="640"
-                    height="800"
-                    className="h-full w-full object-cover duration-700 group-hover:scale-105"
-                  />
-                </div>
-              ) : (
-                <div className="aspect-[4/5] overflow-hidden rounded-2xl" style={{ background: `linear-gradient(160deg, ${l.a}, ${l.b})` }}>
-                  <svg
-                    viewBox="0 0 200 250"
-                    className="h-full w-full transition-transform duration-700 group-hover:scale-110"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d={
-                        [
-                          'M60 250c0-90 10-160 40-180s40 90 40 180',
-                          'M40 250c10-110 30-170 60-180 30 10 50 70 60 180',
-                          'M70 250c0-70 10-140 30-150s30 80 30 150',
-                          'M50 250c5-100 20-150 50-160 30 10 45 60 50 160',
-                          'M65 250c0-60 15-130 35-140 20 10 35 80 35 140',
-                        ][i]
-                      }
-                      fill="#1c1a1a"
-                      opacity="0.25"
-                    />
-                    <circle cx="100" cy="95" r="34" fill="#f1d9c8" opacity="0.9" />
-                    <path
-                      d={
-                        [
-                          'M62 100c0-50 76-50 76 0 0 30-8 60-8 60l-10-50-50 0-8 50s0-30 0-60Z',
-                          'M60 95c0-48 80-48 80 0 4 40 10 70 10 70l-20-60-60 0-20 60s6-30 10-70Z',
-                          'M70 80c10-22 50-22 60 0l-2 14H72Z',
-                          'M64 92c0-46 72-46 72 0l-6 8c10 0 14 10 6 16-8 8-14-4-10-10l-50-14Z',
-                          'M68 84c6-26 58-30 64 4l-30-12-34 8Z',
-                        ][i]
-                      }
-                      fill={l.b}
-                    />
-                  </svg>
-                </div>
-              )}
+              <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-lin">
+                <Photo
+                  nom={l.photo}
+                  alt={l.alt}
+                  sizes="(min-width: 768px) 20rem, 16rem"
+                  width="640"
+                  height="800"
+                  className="h-full w-full object-cover duration-700 group-hover:scale-105"
+                />
+              </div>
               <figcaption className="mt-3 flex justify-between">
                 <span className="font-serif text-xl">{l.titre}</span>
                 <span className="text-sm text-creme/60">{l.note}</span>

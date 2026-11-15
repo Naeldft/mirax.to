@@ -7,11 +7,10 @@ visage reconnaissable sans l’accord écrit de la personne.
 
 | Emplacement | Look | Description de la photo attendue |
 |---|---|---|
-| `look-carre-flou` | Carré flou | Brushing sur cheveux mi-longs, vu de dos (photo actuelle : brushing à la brosse ronde) |
+| `look-brushing-souple` | Brushing souple | Brushing à la brosse ronde sur cheveux mi-longs |
 | `look-balayage-caramel` | Balayage caramel | Cheveux longs ondulés au balayage caramel, de dos |
 | `look-degrade-net` | Dégradé net | Coupe homme dégradée, vue de dos (photo recadrée pour retirer une inscription) |
 | `look-chignon-boheme` | Chignon bohème | Chignon souple épinglé, de dos, mains de la coiffeuse |
-| `look-pixie-texture` | Pixie texturé | **À FOURNIR** : coupe courte texturée, vue de dos ou de trois quarts arrière. Puis mettre `photo: 'look-pixie-texture'` dans `src/data/site.js` (en attendant, la carte garde son illustration) |
 
 L’équipe (Léa, Samir, Inès) est présentée sans photo : ajoutez des portraits uniquement avec l’accord des personnes.
 
@@ -19,7 +18,9 @@ L’équipe (Léa, Samir, Inès) est présentée sans photo : ajoutez des portra
 
 | Fichier | Photo d'origine |
 |---|---|
-| look-carre-flou | https://images.unsplash.com/photo-1580618672591-eb180b1a973f |
+| look-brushing-souple | https://images.unsplash.com/photo-1580618672591-eb180b1a973f |
 | look-balayage-caramel | https://images.unsplash.com/photo-1522337360788-8b13dee7a37e |
 | look-degrade-net | https://images.unsplash.com/photo-1622286342621-4bd786c2447c (recadrée) |
 | look-chignon-boheme | https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3 |
+
+Ces 4 photos sont aussi encadrées dans la galerie 3D de l'accueil (dans le même ordre que `looks` dans `src/data/site.js`).

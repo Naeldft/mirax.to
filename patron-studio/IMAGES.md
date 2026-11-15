@@ -187,6 +187,16 @@ Matières et lumière : **Poly Haven, licence CC0**, dans `demos/snack/public/sc
 
 Construits en code : façade, néons, menus lumineux, comptoir, passe-plat, plancha, hotte, lampes, fumée.
 
+### Atelier Mèche (coiffure)
+
+Détail des photos : `demos/coiffure/photos/LISEZ-MOI.md`.
+- Intro : galerie 3D commune (`demos/shared/src/three/Galerie3D.jsx`, `components/HeroGalerie.jsx`) aux couleurs du
+  salon : une allée où les 4 vraies photos de coupes sont encadrées (cadre laiton, passe-partout, ombre, halo de
+  lumière) ; la caméra avance et pivote vers chacune, le texte et le prix à côté. Les ciseaux dessinés en 3D sont retirés.
+- Inspirations : 4 vraies photos (le « pixie texturé », sans photo, est retiré ; « Carré flou » devient « Brushing
+  souple », ce que montre la photo).
+- Aucune texture ni modèle externe : décor construit en code.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).
