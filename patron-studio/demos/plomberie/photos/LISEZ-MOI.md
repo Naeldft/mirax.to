@@ -6,14 +6,15 @@ aucun rendu 3D). Jamais d'emplacement vide : si une photo ne correspond pas, on 
 Pour changer une photo : déposez la vôtre dans ce dossier **avec le même nom**, puis relancez
 `./construire-dossier-ovh.sh` (versions WebP 800 et 1 600 px créées automatiquement).
 
-## Accueil (la plongée dans le robinet, puis les 3 étapes)
+## Accueil
+
+L'accueil est une scène 3D construite en code (voir `IMAGES.md`). Une seule photo y sert :
 
 | Fichier | Ce qu'elle montre | Photo d'origine (Unsplash) |
 |---|---|---|
-| hero-robinet | Robinet chromé, une goutte au bec (on plonge dans le bec : point réglé dans `src/components/Hero.jsx`, `BEC`) | https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c |
-| hero-reseau | 01 On diagnostique : réseau de canalisations, vannes et compteur sur un mur de briques (recadrée sous le panneau) | https://images.unsplash.com/photo-1607472586893-edb57bdc0e39 |
-| hero-outils | 02 On répare : marteau, pince, tournevis, clés hexagonales, mètre ruban | https://images.unsplash.com/photo-1567361808960-dec9cb578182 |
-| hero-essai | 03 Ça coule de source : une main ouvre le robinet, l'eau jaillit dans un verre | https://images.unsplash.com/photo-1542013936693-884638332954 |
+| hero-robinet | Robinet chromé, une goutte au bec : affichée pendant le chargement, et sans 3D | https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c |
+
+Les textes des 3 étapes gravées sur les parois sont dans `src/data/site.js` (`etapesHero`).
 
 ## Réalisations
 

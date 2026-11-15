@@ -50,11 +50,22 @@ le comptoir, la pelle, la salle (murs, sol, plafond, poutres), les appliques.
 
 ### Ondine Plomberie
 
-Détail complet : `demos/plomberie/photos/LISEZ-MOI.md`.
-- Accueil : 4 vraies photos (robinet où l'on plonge, réseau de canalisations, outils, robinet ouvert sur un verre) ;
-  textes des 3 étapes adaptés à ce que montrent les photos (dont « eau comme gaz » pour le réseau).
-- Réalisations : 3 vraies photos ; la « chaufferie » (photo qui montrait un réseau de gaz) devient une salle de bain avec baignoire îlot.
-- Retirés : la tuyauterie dessinée en 3D.
+Détail complet des photos : `demos/plomberie/photos/LISEZ-MOI.md`.
+- Intro : vraie scène 3D construite en code (`src/three/Canalisation.jsx`) : salle de bain, robinet chromé, vasque,
+  puis la canalisation en cuivre (bagues en laiton, eau qui coule, gouttes) avec les 3 étapes gravées sur les parois.
+- Photo `hero-robinet` (vraie photo de robinet) : affichée le temps du chargement, et à la place de la 3D sans WebGL
+  ou avec « réduire les animations ».
+- Réalisations : 3 vraies photos.
+
+Textures et lumière d'ambiance : **Poly Haven, licence CC0**, dans `demos/plomberie/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Carrelage du mur | `textures/long_white_tiles-*` | https://polyhaven.com/a/long_white_tiles |
+| Reflets de la salle de bain (photo 360°) | `salle-de-bain-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/modern_bathroom |
+| Reflets dans la canalisation (photo 360°) | `chaufferie-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/boiler_room |
+
+Construits en code (pas d'image) : robinet, mousseur, goutte, vasque, plan, canalisation, bagues, eau, gouttes, plaques gravées.
 
 ## Images de partage (réseaux sociaux)
 

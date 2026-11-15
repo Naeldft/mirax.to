@@ -29,26 +29,11 @@ export const navigation = [
 ];
 
 /** Étapes affichées pendant l'assemblage 3D de l'accueil. */
-/** Les 3 étapes de l'accueil, chacune avec sa vraie photo (le texte décrit ce que montre la photo). */
+/** Les 3 étapes de l'accueil, gravées sur les parois de la canalisation 3D. */
 export const etapesHero = [
-  {
-    titre: 'On diagnostique',
-    texte: 'On remonte le réseau vanne après vanne, eau comme gaz, pour trouver la panne sans casser.',
-    photo: 'hero-reseau',
-    alt: 'Réseau de canalisations avec vannes, détendeur et compteur, fixé sur un mur de briques',
-  },
-  {
-    titre: 'On répare',
-    texte: 'Le bon outil pour chaque raccord, et un chantier laissé propre.',
-    photo: 'hero-outils',
-    alt: 'Outils posés sur un établi en bois : marteau, pince, tournevis, clés hexagonales et mètre ruban',
-  },
-  {
-    titre: 'Ça coule de source',
-    texte: 'On ouvre le robinet devant vous : tout est testé avant notre départ.',
-    photo: 'hero-essai',
-    alt: 'Une main ouvre un robinet de cuisine, l’eau jaillit dans un verre posé dans l’évier',
-  },
+  { numero: '1', titre: 'Diagnostic', texte: ['Recherche de fuite sans casse,', 'caméra et détection.'] },
+  { numero: '2', titre: 'Préparation', texte: ['Devis signé avant de commencer,', 'les bonnes pièces dans le camion.'] },
+  { numero: '3', titre: 'Intervention', texte: ['Travail propre, tout est testé', 'devant vous avant notre départ.'] },
 ];
 
 export const services = [
