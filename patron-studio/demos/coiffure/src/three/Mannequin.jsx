@@ -50,10 +50,18 @@ function carteMeches() {
 }
 
 function matiereCheveux(couleur, { degrade } = {}) {
-  return new THREE.MeshStandardMaterial({
+  // reflet soyeux de cheveux soignés : brillance anisotrope (étirée le long des mèches), sans effet plastique
+  return new THREE.MeshPhysicalMaterial({
     color: couleur,
-    roughness: 0.48,
+    roughness: 0.4,
     metalness: 0,
+    anisotropy: 0.6,
+    anisotropyRotation: Math.PI / 2,
+    sheen: 0.12,
+    sheenRoughness: 0.45,
+    sheenColor: new THREE.Color('#e9c39a'),
+    clearcoat: 0.06,
+    clearcoatRoughness: 0.4,
     normalMap: carteMeches(),
     normalScale: new THREE.Vector2(0.32, 0.32),
     vertexColors: !!degrade,
@@ -86,8 +94,8 @@ function volume(profil, { ouverture = 1.0, segments = 72, ondes = 0, degrade } =
     const c1 = new THREE.Color(degrade[1]);
     for (let i = 0; i < pos.count; i++) {
       const y = pos.getY(i);
-      const t = THREE.MathUtils.clamp((0.0 - y) / 0.32, 0, 1);
-      const c = c0.clone().lerp(c1, t * t * 0.9);
+      const t = THREE.MathUtils.clamp((0.06 - y) / 0.36, 0, 1);
+      const c = c0.clone().lerp(c1, Math.pow(t, 1.4));
       couleurs.push(c.r, c.g, c.b);
     }
     geo.setAttribute('color', new THREE.Float32BufferAttribute(couleurs, 3));
@@ -166,27 +174,33 @@ function Degrade({ couleur }) {
   // coupe homme : côtés très courts (dégradé vers la peau), dessus plus long, coiffé vers l'arrière
   const m = useMemo(() => matiereCheveux(couleur), [couleur]);
   const cotes = useMemo(() => {
-    const geo = new THREE.SphereGeometry(0.106, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.62);
+    const geo = new THREE.SphereGeometry(0.104, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.6);
     // dégradé : la couleur des cheveux se fond vers la peau en bas
     const pos = geo.attributes.position;
     const c0 = new THREE.Color(couleur);
     const c1 = new THREE.Color(PEAU).lerp(c0, 0.35);
     const cols = [];
     for (let i = 0; i < pos.count; i++) {
-      const t = THREE.MathUtils.clamp((0.03 - pos.getY(i)) / 0.06, 0, 1);
+      const t = THREE.MathUtils.clamp((0.045 - pos.getY(i)) / 0.07, 0, 1);
       const c = c0.clone().lerp(c1, t);
       cols.push(c.r, c.g, c.b);
     }
     geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
     return geo;
   }, [couleur]);
-  const mCotes = useMemo(() => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75, normalMap: carteMeches(), normalScale: new THREE.Vector2(0.25, 0.25) }), []);
+  const mCotes = useMemo(
+    () => new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.62, sheen: 0.08, sheenColor: new THREE.Color('#d9b48c'), normalMap: carteMeches(), normalScale: new THREE.Vector2(0.25, 0.25) }),
+    [],
+  );
   return (
     <group>
       <mesh geometry={cotes} material={mCotes} rotation-x={-0.12} />
-      {/* le dessus : volume plus long, en légère houppe vers l'avant */}
-      <mesh material={m} position={[0, 0.075, 0.012]} rotation-x={-0.25} scale={[0.92, 0.42, 1.12]}>
-        <sphereGeometry args={[0.105, 48, 24]} />
+      {/* le dessus : une calotte un peu plus épaisse, au ras du crâne, avec une petite houppe vers l'avant */}
+      <mesh material={m} rotation-x={-0.18} scale={[1.0, 1.0, 1.03]}>
+        <sphereGeometry args={[0.112, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.33]} />
+      </mesh>
+      <mesh material={m} position={[0, 0.098, 0.05]} rotation-x={-0.6} scale={[0.75, 0.28, 0.7]}>
+        <sphereGeometry args={[0.07, 32, 16]} />
       </mesh>
     </group>
   );
@@ -228,22 +242,42 @@ function Longs({ couleurs }) {
 function Chignon({ couleur }) {
   // cheveux tirés en arrière, chignon bas sur la nuque
   const m = useMemo(() => matiereCheveux(couleur), [couleur]);
-  const calotte = useMemo(() => new THREE.SphereGeometry(0.109, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.56), []);
+  const calotte = useMemo(() => new THREE.SphereGeometry(0.106, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.52), []);
   return (
     <group>
-      <mesh geometry={calotte} material={m} rotation-x={-0.35} />
-      {/* le chignon : un tore torsadé sur la nuque */}
-      <mesh material={m} position={[0, -0.04, -0.118]} rotation-x={0.35}>
-        <torusGeometry args={[0.042, 0.03, 24, 48]} />
+      <mesh geometry={calotte} material={m} rotation-x={-0.42} />
+      {/* le chignon : un gros tore torsadé, bas sur la nuque */}
+      <mesh material={m} position={[0, -0.035, -0.125]} rotation-x={0.25}>
+        <torusGeometry args={[0.05, 0.034, 24, 64]} />
       </mesh>
-      <mesh material={m} position={[0, -0.04, -0.12]} scale={[1, 0.85, 0.7]}>
-        <sphereGeometry args={[0.045, 32, 16]} />
+      <mesh material={m} position={[0, -0.035, -0.135]} scale={[1, 0.85, 0.75]}>
+        <sphereGeometry args={[0.052, 32, 16]} />
       </mesh>
     </group>
   );
 }
 
 const COUPES = { carre: Carre, degrade: Degrade, longs: Longs, chignon: Chignon };
+
+/** Le logo brodé sur la cape : « Atelier Mèche », en blanc, discret. */
+let _logo;
+function logo() {
+  if (_logo) return _logo;
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 160;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f4eee8';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = 'italic 64px "Fraunces Variable", Georgia, serif';
+  g.fillText('Atelier Mèche', 256, 70);
+  g.fillRect(196, 118, 120, 2);
+  _logo = new THREE.CanvasTexture(c);
+  _logo.colorSpace = THREE.SRGBColorSpace;
+  _logo.anisotropy = 8;
+  return _logo;
+}
 
 /* ---------- le mannequin ---------- */
 export default function Mannequin({ coupe, cheveux, homme = false }) {
@@ -287,6 +321,10 @@ export default function Mannequin({ coupe, cheveux, homme = false }) {
   return (
     <group>
       <mesh geometry={geoCape} material={cape} />
+      <mesh position={[0, 1.02, 0.212]} rotation-x={-0.12}>
+        <planeGeometry args={[0.15, 0.047]} />
+        <meshStandardMaterial map={logo()} transparent roughness={0.7} polygonOffset polygonOffsetFactor={-2} />
+      </mesh>
       {/* jambes sous la cape : tibias et pieds sur le repose-pieds */}
       {[-1, 1].map((s) => (
         <group key={s} position={[s * 0.1, 0, 0]}>

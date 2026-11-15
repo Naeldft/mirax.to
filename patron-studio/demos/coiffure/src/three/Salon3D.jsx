@@ -213,6 +213,8 @@ function Poste({ poste, envMiroir, marbre, laiton, client }) {
         <primitive object={fauteuil} />
         {/* lumière du poste : douce, côté miroir, elle modèle le visage */}
         <pointLight position={[0.75, 1.85, 0.35]} color="#ffe2c4" intensity={0.8} distance={2.4} decay={1.6} />
+        {/* contre-jour chaud derrière le client : il détache la silhouette de la coupe */}
+        <pointLight position={[0, 1.78, -0.62]} color="#ffbe7a" intensity={1.3} distance={1.6} decay={1.4} />
         {/* le client, assis, tourné vers le miroir */}
         {client && (
           <group position={[0, 0.0, -0.13]}>
@@ -305,12 +307,12 @@ function vueAutour(i, a, portrait, pos, cible) {
     const dx = cible.x - pos.x;
     const dz = cible.z - pos.z;
     const n = Math.hypot(dx, dz);
-    cible.x += (dz / n) * 0.42;
-    cible.z -= (dx / n) * 0.42;
+    cible.x += (dz / n) * 0.3;
+    cible.z -= (dx / n) * 0.3;
   }
 }
 
-function Camera({ progres, refPorte }) {
+function Camera({ progres, refPorte, clientsVues }) {
   const { camera, size } = useThree();
   const p0 = useMemo(() => new THREE.Vector3(), []);
   const c0 = useMemo(() => new THREE.Vector3(), []);
@@ -324,8 +326,10 @@ function Camera({ progres, refPorte }) {
     // la suite des « poses » : entrée, puis pour chaque client une arrivée et un départ (en tournant), puis la sortie
     const poses = [...ENTREE.map(([t, a, b]) => [t, (pp, cc) => (pp.set(...a), cc.set(...b))])];
     ARRETS.forEach(([ta, tb], i) => {
-      poses.push([ta, (pp, cc) => vueAutour(i, 1.25, portrait, pp, cc)]);
-      poses.push([tb, (pp, cc) => vueAutour(i, 2.25, portrait, pp, cc)]);
+      // coupes courtes et chignons : on tourne par l'arrière ; coupes encadrant le visage : de profil à trois quarts face
+      const [a0, a1] = clientsVues[i] === 'dos' ? [0.35, 1.25] : [1.25, 2.25];
+      poses.push([ta, (pp, cc) => vueAutour(i, a0, portrait, pp, cc)]);
+      poses.push([tb, (pp, cc) => vueAutour(i, a1, portrait, pp, cc)]);
     });
     SORTIE.forEach(([t, a, b]) => poses.push([t, (pp, cc) => (pp.set(...a), cc.set(...b))]));
     let i = 1;
@@ -451,7 +455,7 @@ export default function Salon3D({ progres, clientes, leger, actif = true, onRead
       <hemisphereLight args={['#fff1e4', '#6a4a3a', 0.35]} />
       <Suspense fallback={null}>
         <Scene taille={taille} clientes={clientes} refPorte={refPorte} petit={petit} />
-        <Camera progres={progres} refPorte={refPorte} />
+        <Camera progres={progres} refPorte={refPorte} clientsVues={clientes.map((c) => c.vue)} />
         <Pret onReady={onReady} />
       </Suspense>
     </Canvas>
