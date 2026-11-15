@@ -117,8 +117,8 @@ export default function Athlete({ pose = {}, homme = false, tenue = TENUE, objet
   const bras = (i, s) => (
     <group key={`b${s}`} position={[s * (homme ? 0.2 : 0.178) * k, 0.45 * k, 0]} rotation={[-p.epaules[i], 0, s * p.ouverture[i]]}>
       {/* deltoïde : une épaule pleine, un peu tombante */}
-      <mesh material={m.peau} position={[s * 0.008, -0.01, 0]} scale={[1.05, 1.12, 1]} castShadow>
-        <sphereGeometry args={[0.058 * k, 28, 18]} />
+      <mesh material={m.peau} position={[s * 0.004, -0.012, 0]} scale={[0.95, 1.15, 0.92]} castShadow>
+        <sphereGeometry args={[0.052 * k, 28, 18]} />
       </mesh>
       {/* bras : biceps et triceps légèrement marqués */}
       <Membre long={0.27 * k} rayon={0.046 * k} rayonBas={0.033 * k} bombe={0.12} pic={0.45} material={m.peau} />
@@ -158,7 +158,7 @@ export default function Athlete({ pose = {}, homme = false, tenue = TENUE, objet
           <mesh geometry={torse} material={m.tenue} position={[0, 0.02, 0]} castShadow receiveShadow />
           {/* pectoraux sous le débardeur, à peine marqués */}
           {[-1, 1].map((s) => (
-            <mesh key={s} material={m.tenue} position={[s * 0.07 * k, 0.4 * k, 0.07 * k]} scale={[1.25, 0.8, homme ? 0.5 : 0.62]} castShadow>
+            <mesh key={s} material={m.tenue} position={[s * 0.068 * k, 0.405 * k, 0.062 * k]} scale={[1.3, 0.75, homme ? 0.38 : 0.45]} castShadow>
               <sphereGeometry args={[0.075 * k, 24, 16]} />
             </mesh>
           ))}
