@@ -1,14 +1,24 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, useTexture } from '@react-three/drei';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Environment, MeshReflectorMaterial, useGLTF } from '@react-three/drei';
+import { DepthOfField, EffectComposer, N8AO, Noise, ToneMapping, Vignette } from '@react-three/postprocessing';
+import { BlendFunction, ToneMappingMode } from 'postprocessing';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import Athlete, { Kettlebell } from './Athlete';
+import { brosse, coutures, marquage, moletage, trousRack, usePBR } from './materiaux';
 
 /* ------------------------------------------------------------------
    Intro 3D de Pulse Coaching (pilotée par le défilement, progres 0 → 1).
-   Une salle de sport premium : sol caoutchouc noir, béton, mur à lames de bois, grandes verrières, néon « PULSE »
-   vert acide. Le matériel est construit en code (rack, barre et disques, haltères, kettlebells, box, banc, écran) ;
-   les plantes viennent de Poly Haven (CC0). Les athlètes sont des mannequins élégants en pleine séance.
+   Une salle de sport premium, rendue de façon photoréaliste :
+   - matières PBR Poly Haven (CC0) partout : dalles de caoutchouc, béton banché, parquet de chêne, cuir, caoutchouc
+     granuleux des disques, métal brossé et chromé (cartes de relief, de rugosité et d'occlusion) ;
+   - lumière d'une vraie salle (HDRI Poly Haven « crossfit gym », neutralisée et réchauffée), soleil rasant par la verrière
+     avec ombres douces, occlusion ambiante (N8AO), reflets au sol, rendu filmique AgX, légère profondeur de champ,
+     grain et vignettage de caméra. Vert acide réservé au néon « PULSE » et à quelques liserés ;
+   - matériel construit en code, à l'échelle et détaillé (barre olympique moletée, disques à moyeu d'acier et marquage
+     du poids, rack percé et boulonné, banc en cuir surpiqué, haltères hexagonaux) ;
+   - athlètes : mannequins aux proportions réelles, figés au plus beau moment du mouvement.
+   Sur téléphone : textures plus légères, moins d'effets (ni reflets ni profondeur de champ), toujours fluide.
    La caméra s'arrête devant chaque offre, à droite puis à gauche, et tourne un peu autour.
 ------------------------------------------------------------------- */
 
@@ -31,24 +41,6 @@ export const POSTES = [
   { id: 'enligne', cote: 1, z: -11.6 },
 ];
 const X_POSTE = 2.3; // distance du centre de l'allée
-
-function useMatiere(nom, { taille, couleur, repeat = [1, 1], env = 0.4 } = {}) {
-  const t = useTexture({
-    map: `${BASE}scene/textures/${nom}-diffuse-${taille}.webp`,
-    normalMap: `${BASE}scene/textures/${nom}-normal-${taille}.webp`,
-    roughnessMap: `${BASE}scene/textures/${nom}-rough-${taille}.webp`,
-  });
-  return useMemo(() => {
-    Object.entries(t).forEach(([k, tex]) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.repeat.set(...repeat);
-      tex.anisotropy = 8;
-      if (k === 'map') tex.colorSpace = THREE.SRGBColorSpace;
-    });
-    return new THREE.MeshStandardMaterial({ ...t, color: couleur ?? '#ffffff', roughness: 1, envMapIntensity: env });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois
-  }, [t]);
-}
 
 function Plante(props) {
   const { scene } = useGLTF(`${BASE}scene/modeles/potted_plant_04.glb`);
@@ -81,64 +73,80 @@ function neon(texte, couleur, taille = 200) {
   return t;
 }
 
-/** Sol en caoutchouc : dalles noires, joints fins. */
-function texSol() {
-  const c = document.createElement('canvas');
-  c.width = c.height = 512;
-  const g = c.getContext('2d');
-  g.fillStyle = '#1b1b1d';
-  g.fillRect(0, 0, 512, 512);
-  for (let i = 0; i < 6000; i++) {
-    g.fillStyle = `rgba(255,255,255,${Math.random() * 0.035})`;
-    g.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
-  }
-  g.fillStyle = '#0d0d0e';
-  g.fillRect(0, 0, 512, 3);
-  g.fillRect(0, 0, 3, 512);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(8, 13);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
 /* ---------- la salle ---------- */
-function Salle({ taille }) {
-  const beton = useMemo(() => new THREE.MeshStandardMaterial({ color: '#3a3a3d', roughness: 0.92 }), []);
-  const bois = useMatiere('wood_floor', { taille, couleur: '#a77d55', repeat: [3, 2], env: 0.4 });
-  const m = useMemo(
-    () => ({
-      sol: new THREE.MeshStandardMaterial({ map: texSol(), roughness: 0.75, envMapIntensity: 0.3 }),
-      plafond: new THREE.MeshStandardMaterial({ color: '#141416', roughness: 0.9 }),
-      led: new THREE.MeshBasicMaterial({ color: '#f4f4f1', toneMapped: false }),
-      jour: new THREE.MeshBasicMaterial({ color: '#e8eef2', toneMapped: false }),
-      acier: new THREE.MeshStandardMaterial({ color: '#202024', roughness: 0.4, metalness: 0.8 }),
-      acide: new THREE.MeshBasicMaterial({ color: ACIDE, toneMapped: false }),
-    }),
-    [],
-  );
-  const pulse = useMemo(() => neon('PULSE', ACIDE, 230), []);
+function Sol({ def, reflets }) {
+  // dalles de caoutchouc 1 m × 1 m, joints fins ; sur ordinateur, un reflet très diffus (caoutchouc satiné)
+  const mat = usePBR('rubber_tiles', { def, repeat: [2 * L, -FOND], couleur: '#d6d3cf', relief: 0.8, env: 0.35 });
   const long = -FOND;
   return (
+    <mesh rotation-x={-Math.PI / 2} position={[0, 0, FOND / 2]} receiveShadow userData={{ coque: true }} material={reflets ? undefined : mat}>
+      <planeGeometry args={[2 * L, long]} />
+      {reflets && (
+        <MeshReflectorMaterial
+          map={mat.map}
+          normalMap={mat.normalMap}
+          normalScale={mat.normalScale}
+          roughnessMap={mat.roughnessMap}
+          aoMap={mat.aoMap}
+          color="#d6d3cf"
+          roughness={1}
+          envMapIntensity={0.35}
+          resolution={1024}
+          blur={[500, 180]}
+          mixBlur={1}
+          mixStrength={0.9}
+          mixContrast={1}
+          depthScale={0.6}
+          minDepthThreshold={0.3}
+          maxDepthThreshold={1.3}
+          mirror={0}
+        />
+      )}
+    </mesh>
+  );
+}
+
+function Salle({ def, reflets }) {
+  const long = -FOND;
+  const beton = usePBR('concrete_wall_008', { def, repeat: [long / 3, HAUT / 3], couleur: '#b4aca2', env: 0.5 });
+  const plafond = usePBR('concrete_wall_008', { def, repeat: [2, 4], couleur: '#3c3a38', env: 0.3 });
+  const bois = usePBR('oak_wood_planks', { def, repeat: [long / 2.2, 0.6], couleur: '#e2cdb5', env: 0.6 });
+  const boisFond = usePBR('oak_wood_planks', { def, repeat: [3.5, 2], couleur: '#e2cdb5', env: 0.6 });
+  const b = brosse();
+  const m = useMemo(
+    () => ({
+      led: new THREE.MeshBasicMaterial({ color: '#fff6ea', toneMapped: false }),
+      jour: new THREE.MeshBasicMaterial({ color: '#f2eee6', toneMapped: false }),
+      // menuiseries de la verrière : acier thermolaqué noir, légèrement brossé
+      acier: new THREE.MeshStandardMaterial({ color: '#1d1d1f', roughness: 0.45, metalness: 0.75, normalMap: b.normal, roughnessMap: b.rugosite }),
+      acide: new THREE.MeshBasicMaterial({ color: ACIDE, toneMapped: false }),
+    }),
+    [b],
+  );
+  const pulse = useMemo(() => neon('PULSE', ACIDE, 230), []);
+  return (
     <group>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0, FOND / 2]} material={m.sol}>
+      <Sol def={def} reflets={reflets} />
+      <mesh rotation-x={Math.PI / 2} position={[0, HAUT, FOND / 2]} material={plafond} userData={{ coque: true }}>
         <planeGeometry args={[2 * L, long]} />
       </mesh>
-      <mesh rotation-x={Math.PI / 2} position={[0, HAUT, FOND / 2]} material={m.plafond}>
-        <planeGeometry args={[2 * L, long]} />
-      </mesh>
-      {/* rampes LED au plafond */}
+      {/* rampes LED au plafond, dans des profilés d'acier */}
       {[-1.6, 0, 1.6].map((x) => (
-        <mesh key={x} position={[x, HAUT - 0.02, FOND / 2]} material={m.led}>
-          <boxGeometry args={[0.05, 0.02, long - 1]} />
-        </mesh>
+        <group key={x} position={[x, HAUT - 0.03, FOND / 2]}>
+          <mesh material={m.acier} userData={{ coque: true }}>
+            <boxGeometry args={[0.09, 0.05, long - 1]} />
+          </mesh>
+          <mesh position={[0, -0.026, 0]} rotation-x={Math.PI / 2} material={m.led}>
+            <planeGeometry args={[0.05, long - 1.1]} />
+          </mesh>
+        </group>
       ))}
-      {/* mur de droite : béton */}
-      <mesh position={[L, HAUT / 2, FOND / 2]} rotation-y={-Math.PI / 2} material={beton}>
+      {/* mur de droite : béton banché */}
+      <mesh position={[L, HAUT / 2, FOND / 2]} rotation-y={-Math.PI / 2} material={beton} userData={{ coque: true }}>
         <planeGeometry args={[long, HAUT]} />
       </mesh>
-      {/* mur de gauche : verrière (lumière du jour) au-dessus d'un soubassement en lames de bois */}
-      <mesh position={[-L, 0.6, FOND / 2]} rotation-y={Math.PI / 2} material={bois}>
+      {/* mur de gauche : verrière (lumière du jour) au-dessus d'un soubassement en chêne */}
+      <mesh position={[-L, 0.6, FOND / 2]} rotation-y={Math.PI / 2} material={bois} userData={{ coque: true }}>
         <planeGeometry args={[long, 1.2]} />
       </mesh>
       <mesh position={[-L - 0.05, 2.65, FOND / 2]} rotation-y={Math.PI / 2} material={m.jour}>
@@ -149,22 +157,24 @@ function Salle({ taille }) {
           <boxGeometry args={[0.06, 2.9, 0.06]} />
         </mesh>
       ))}
-      <mesh position={[-L + 0.02, 2.65, FOND / 2]} material={m.acier}>
-        <boxGeometry args={[0.06, 0.06, long]} />
-      </mesh>
-      {/* mur du fond : bois, néon PULSE */}
-      <mesh position={[0, HAUT / 2, FOND]} material={bois}>
+      {[1.2, 2.65, 4.1].map((y) => (
+        <mesh key={y} position={[-L + 0.02, y, FOND / 2]} material={m.acier}>
+          <boxGeometry args={[0.07, 0.06, long]} />
+        </mesh>
+      ))}
+      {/* mur du fond : chêne, néon PULSE */}
+      <mesh position={[0, HAUT / 2, FOND]} material={boisFond} userData={{ coque: true }}>
         <planeGeometry args={[2 * L, HAUT]} />
       </mesh>
       <mesh position={[0, 2.9, FOND + 0.02]}>
         <planeGeometry args={[3.2, 0.8]} />
         <meshBasicMaterial map={pulse} transparent toneMapped={false} depthWrite={false} />
       </mesh>
-      <pointLight position={[0, 2.9, FOND + 0.8]} color={ACIDE} intensity={3} distance={6} decay={1.6} />
+      <pointLight position={[0, 2.9, FOND + 0.8]} color={ACIDE} intensity={2.2} distance={5} decay={1.8} />
       {/* liseré vert acide au pied des murs */}
       {[-1, 1].map((s) => (
         <mesh key={s} position={[s * (L - 0.01), 0.04, FOND / 2]} material={m.acide}>
-          <boxGeometry args={[0.01, 0.015, long]} />
+          <boxGeometry args={[0.01, 0.012, long]} />
         </mesh>
       ))}
       <Plante position={[-L + 0.5, 0, -0.9]} scale={4} />
@@ -173,36 +183,130 @@ function Salle({ taille }) {
   );
 }
 
-/* ---------- le matériel, construit en code ---------- */
-function useMateriel() {
-  return useMemo(
-    () => ({
-      acier: new THREE.MeshStandardMaterial({ color: '#26262a', roughness: 0.35, metalness: 0.85 }),
-      chrome: new THREE.MeshStandardMaterial({ color: '#c9c9cc', roughness: 0.2, metalness: 1 }),
-      fonte: new THREE.MeshStandardMaterial({ color: '#18181b', roughness: 0.55, metalness: 0.5 }),
-      caoutchouc: new THREE.MeshStandardMaterial({ color: '#141416', roughness: 0.85 }),
-      acide: new THREE.MeshStandardMaterial({ color: ACIDE, roughness: 0.5, emissive: ACIDE, emissiveIntensity: 0.15 }),
-      bois: new THREE.MeshStandardMaterial({ color: '#b48a5e', roughness: 0.6 }),
-      cuir: new THREE.MeshStandardMaterial({ color: '#1c1c1f', roughness: 0.6 }),
+/* ---------- le matériel, construit en code, à l'échelle ---------- */
+function useMateriel(def) {
+  const b = brosse();
+  const cuir = usePBR('brown_leather', { def, repeat: [2, 1], couleur: '#5a524c', env: 0.6, relief: 1.2 });
+  // caoutchouc granuleux (disques, têtes d'haltères) : relief et rugosité du revêtement de piste, teinté noir
+  const gomme = usePBR('rubberized_track', { def, repeat: [1.5, 1.5], couleur: '#1c1c1e', sansCouleur: true, env: 0.45, relief: 0.9 });
+  const tole = usePBR('metal_plate', { def, repeat: [1, 1], couleur: '#2a2a2c', sansCouleur: true, metal: 0.85, rugosite: 0.8, env: 0.7 });
+  const plateau = usePBR('oak_wood_planks', { def, repeat: [0.7, 1], couleur: '#d9c3a8', env: 0.6 });
+  const box = usePBR('oak_wood_planks', { def, repeat: [0.4, 0.4], couleur: '#ead7bf', env: 0.5 });
+  return useMemo(() => {
+    const mol = moletage();
+    return {
+      // acier thermolaqué noir mat (rack, banc), grain fin de la peinture
+      acier: new THREE.MeshStandardMaterial({ color: '#202023', roughness: 0.55, metalness: 0.55, normalMap: b.normal, normalScale: new THREE.Vector2(0.3, 0.3), envMapIntensity: 0.8 }),
+      montant: new THREE.MeshStandardMaterial({ color: '#202023', map: trousRack(), roughness: 0.55, metalness: 0.55, envMapIntensity: 0.8 }),
+      // chrome dur (manchons, poignées), un peu brossé
+      chrome: new THREE.MeshStandardMaterial({ color: '#d8d8da', roughness: 0.16, metalness: 1, normalMap: b.normal, normalScale: new THREE.Vector2(0.15, 0.15), roughnessMap: b.rugosite, envMapIntensity: 1.2 }),
+      // barre moletée : losanges en relief, acier satiné
+      molette: new THREE.MeshStandardMaterial({ color: '#bdbdc0', roughness: 0.32, metalness: 1, normalMap: mol, normalScale: new THREE.Vector2(1.2, 1.2), envMapIntensity: 1.1 }),
+      zinc: new THREE.MeshStandardMaterial({ color: '#a9a9a6', roughness: 0.35, metalness: 1, envMapIntensity: 1 }),
+      gomme,
+      tole,
+      plateau,
+      box,
+      cuir,
+      coutures: new THREE.MeshBasicMaterial({ map: coutures(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, toneMapped: true }),
+      acide: new THREE.MeshStandardMaterial({ color: ACIDE, roughness: 0.5, emissive: ACIDE, emissiveIntensity: 0.12 }),
+      nylon: new THREE.MeshStandardMaterial({ color: '#111113', roughness: 0.75 }),
       ecran: new THREE.MeshBasicMaterial({ color: '#0e1a05', toneMapped: false }),
-    }),
-    [],
+      verre: new THREE.MeshStandardMaterial({ color: '#050506', roughness: 0.08, metalness: 0.2, envMapIntensity: 1.3 }),
+    };
+  }, [b, cuir, gomme, tole, plateau, box]);
+}
+
+/** Disque olympique « bumper » : caoutchouc granuleux, rebord arrondi, face creusée, moyeu d'acier vissé, poids marqué. */
+const DISQUES = { 20: { r: 0.225, e: 0.068 }, 10: { r: 0.225, e: 0.04 }, 5: { r: 0.115, e: 0.03 } };
+function Disque({ m, kg = 20, face = 1 }) {
+  const { r, e } = DISQUES[kg];
+  const geo = useMemo(() => {
+    // profil tourné autour de l'axe (x ici après rotation) : rayon, demi-épaisseur
+    const h = e / 2;
+    const pts = [
+      [0.026, -h * 0.7],
+      [0.08, -h * 0.7],
+      [0.09, -h * 0.85],
+      [r - 0.02, -h * 0.85],
+      [r - 0.006, -h],
+      [r, -h + 0.006],
+      [r, h - 0.006],
+      [r - 0.006, h],
+      [r - 0.02, h * 0.85],
+      [0.09, h * 0.85],
+      [0.08, h * 0.7],
+      [0.026, h * 0.7],
+    ].map(([a, y]) => new THREE.Vector2(a, y));
+    const g = new THREE.LatheGeometry(pts, 72);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  }, [r, e]);
+  const etiquette = useMemo(() => marquage(`${kg} KG`, { taille: 74 }), [kg]);
+  const vis = useMemo(() => Array.from({ length: 6 }, (_, i) => (i / 6) * Math.PI * 2), []);
+  return (
+    <group>
+      <mesh geometry={geo} material={m.gomme} />
+      {/* moyeu : bague d'acier inox, six vis de serrage */}
+      <mesh material={m.chrome} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[0.065, 0.065, e * 0.72, 48, 1, true]} />
+      </mesh>
+      {[-1, 1].map((s) => (
+        <mesh key={s} material={m.chrome} position={[(s * e * 0.72) / 2, 0, 0]} rotation-y={(s * Math.PI) / 2}>
+          <ringGeometry args={[0.026, 0.065, 48]} />
+        </mesh>
+      ))}
+      {[-1, 1].flatMap((s) =>
+        vis.map((a) => (
+          <mesh key={`${s}${a}`} material={m.zinc} position={[(s * e * 0.72) / 2 + s * 0.002, Math.cos(a) * 0.05, Math.sin(a) * 0.05]} rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.0055, 0.0055, 0.004, 6]} />
+          </mesh>
+        )),
+      )}
+      {/* poids, en relief blanc sur la face visible */}
+      {[0.6, Math.PI + 0.6].map((a) => (
+        <mesh key={a} position={[face * (e * 0.425 + 0.001), Math.sin(a) * (r - 0.06), Math.cos(a) * (r - 0.06)]} rotation={[-a + Math.PI / 2, (face * Math.PI) / 2, 0]}>
+          <planeGeometry args={[0.1, 0.05]} />
+          <meshStandardMaterial map={etiquette} transparent roughness={0.6} depthWrite={false} polygonOffset polygonOffsetFactor={-2} />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
-function Barre({ m, longueur = 2.0 }) {
+/** Barre olympique 20 kg : 2,20 m, fût Ø 28 mm moleté, manchons chromés Ø 50 mm, deux disques et colliers par côté. */
+function Barre({ m, disques = [20, 10] }) {
   return (
     <group>
-      <mesh material={m.chrome} rotation-z={Math.PI / 2}>
-        <cylinderGeometry args={[0.014, 0.014, longueur, 16]} />
+      {/* fût moleté (zone centrale lisse, puis moletage) */}
+      <mesh material={m.zinc} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[0.014, 0.014, 0.42, 24]} />
       </mesh>
       {[-1, 1].map((s) => (
-        <group key={s} position={[s * (longueur / 2 - 0.25), 0, 0]}>
-          <mesh material={m.caoutchouc} rotation-z={Math.PI / 2}>
-            <cylinderGeometry args={[0.225, 0.225, 0.06, 40]} />
+        <mesh key={s} material={m.molette} position={[s * 0.43, 0, 0]} rotation-z={Math.PI / 2}>
+          <cylinderGeometry args={[0.0142, 0.0142, 0.44, 24]} />
+        </mesh>
+      ))}
+      {[-1, 1].map((s) => (
+        <group key={s} position={[s * 0.655, 0, 0]}>
+          {/* bague d'arrêt, puis manchon */}
+          <mesh material={m.chrome} rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.035, 0.035, 0.03, 40]} />
           </mesh>
-          <mesh material={m.acide} rotation-z={Math.PI / 2} position={[s * 0.031, 0, 0]}>
-            <ringGeometry args={[0.04, 0.06, 32]} />
+          <mesh material={m.chrome} position={[s * 0.23, 0, 0]} rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.025, 0.025, 0.43, 40]} />
+          </mesh>
+          {disques.map((kg, j) => {
+            const x = disques.slice(0, j).reduce((t, d) => t + DISQUES[d].e + 0.003, 0.03) + DISQUES[kg].e / 2;
+            return (
+              <group key={j} position={[s * x, 0, 0]}>
+                <Disque m={m} kg={kg} face={s} />
+              </group>
+            );
+          })}
+          {/* collier à ressort */}
+          <mesh material={m.zinc} position={[s * (disques.reduce((t, d) => t + DISQUES[d].e + 0.003, 0.03) + 0.012), 0, 0]} rotation-y={Math.PI / 2}>
+            <torusGeometry args={[0.03, 0.006, 10, 32]} />
           </mesh>
         </group>
       ))}
@@ -210,62 +314,198 @@ function Barre({ m, longueur = 2.0 }) {
   );
 }
 
+/** Cage à squat : montants 7,5 cm percés et numérotés, traverses boulonnées, crochets, bras de sécurité, barre de traction. */
 function Rack({ m }) {
+  const H = 2.3;
+  const marque = useMemo(() => marquage('PULSE', { taille: 92, couleur: ACIDE }), []);
   const montant = (x, z) => (
-    <mesh key={`${x}${z}`} position={[x, 1.15, z]} material={m.acier}>
-      <boxGeometry args={[0.075, 2.3, 0.075]} />
-    </mesh>
+    <group key={`${x}${z}`} position={[x, H / 2, z]}>
+      <mesh material={m.montant}>
+        <boxGeometry args={[0.075, H, 0.075]} />
+      </mesh>
+      {/* platine au sol, deux boulons */}
+      <mesh material={m.tole} position={[0, -H / 2 + 0.006, 0]}>
+        <boxGeometry args={[0.16, 0.012, 0.16]} />
+      </mesh>
+    </group>
   );
+  const boulons = (x, y, z, axe) =>
+    [-0.02, 0.02].map((d) => (
+      <mesh key={`${x}${y}${z}${d}`} material={m.zinc} position={axe === 'x' ? [x, y + d, z] : [x, y + d, z]} rotation={axe === 'x' ? [0, 0, Math.PI / 2] : [Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.0085, 0.0085, 0.012, 6]} />
+      </mesh>
+    ));
   return (
     <group>
       {[-0.6, 0.6].flatMap((x) => [montant(x, -0.6), montant(x, 0.6)])}
       {[-0.6, 0.6].map((z) => (
-        <mesh key={z} position={[0, 2.28, z]} material={m.acier}>
+        <mesh key={z} position={[0, H - 0.02, z]} material={m.acier}>
           <boxGeometry args={[1.28, 0.075, 0.075]} />
         </mesh>
       ))}
       {[-0.6, 0.6].map((x) => (
-        <mesh key={`h${x}`} position={[x, 2.28, 0]} material={m.acier}>
+        <mesh key={`h${x}`} position={[x, H - 0.02, 0]} material={m.acier}>
           <boxGeometry args={[0.075, 0.075, 1.28]} />
         </mesh>
       ))}
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0.006, 0]} material={m.bois}>
-        <planeGeometry args={[1.5, 1.6]} />
+      {/* traverses basses */}
+      {[-0.6, 0.6].map((x) => (
+        <mesh key={`b${x}`} position={[x, 0.06, 0]} material={m.acier}>
+          <boxGeometry args={[0.075, 0.075, 1.28]} />
+        </mesh>
+      ))}
+      {/* boulons aux assemblages (faces avant) */}
+      {[-0.6, 0.6].flatMap((x) => [...boulons(x, H - 0.02, 0.6 + 0.04, 'z'), ...boulons(x, 0.06, 0.6 + 0.04, 'z'), ...boulons(x, H - 0.02, -0.6 - 0.04, 'z')])}
+      {/* barre de traction moletée, à l'avant */}
+      <mesh material={m.molette} position={[0, H + 0.06, 0.6]} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[0.016, 0.016, 1.36, 24]} />
       </mesh>
+      {/* crochets (J-hooks) gainés de nylon, à hauteur d'épaule, sur les montants arrière */}
+      {[-0.6, 0.6].map((x) => (
+        <group key={`j${x}`} position={[x, 1.43, -0.6 + 0.06]}>
+          <mesh material={m.acier}>
+            <boxGeometry args={[0.08, 0.12, 0.05]} />
+          </mesh>
+          <mesh material={m.nylon} position={[0, -0.03, 0.05]}>
+            <boxGeometry args={[0.07, 0.035, 0.06]} />
+          </mesh>
+          <mesh material={m.nylon} position={[0, 0.0, 0.085]}>
+            <boxGeometry args={[0.07, 0.07, 0.014]} />
+          </mesh>
+        </group>
+      ))}
+      {/* bras de sécurité, à hauteur de hanche */}
+      {[-0.6, 0.6].map((x) => (
+        <mesh key={`s${x}`} material={m.acier} position={[x, 0.82, 0]}>
+          <boxGeometry args={[0.05, 0.05, 1.32]} />
+        </mesh>
+      ))}
+      {/* plaque de marque */}
+      <mesh position={[0, H - 0.02, 0.6 + 0.039]}>
+        <planeGeometry args={[0.36, 0.06]} />
+        <meshStandardMaterial map={marque} transparent depthWrite={false} roughness={0.5} />
+      </mesh>
+      {/* plateforme d'haltérophilie : chêne au centre, caoutchouc de part et d'autre */}
+      <mesh position={[0, 0.012, 0]} material={m.plateau}>
+        <boxGeometry args={[1.0, 0.024, 2.2]} />
+      </mesh>
+      {[-1, 1].map((s) => (
+        <mesh key={`p${s}`} position={[s * 0.75, 0.012, 0]} material={m.gomme}>
+          <boxGeometry args={[0.5, 0.024, 2.2]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Banc réglable : sellerie en cuir surpiquée, châssis acier, échelle de réglage, roulettes et poignée. */
+function Banc({ m, dossier = 0.35 }) {
+  const coussin = (l, key, props) => (
+    <group key={key} {...props}>
+      <mesh material={m.cuir}>
+        <boxGeometry args={[0.28, 0.065, l]} />
+      </mesh>
+      {/* coutures sur le dessus et le pourtour */}
+      <mesh material={m.coutures} position={[0, 0.0334, 0]} rotation-x={-Math.PI / 2}>
+        <planeGeometry args={[0.28, l]} />
+      </mesh>
+      <mesh material={m.acier} position={[0, -0.042, 0]}>
+        <boxGeometry args={[0.24, 0.02, l - 0.04]} />
+      </mesh>
+    </group>
+  );
+  return (
+    <group>
+      {/* poutre centrale et pieds */}
+      <mesh material={m.acier} position={[0, 0.2, 0]}>
+        <boxGeometry args={[0.075, 0.075, 1.2]} />
+      </mesh>
+      {[-0.6, 0.6].map((z) => (
+        <mesh key={z} material={m.acier} position={[0, 0.03, z]}>
+          <boxGeometry args={[0.5, 0.06, 0.07]} />
+        </mesh>
+      ))}
+      {[-1, 1].map((s) => (
+        <mesh key={s} material={m.nylon} position={[s * 0.22, 0.035, 0.66]} rotation-z={Math.PI / 2}>
+          <cylinderGeometry args={[0.035, 0.035, 0.03, 24]} />
+        </mesh>
+      ))}
+      <mesh material={m.acier} position={[0, 0.25, -0.38]} rotation-x={-0.6}>
+        <boxGeometry args={[0.05, 0.3, 0.05]} />
+      </mesh>
+      {/* échelle de réglage */}
+      <mesh material={m.montant} position={[0, 0.3, 0.2]} rotation-x={-0.9}>
+        <boxGeometry args={[0.06, 0.45, 0.04]} />
+      </mesh>
+      {/* poignée de transport chromée */}
+      <mesh material={m.chrome} position={[0, 0.06, -0.68]} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[0.014, 0.014, 0.4, 16]} />
+      </mesh>
+      {coussin(0.42, 'assise', { position: [0, 0.42, -0.36] })}
+      {coussin(0.76, 'dossier', { position: [0, 0.42 + Math.sin(dossier) * 0.38, 0.06 + 0.38 - Math.cos(dossier) * 0.38], rotation: [dossier, 0, 0] })}
+    </group>
+  );
+}
+
+/** Haltère hexagonal : têtes gainées de caoutchouc, poignée chromée moletée, embout marqué. */
+function Haltere({ m, kg }) {
+  const s = 0.72 + kg * 0.012;
+  const etiquette = useMemo(() => marquage(String(kg), { taille: 110 }), [kg]);
+  return (
+    <group scale={s}>
+      <mesh material={m.molette} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[0.016, 0.016, 0.135, 20]} />
+      </mesh>
+      {[-1, 1].map((k) => (
+        <group key={k} position={[k * 0.1, 0, 0]}>
+          <mesh material={m.gomme} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.058, 0.058, 0.07, 6]} />
+          </mesh>
+          <mesh material={m.chrome} position={[k * 0.0352, 0, 0]} rotation-y={(k * Math.PI) / 2}>
+            <circleGeometry args={[0.03, 32]} />
+          </mesh>
+          <mesh position={[k * 0.0356, 0, 0]} rotation-y={(k * Math.PI) / 2}>
+            <planeGeometry args={[0.04, 0.02]} />
+            <meshBasicMaterial map={etiquette} color="#222" transparent depthWrite={false} />
+          </mesh>
+          <mesh material={m.chrome} position={[-k * 0.04, 0, 0]} rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.024, 0.024, 0.012, 24]} />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
 
 function Halteres({ m }) {
-  // un rack d'haltères hexagonaux, du plus léger au plus lourd
+  // un rack d'haltères sur deux étages, du plus léger au plus lourd
   return (
     <group>
       {[0.45, 0.8].map((y) => (
-        <mesh key={y} position={[0, y, 0]} rotation-x={-0.2} material={m.acier}>
-          <boxGeometry args={[1.6, 0.04, 0.32]} />
-        </mesh>
+        <group key={y} position={[0, y, 0]} rotation-x={-0.2}>
+          {[-0.08, 0.08].map((z) => (
+            <mesh key={z} position={[0, 0, z]} material={m.acier}>
+              <boxGeometry args={[1.6, 0.04, 0.04]} />
+            </mesh>
+          ))}
+        </group>
       ))}
       {[0.45, 0.8].flatMap((y, r) =>
-        Array.from({ length: 5 }, (_, i) => {
-          const s = 0.75 + (i + r * 5) * 0.05;
-          return (
-            <group key={`${r}${i}`} position={[-0.64 + i * 0.32, y + 0.07 * s, 0]} scale={s}>
-              <mesh material={m.chrome} rotation-z={Math.PI / 2}>
-                <cylinderGeometry args={[0.014, 0.014, 0.26, 12]} />
-              </mesh>
-              {[-1, 1].map((k) => (
-                <mesh key={k} material={m.fonte} position={[k * 0.1, 0, 0]} rotation-z={Math.PI / 2}>
-                  <cylinderGeometry args={[0.05, 0.05, 0.07, 6]} />
-                </mesh>
-              ))}
-            </group>
-          );
-        }),
+        Array.from({ length: 5 }, (_, i) => (
+          <group key={`${r}${i}`} position={[-0.64 + i * 0.32, y + 0.07, 0]}>
+            <Haltere m={m} kg={(r === 0 ? 12 : 2) + i * 2} />
+          </group>
+        )),
       )}
-      {[-0.75, 0.75].map((x) => (
-        <mesh key={x} position={[x, 0.42, 0]} material={m.acier}>
-          <boxGeometry args={[0.05, 0.84, 0.3]} />
-        </mesh>
+      {[-0.78, 0.78].map((x) => (
+        <group key={x} position={[x, 0, 0]}>
+          <mesh position={[0, 0.43, 0]} material={m.acier}>
+            <boxGeometry args={[0.05, 0.86, 0.05]} />
+          </mesh>
+          <mesh position={[0, 0.02, 0]} material={m.acier}>
+            <boxGeometry args={[0.06, 0.04, 0.5]} />
+          </mesh>
+        </group>
       ))}
     </group>
   );
@@ -273,7 +513,7 @@ function Halteres({ m }) {
 
 function Box({ m, h = 0.5 }) {
   return (
-    <mesh position={[0, h / 2, 0]} material={m.bois}>
+    <mesh position={[0, h / 2, 0]} material={m.box}>
       <boxGeometry args={[0.6, h, 0.5]} />
     </mesh>
   );
@@ -281,8 +521,8 @@ function Box({ m, h = 0.5 }) {
 
 function Tapis({ m }) {
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, 0.008, 0]} material={m.caoutchouc}>
-      <planeGeometry args={[0.65, 1.8]} />
+    <mesh position={[0, 0.006, 0]} material={m.gomme}>
+      <boxGeometry args={[0.65, 0.012, 1.8]} />
     </mesh>
   );
 }
@@ -313,15 +553,8 @@ function Poste({ poste, m }) {
       {id === 'decouverte' && (
         <>
           {/* le bilan de forme : un banc, une tablette sur pied, une athlète qui s'étire */}
-          <group position={[-0.7, 0, -0.3]}>
-            <mesh position={[0, 0.42, 0]} material={m.cuir}>
-              <boxGeometry args={[1.2, 0.08, 0.32]} />
-            </mesh>
-            {[-0.5, 0.5].map((dx) => (
-              <mesh key={dx} position={[dx, 0.2, 0]} material={m.acier}>
-                <boxGeometry args={[0.06, 0.4, 0.28]} />
-              </mesh>
-            ))}
+          <group position={[-0.8, 0, -0.3]} rotation-y={Math.PI / 2}>
+            <Banc m={m} dossier={0} />
           </group>
           <group position={[0.75, 0, 0.1]}>
             <mesh position={[0, 0.6, 0]} material={m.acier}>
@@ -341,7 +574,7 @@ function Poste({ poste, m }) {
         <>
           <group position={[0, 0, -0.35]}>
             <Rack m={m} />
-            <group position={[0, 1.45, -0.6]}>
+            <group position={[0, 1.478, -0.465]}>
               <Barre m={m} />
             </group>
           </group>
@@ -368,6 +601,13 @@ function Poste({ poste, m }) {
           </group>
           <group position={[-1.35, 0, -0.5]} rotation-y={0.3}>
             <Halteres m={m} />
+          </group>
+          <group position={[-1.15, 0, 0.75]} rotation-y={0.45}>
+            <Banc m={m} dossier={0.6} />
+          </group>
+          {/* une paire d'haltères posée au sol, au pied du banc */}
+          <group position={[-0.55, 0.045, 1.05]} rotation-y={0.3}>
+            <Haltere m={m} kg={12} />
           </group>
         </>
       )}
@@ -417,8 +657,8 @@ function Poste({ poste, m }) {
         </>
       )}
       {/* une lumière douce sur chaque poste, et un contre-jour chaud */}
-      <pointLight position={[0.6, 2.4, 1.2]} color="#fff2e2" intensity={2.2} distance={4} decay={1.5} />
-      <pointLight position={[0, 1.9, -1.1]} color="#ffbe7a" intensity={1.4} distance={2.4} decay={1.4} />
+      <pointLight position={[0.6, 2.6, 1.3]} color="#ffeedd" intensity={2.4} distance={5} decay={1.6} />
+      <pointLight position={[0, 1.9, -1.2]} color="#ffc28a" intensity={1.3} distance={2.6} decay={1.5} />
     </group>
   );
 }
@@ -450,7 +690,7 @@ function vue(i, a, portrait, pos, cible) {
   }
 }
 
-function Camera({ progres }) {
+function Camera({ progres, foyer }) {
   const { camera, size } = useThree();
   const p0 = useMemo(() => new THREE.Vector3(), []);
   const c0 = useMemo(() => new THREE.Vector3(), []);
@@ -477,26 +717,84 @@ function Camera({ progres }) {
     f0(p0, c0);
     f1(p1, c1);
     camera.position.copy(p0.lerp(p1, k));
-    camera.lookAt(c0.lerp(c1, k));
+    c0.lerp(c1, k);
+    camera.lookAt(c0);
+    // mise au point sur le poste regardé (la profondeur de champ suit la caméra)
+    foyer?.copy(c0);
     camera.fov = portrait ? 62 : 46;
     camera.updateProjectionMatrix();
   });
   return null;
 }
 
-function Ambiance({ taille }) {
-  const env = useTexture(`${BASE}scene/loft-${taille}.jpg`);
+/** Lumière et reflets d'une vraie salle de sport : HDRI Poly Haven (crossfit gym), neutralisée et réchauffée. */
+function Ambiance({ def }) {
+  return <Environment files={`${BASE}scene/gym-${def === 'hd' ? '1k' : '512'}.hdr`} environmentIntensity={0.55} />;
+}
+
+/** Le soleil rasant entre par la verrière : ombres douces au sol, rais de lumière entre les montants. */
+function Soleil({ taille }) {
+  const [cible] = useState(() => new THREE.Object3D());
+  return (
+    <>
+      <primitive object={cible} position={[0, 0, -6.5]} />
+      <directionalLight
+        position={[-10, 5.2, -3.5]}
+        target={cible}
+        color="#ffe2c2"
+        intensity={2.4}
+        castShadow
+        shadow-mapSize={[taille, taille]}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.025}
+        shadow-radius={4}
+        shadow-camera-left={-9}
+        shadow-camera-right={9}
+        shadow-camera-top={9}
+        shadow-camera-bottom={-9}
+        shadow-camera-near={1}
+        shadow-camera-far={26}
+      />
+    </>
+  );
+}
+
+/** Ombres : tout objet opaque en porte et en reçoit, sauf la coque de la salle (murs, plafond), qui ne fait que les recevoir. */
+function Ombres() {
   const { scene } = useThree();
   useEffect(() => {
-    env.mapping = THREE.EquirectangularReflectionMapping;
-    env.colorSpace = THREE.SRGBColorSpace;
-    scene.environment = env;
-    scene.environmentIntensity = 0.5;
-    return () => {
-      scene.environment = null;
-    };
-  }, [env, scene]);
+    scene.traverse((o) => {
+      if (!o.isMesh || o.material?.isMeshBasicMaterial || o.material?.transparent) return;
+      o.receiveShadow = true;
+      o.castShadow = !o.userData.coque;
+    });
+  }, [scene]);
   return null;
+}
+
+/** Rendu « caméra » : occlusion ambiante, profondeur de champ, rendu filmique AgX, grain et vignettage. */
+function Effets({ niveau, foyer }) {
+  const dof = useRef();
+  useFrame(() => dof.current?.target?.copy(foyer));
+  if (niveau === 'complet')
+    return (
+      <EffectComposer multisampling={4}>
+        <N8AO aoRadius={0.55} distanceFalloff={0.5} intensity={2.4} quality="medium" color="#0a0806" />
+        <DepthOfField ref={dof} target={foyer} worldFocusRange={2.6} bokehScale={2.2} resolutionScale={0.5} />
+        <ToneMapping mode={ToneMappingMode.AGX} />
+        <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.35} />
+        <Vignette offset={0.28} darkness={0.55} />
+      </EffectComposer>
+    );
+  // téléphone : occlusion à demi-résolution, rendu filmique, grain et vignettage ; ni profondeur de champ ni reflets
+  return (
+    <EffectComposer multisampling={0}>
+      <N8AO aoRadius={0.5} distanceFalloff={0.5} intensity={2.2} quality="performance" halfRes depthAwareUpsampling color="#0a0806" />
+      <ToneMapping mode={ToneMappingMode.AGX} />
+      <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.3} />
+      <Vignette offset={0.28} darkness={0.5} />
+    </EffectComposer>
+  );
 }
 
 function Pilote() {
@@ -521,43 +819,49 @@ function Pret({ onReady }) {
   return null;
 }
 
-function Scene({ taille }) {
-  const m = useMateriel();
+function Scene({ def, reflets }) {
+  const m = useMateriel(def);
   return (
     <>
-      <Ambiance taille={taille} />
-      <Salle taille={taille} />
+      <Ambiance def={def} />
+      <Salle def={def} reflets={reflets} />
       {POSTES.map((p) => (
         <Poste key={p.id} poste={p} m={m} />
       ))}
+      <Ombres />
     </>
   );
 }
 
 export default function Salle3D({ progres, leger, actif = true, onReady }) {
   const petit = typeof window !== 'undefined' && innerWidth < 768;
-  const taille = petit || leger ? 512 : 1024;
+  // ordinateur : tout (textures 2K, reflets au sol, profondeur de champ) ; téléphone : version allégée automatique
+  const complet = !petit && !leger;
+  const def = complet ? 'hd' : 'sd';
+  const foyer = useRef(new THREE.Vector3(-2.3, 1, -4.9)).current;
   return (
     <Canvas
       className="!absolute inset-0"
-      dpr={leger ? [1, 1.25] : petit ? [1, 1.6] : [1, 1.75]}
+      dpr={leger ? [1, 1.25] : petit ? [1, 1.5] : [1, 1.75]}
       frameloop={IMAGE_PAR_IMAGE || !actif ? 'never' : 'always'}
       camera={{ fov: 46, near: 0.05, far: 50, position: [0, 1.7, 2.6] }}
-      gl={{ antialias: !leger, powerPreference: 'high-performance' }}
+      shadows={leger ? false : 'soft'}
+      gl={{ antialias: false, powerPreference: 'high-performance', stencil: false }}
       onCreated={({ gl, scene }) => {
-        gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.05;
-        scene.background = new THREE.Color('#0b0b0c');
-        scene.fog = new THREE.Fog('#0b0b0c', 12, 24);
+        gl.toneMapping = THREE.AgXToneMapping;
+        gl.toneMappingExposure = 1.0;
+        scene.background = new THREE.Color('#0d0b09');
+        scene.fog = new THREE.Fog('#0d0b09', 14, 28);
       }}
       aria-hidden="true"
     >
       <Pilote />
-      <hemisphereLight args={['#e9eef2', '#2a2622', 0.45]} />
-      <directionalLight position={[-6, 6, 2]} intensity={1.1} color="#eef3f6" />
+      <hemisphereLight args={['#f3ece2', '#2a2420', 0.18]} />
+      {!leger && <Soleil taille={complet ? 2048 : 1024} />}
       <Suspense fallback={null}>
-        <Scene taille={taille} />
-        <Camera progres={progres} />
+        <Scene def={def} reflets={complet} />
+        <Camera progres={progres} foyer={foyer} />
+        {!leger && <Effets niveau={complet ? 'complet' : 'leger'} foyer={foyer} />}
         <Pret onReady={onReady} />
       </Suspense>
     </Canvas>
