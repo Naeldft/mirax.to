@@ -343,8 +343,13 @@ function Camera({ progres, refPorte }) {
     a.set(...p0).lerp(b.set(...p1), k);
     // téléphone : on se tient un peu plus loin du rayon regardé
     if (portrait && p > 0.2) a.x *= 0.4;
+    c.set(...c0).lerp(b.set(...c1), k);
+    // ordinateur, au départ : la devanture à droite du titre
+    const decale = portrait ? 0 : -1.7 * (1 - doux(p / 0.1));
+    a.x += decale;
+    c.x += decale;
     camera.position.copy(a);
-    camera.lookAt(c.set(...c0).lerp(b.set(...c1), k));
+    camera.lookAt(c);
     camera.fov = portrait ? 66 : 52;
     camera.updateProjectionMatrix();
     if (refPorte.current) refPorte.current.rotation.y = 1.4 * doux((p - 0.08) / 0.07);
