@@ -20,7 +20,7 @@ const IMAGE_PAR_IMAGE = typeof location !== 'undefined' && new URLSearchParams(l
 const horloge = { t: 0, maintenant: () => (IMAGE_PAR_IMAGE ? horloge.t : performance.now() / 1000) };
 
 /** Repères du défilement. */
-export const REPERES = { fonce: [0.02, 0.13], noir: [0.12, 0.17], habitacle: [0.17, 0.6], sortie: [0.58, 0.66], allees: [0.66, 0.95] };
+export const REPERES = { fonce: [0.02, 0.13], noir: [0.12, 0.17], habitacle: [0.17, 0.6], sortie: [0.58, 0.66], allees: [0.66, 0.87] };
 const ROUGE = '#e10600';
 const doux = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 const entre = (p, [a, b]) => Math.min(1, Math.max(0, (p - a) / (b - a)));

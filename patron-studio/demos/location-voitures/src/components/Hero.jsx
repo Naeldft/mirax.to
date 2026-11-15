@@ -13,7 +13,7 @@ const Velocita3D = lazy(() => import('../three/Velocita3D'));
 // mêmes repères que la scène (three/Velocita3D.jsx, REPERES) : copiés ici pour ne pas charger three.js d'avance
 const NOIR = [0.12, 0.17]; // la voiture nous percute : bref fondu au noir, on est dans l'habitacle
 const PARE_BRISE = [0.58, 0.66]; // on ressort par le pare-brise
-const FIN = [0.88, 0.96]; // l'appel à l'action, puis le site
+const FIN = [0.9, 0.97]; // l'appel à l'action, puis le site
 const HABITACLE = 0.175; // où mène « Démarrer »
 
 const pic = (p, [a, b]) => (p < a || p > b ? 0 : 1 - Math.abs(p - (a + b) / 2) / ((b - a) / 2));
