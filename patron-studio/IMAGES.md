@@ -67,6 +67,26 @@ Textures et lumière d'ambiance : **Poly Haven, licence CC0**, dans `demos/plomb
 
 Construits en code (pas d'image) : robinet, mousseur, goutte, vasque, plan, canalisation, bagues, eau, gouttes, plaques gravées.
 
+### Velocità Location
+
+Détail complet des photos : `demos/location-voitures/photos/LISEZ-MOI.md`.
+- Intro : vraie scène 3D construite en code (`src/three/Velocita3D.jsx`) : showroom au sol laqué, le coupé (vraie photo
+  détourée, avec reflet et ombre) fonce vers nous ; l'habitacle est une **vraie photo** mise en relief par sa carte de
+  profondeur (calculée avec Depth Anything V2, modèle libre Apache 2.0) que la caméra traverse ; puis 4 places de
+  parking avec une vraie voiture détourée par catégorie.
+- Photo `flotte-premium` : affichée le temps du chargement, et à la place de la 3D sans WebGL ou avec « réduire les animations ».
+
+| Élément | Fichier (`public/scene/`) | Photo d'origine |
+|---|---|---|
+| Habitacle (photo + profondeur) | `habitacle-1800|1000.webp`, `habitacle-profondeur.png` | https://images.unsplash.com/photo-1610647752706-3bb12232b3ab (Unsplash) |
+| Coupé (Mercedes-AMG GT) | `voiture-premium-*.webp` | https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8 (Unsplash) |
+| Citadine (Fiat 500) | `voiture-citadine-*.webp` | https://images.unsplash.com/photo-1549317661-bd32c8ce0db2 (Unsplash) |
+| SUV (Honda CR-V) | `voiture-suv-*.webp` | https://images.unsplash.com/photo-1519641471654-76ce0107ad1b (Unsplash) |
+| Fourgon aménagé (VW Combi) | `voiture-fourgon-*.webp` | https://images.unsplash.com/photo-1527786356703-4b100091cd2c (Unsplash) |
+| Reflets du sol (photo 360°) | `parking-1024|512.jpg` | https://polyhaven.com/a/parking_garage (Poly Haven, CC0) |
+
+Détourages : rembg (BiRefNet). Construits en code : sol, lignes rouges, rampes lumineuses, traits de vitesse, places de parking, étiquettes.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

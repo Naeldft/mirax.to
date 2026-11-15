@@ -17,7 +17,6 @@ import { agences, entreprise } from './data/site';
 export default function App() {
   const [ready, setReady] = useState(false);
   const [model, setModel] = useState('suv');
-  const [color, setColor] = useState('rouge');
   useScrollRefresh();
   return (
     <>
@@ -33,8 +32,8 @@ export default function App() {
       />
       <Header />
       <main>
-        <Hero model={model} color={color} onModel={setModel} onColor={setColor} onReady={() => setReady(true)} />
-        <Flotte model={model} color={color} onModel={setModel} />
+        <Hero onModel={setModel} onReady={() => setReady(true)} />
+        <Flotte model={model} onModel={setModel} />
         <Fonctionnement />
         <Agences />
         <Avis />

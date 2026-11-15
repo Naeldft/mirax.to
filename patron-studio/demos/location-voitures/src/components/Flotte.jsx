@@ -1,39 +1,17 @@
 import Photo from '@demos/shared/components/Photo.jsx';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
-import { couleurs, modeles } from '../data/site';
-import { silhouettePath } from '../three/carGeometry';
+import { modeles } from '../data/site';
 import { Boite, Energie, Places, Valise } from './Icons';
 import SectionTitle from './SectionTitle';
 
-/** Silhouette du véhicule, dessinée à partir des mêmes données que la 3D. */
-function Silhouette({ profil, color }) {
-  const { body, cabin, p } = useMemo(() => silhouettePath(profil), [profil]);
-  const w = p.L * 100 + 60;
-  return (
-    <svg viewBox={`${-w / 2} -230 ${w} 250`} className="h-full w-full" aria-hidden="true">
-      <ellipse cx="0" cy="8" rx={w * 0.42} ry="10" fill="#000" opacity="0.5" />
-      <path d={body} fill={color} />
-      <path d={cabin} fill="#0d1117" opacity="0.92" />
-      {p.wheels.map((x) => (
-        <g key={x}>
-          <circle cx={x * 100} cy={-p.R * 100} r={p.R * 100} fill="#141414" />
-          <circle cx={x * 100} cy={-p.R * 100} r={p.R * 62} fill="#c9cdd3" />
-          <circle cx={x * 100} cy={-p.R * 100} r={p.R * 18} fill="#141414" />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-export default function Flotte({ model, color, onModel }) {
+export default function Flotte({ model, onModel }) {
   const scope = useRef(null);
   const track = useRef(null);
   const reduced = useReducedMotion();
   useReveal(scope);
-  const hex = couleurs.find((c) => c.id === color).hex;
 
   // grand écran : la flotte défile à l'horizontale pendant que la section reste fixe
   useLayoutEffect(() => {
@@ -95,23 +73,16 @@ export default function Flotte({ model, color, onModel }) {
                       <span className="block text-xs text-ivoire/55">par jour</span>
                     </p>
                   </div>
-                  {m.photo ? (
-                    <div className="-mx-6 my-4 aspect-[16/9] overflow-hidden bg-carbone">
-                      {/* emplacement photo : m.photo (photos/<nom>.jpg) */}
-                      <Photo
-                        nom={m.photo}
-                        alt={m.alt}
-                        sizes="(min-width: 1024px) 30rem, 100vw"
-                        width="800"
-                        height="450"
-                        className="h-full w-full object-cover duration-700 ease-out group-hover:scale-105"
-                      />
-                    </div>
-                  ) : (
-                    <div className="my-4 h-32 transition-transform duration-700 ease-out group-hover:translate-x-3 md:h-40">
-                      <Silhouette profil={m.profil} color={hex} />
-                    </div>
-                  )}
+                  <div className="-mx-6 my-4 aspect-[16/9] overflow-hidden bg-carbone">
+                    <Photo
+                      nom={m.photo}
+                      alt={m.alt}
+                      sizes="(min-width: 1024px) 30rem, 100vw"
+                      width="800"
+                      height="450"
+                      className="h-full w-full object-cover duration-700 ease-out group-hover:scale-105"
+                    />
+                  </div>
                   <ul className="grid grid-cols-4 gap-2 border-y border-ivoire/10 py-4 text-center text-xs text-ivoire/70">
                     <li>
                       <Places className="mx-auto mb-1 text-lg text-course-vif" />
@@ -119,7 +90,7 @@ export default function Flotte({ model, color, onModel }) {
                     </li>
                     <li>
                       <Valise className="mx-auto mb-1 text-lg text-course-vif" />
-                      {m.profil === 'utilitaire' ? '12 m³' : `${m.bagages} valises`}
+                      {m.bagages} valise{m.bagages > 1 ? 's' : ''}
                     </li>
                     <li>
                       <Boite className="mx-auto mb-1 text-lg text-course-vif" />

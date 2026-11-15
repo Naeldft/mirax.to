@@ -2,7 +2,8 @@
  * ============================================================
  *  VELOCITÀ LOCATION — textes et données (entreprise fictive).
  * ============================================================
- *  Les modèles décrivent aussi la voiture 3D (silhouette, roues, couleurs).
+ *  Chaque modèle a sa vraie photo (photos/flotte-<id>.jpg) et sa version détourée pour l’accueil 3D
+ *  (public/scene/voiture-<id>-1400|720.webp).
  *  Numéro de téléphone : tranche 01 99 00 … réservée à la fiction.
  */
 
@@ -24,40 +25,34 @@ export const navigation = [
   { href: '#faq', label: 'FAQ' },
 ];
 
-export const couleurs = [
-  { id: 'rouge', nom: 'Rouge Velocità', hex: '#c8102e' },
-  { id: 'noir', nom: 'Noir Onyx', hex: '#16171a' },
-  { id: 'blanc', nom: 'Blanc Glacier', hex: '#e9ecef' },
-  { id: 'titane', nom: 'Gris Titane', hex: '#6b7078' },
-  { id: 'bleu', nom: 'Bleu Nuit', hex: '#1d3557' },
-];
-
 /**
- * Flotte. prix : par jour (TTC). profil : silhouette 3D (voir three/carGeometry.js).
+ * Flotte. prix : par jour (TTC). hauteurPhoto : hauteur (en mètres) de la photo détourée dans la scène 3D.
+ * Le nom suit la voiture réellement photographiée (« ou équivalent » : la catégorie est garantie, pas le modèle).
  */
 export const modeles = [
   {
     id: 'citadine',
-    photo: null, // à fournir : photos/flotte-citadine.jpg, puis mettre 'flotte-citadine'
+    photo: 'flotte-citadine', // photos/flotte-citadine.jpg
+    alt: 'Fiat 500 bleu ciel vue de profil',
     categorie: 'Citadine',
-    nom: 'Citadine Urbana',
+    nom: 'Fiat 500',
     exemple: 'ou équivalent',
     prix: 39,
     prixWeekend: 99,
     prixSemaine: 229,
-    places: 5,
-    bagages: 2,
+    places: 4,
+    bagages: 1,
     boite: 'Manuelle',
     energie: 'Essence',
     atouts: ['Facile à garer', '5,2 L / 100 km', 'Bluetooth & CarPlay'],
-    profil: 'citadine',
+    hauteurPhoto: 1.55,
   },
   {
     id: 'suv',
     photo: 'flotte-suv', // photos/flotte-suv.jpg
-    alt: 'SUV blanc garé au bord d’une route enneigée',
+    alt: 'Honda CR-V blanc vu de trois quarts avant',
     categorie: 'SUV',
-    nom: 'SUV Altura',
+    nom: 'Honda CR-V',
     exemple: 'ou équivalent',
     prix: 69,
     prixWeekend: 169,
@@ -67,40 +62,41 @@ export const modeles = [
     boite: 'Automatique',
     energie: 'Hybride',
     atouts: ['Position de conduite haute', 'Grand coffre', 'Aide au stationnement'],
-    profil: 'suv',
+    hauteurPhoto: 1.85,
   },
   {
-    id: 'utilitaire',
-    photo: null, // à fournir : photos/flotte-utilitaire.jpg, puis mettre 'flotte-utilitaire'
-    categorie: 'Utilitaire',
-    nom: 'Fourgon Cargo 12 m³',
+    id: 'fourgon',
+    photo: 'flotte-fourgon', // photos/flotte-fourgon.jpg
+    alt: 'Combi Volkswagen beige au toit relevable, vu de trois quarts avant',
+    categorie: 'Fourgon aménagé',
+    nom: 'Volkswagen Combi',
     exemple: 'ou équivalent',
-    prix: 59,
-    prixWeekend: 139,
-    prixSemaine: 329,
-    places: 3,
-    bagages: 12,
+    prix: 89,
+    prixWeekend: 219,
+    prixSemaine: 549,
+    places: 4,
+    bagages: 4,
     boite: 'Manuelle',
-    energie: 'Diesel',
-    atouts: ['12 m³ de chargement', 'Permis B', 'Diable et sangles offerts'],
-    profil: 'utilitaire',
+    energie: 'Essence',
+    atouts: ['Toit relevable, 4 couchages', 'Coin cuisine', 'Permis B'],
+    hauteurPhoto: 2.7,
   },
   {
     id: 'premium',
     photo: 'flotte-premium', // photos/flotte-premium.jpg
-    alt: 'Coupé noir sculpté par la lumière dans un studio sombre',
-    categorie: 'Premium',
-    nom: 'Coupé Gran Turismo',
+    alt: 'Mercedes-AMG GT gris mat vu de trois quarts avant',
+    categorie: 'Coupé',
+    nom: 'Mercedes-AMG GT',
     exemple: 'ou équivalent',
     prix: 119,
     prixWeekend: 289,
     prixSemaine: 690,
-    places: 4,
-    bagages: 2,
+    places: 2,
+    bagages: 1,
     boite: 'Automatique',
     energie: 'Essence',
     atouts: ['Sellerie cuir', 'Son haute fidélité', 'Le plaisir, tout simplement'],
-    profil: 'premium',
+    hauteurPhoto: 1.45,
   },
 ];
 
@@ -157,7 +153,7 @@ export const avis = [
     note: 5,
     texte: 'Réservé le matin, parti à midi. Voiture impeccable et presque neuve. Le prix affiché était le prix payé.',
   },
-  { nom: 'Amandine L.', note: 5, texte: 'Le fourgon pour mon déménagement : propre, diable fourni, accueil adorable. Je reviendrai.' },
+  { nom: 'Amandine L.', note: 5, texte: 'Le Combi pour une semaine sur la côte d’Opale : propre, bien équipé, accueil adorable. Je reviendrai.' },
   { nom: 'Rachid T.', note: 5, texte: 'Coupé loué pour notre anniversaire de mariage. Un vrai moment, et une équipe aux petits soins.' },
   {
     nom: 'Claire D.',
@@ -169,11 +165,11 @@ export const avis = [
 export const faq = [
   {
     q: 'Quel âge faut-il avoir pour louer ?',
-    a: '21 ans minimum et deux ans de permis. Pour la catégorie Premium : 25 ans et trois ans de permis.',
+    a: '21 ans minimum et deux ans de permis. Pour la catégorie Coupé : 25 ans et trois ans de permis.',
   },
   {
     q: 'Quelle caution est demandée ?',
-    a: 'Une empreinte de carte bancaire, non débitée : 800 € pour les citadines et utilitaires, 1 500 € pour les SUV et 2 500 € pour le Premium.',
+    a: 'Une empreinte de carte bancaire, non débitée : 800 € pour les citadines, 1 500 € pour les SUV et le fourgon aménagé, 2 500 € pour le coupé.',
   },
   {
     q: 'Le kilométrage est-il limité ?',

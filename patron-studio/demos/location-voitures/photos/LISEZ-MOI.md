@@ -1,22 +1,27 @@
 # Photos de Velocità Location
 
+Règle : uniquement de vraies photos qui montrent **exactement** ce que dit le texte (aucune image IA, aucun dessin,
+aucun rendu 3D). Le nom de chaque modèle suit la voiture réellement photographiée (« ou équivalent »).
+
 Pour changer une photo : déposez la vôtre dans ce dossier **avec le même nom**, puis relancez
 `./construire-dossier-ovh.sh` (versions WebP 800 et 1 600 px créées automatiquement).
-Tant qu’une photo de véhicule manque, la carte affiche la silhouette dessinée du modèle.
+Pensez aussi à changer le nom et les caractéristiques du modèle dans `src/data/site.js`.
 
-| Emplacement | Où | Description de la photo attendue |
+## Flotte
+
+| Fichier | Ce qu'elle montre | Photo d'origine (Unsplash) |
 |---|---|---|
-| `flotte-citadine` | Flotte | **À FOURNIR** : petite citadine (type 5 portes), vue de trois quarts avant, fond sombre ou parking, **logo et plaque masqués**. Puis mettre `photo: 'flotte-citadine'` dans `src/data/site.js` |
-| `flotte-suv` | Flotte | SUV vu de trois quarts, en extérieur (photo actuelle : SUV blanc, logo flouté, plaque masquée) |
-| `flotte-utilitaire` | Flotte | **À FOURNIR** : fourgon type 12 m³, vue de côté ou trois quarts, sans logo ni plaque lisible. Puis mettre `photo: 'flotte-utilitaire'` |
-| `flotte-premium` | Flotte | Coupé haut de gamme en studio sombre, lumière rasante (photo actuelle : coupé noir, aucun logo visible) |
+| flotte-citadine | Fiat 500 bleu ciel, de profil | https://images.unsplash.com/photo-1549317661-bd32c8ce0db2 |
+| flotte-suv | Honda CR-V blanc, trois quarts avant | https://images.unsplash.com/photo-1519641471654-76ce0107ad1b |
+| flotte-fourgon | Volkswagen Combi au toit relevable (fourgon aménagé) | https://images.unsplash.com/photo-1527786356703-4b100091cd2c |
+| flotte-premium | Mercedes-AMG GT gris mat (catégorie Coupé) ; aussi affichée à l'accueil sans 3D | https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8 |
 
-Conseil : photographiez les vrais véhicules de l’agence, plaques floutées, devant un fond uni et sombre pour
-garder l’ambiance « showroom » du site.
+## Accueil 3D (`public/scene/`)
 
-## Origine (Unsplash, licence libre, usage commercial autorisé)
+Les mêmes voitures, détourées (`voiture-<modèle>-1400|720.webp`), et une vraie photo d'habitacle
+(`habitacle-1800|1000.webp`, https://images.unsplash.com/photo-1610647752706-3bb12232b3ab) avec sa carte de profondeur
+(`habitacle-profondeur.png`). Pour changer une voiture de l'accueil : détourez la nouvelle photo (fond transparent, WebP)
+et gardez le même nom. Voir `IMAGES.md` à la racine pour le détail.
 
-| Fichier | Photo d'origine |
-|---|---|
-| flotte-suv | https://images.unsplash.com/photo-1519641471654-76ce0107ad1b (logo du constructeur flouté) |
-| flotte-premium | https://images.unsplash.com/photo-1485291571150-772bcfc10da5 |
+Pour un vrai client : photographiez les vrais véhicules de l'agence, plaques floutées.
+Licence Unsplash : usage commercial autorisé, sans attribution obligatoire.
