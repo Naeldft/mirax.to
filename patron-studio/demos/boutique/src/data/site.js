@@ -7,9 +7,9 @@
 
 export const boutique = {
   nom: 'Atelier Lin',
-  slogan: 'Le lin, tout simplement.',
-  accroche: 'Vêtements en lin · fabriqués en France',
-  intro: 'Des pièces simples et durables, en lin cultivé en Normandie, tissé dans le Nord et teint avec des pigments végétaux.',
+  slogan: 'L’essentiel, tout simplement.',
+  accroche: 'Prêt-à-porter en matières naturelles · Lille',
+  intro: 'Des pièces simples et durables, en matières naturelles, choisies et retouchées dans notre atelier lillois.',
   adresse: '9 rue des Tisserands, 59000 Lille',
   telephone: '01 99 00 84 84',
   telephoneLien: '+33199008484',
@@ -26,58 +26,119 @@ export const navigation = [
   { href: '#faq', label: 'FAQ' },
 ];
 
-export const coloris = [
-  { id: 'naturel', nom: 'Naturel', hex: '#d8ccb6' },
-  { id: 'sauge', nom: 'Sauge', hex: '#9aa58a' },
-  { id: 'terracotta', nom: 'Terracotta', hex: '#b8735a' },
-  { id: 'ciel', nom: 'Bleu ciel', hex: '#9fb6c8' },
-  { id: 'encre', nom: 'Encre', hex: '#2b2b2e' },
-];
-
-/** Produits. forme : silhouette dessinée (chemise, robe, pantalon, top, foulard, sac). */
+/**
+ * Produits. Chaque pièce a sa vraie photo (photos/<photo>.jpg) ; le nom, la couleur et la description suivent la photo.
+ * rayon : où elle est accrochée dans la boutique 3D de l'accueil ('hauts' à gauche, 'autres' à droite, 'table'),
+ *   avec sa photo détourée (public/scene/vetements/<photo>-1024|512.webp) ; hauteur : taille réelle (m) ;
+ *   crochet : où le cintre se trouve en haut de la photo (0 → 1). Les robes, photographiées portées, n'y sont pas.
+ */
 export const produits = [
   {
     id: 'chemise',
+    photo: 'chemise-ondine',
+    alt: 'Chemise en chambray bleu à petits cœurs blancs, manches 3/4, sur un cintre',
     nom: 'Chemise Ondine',
+    couleur: 'Chambray bleu',
     prix: 89,
-    forme: 'chemise',
-    coloris: ['naturel', 'ciel', 'encre'],
-    note: 'Coupe ample, manches retroussables',
+    note: 'Petits cœurs blancs, manches 3/4',
+    rayon: 'hauts',
+    hauteur: 0.66,
+    crochet: 0.53,
   },
   {
-    id: 'robe',
+    id: 'tshirt',
+    photo: 'tshirt-ecume',
+    alt: 'T-shirt blanc uni sur un cintre, contre un mur de béton',
+    nom: 'T-shirt Écume',
+    couleur: 'Blanc',
+    prix: 35,
+    note: 'Coton épais, coupe droite',
+    rayon: 'hauts',
+    hauteur: 0.74,
+    crochet: 0.55,
+  },
+  {
+    id: 'robe-brise',
+    photo: 'robe-brise',
+    alt: 'Robe midi en velours côtelé bordeaux, col officier boutonné, portée',
     nom: 'Robe Brise',
+    couleur: 'Bordeaux',
     prix: 129,
-    forme: 'robe',
-    coloris: ['terracotta', 'sauge', 'naturel'],
-    note: 'Longueur midi, poches cachées',
+    note: 'Velours côtelé, col officier, longueur midi',
   },
   {
-    id: 'pantalon',
-    nom: 'Pantalon Dune',
-    prix: 95,
-    forme: 'pantalon',
-    coloris: ['naturel', 'encre'],
-    note: 'Taille élastiquée, jambe large',
+    id: 'robe-sable',
+    photo: 'robe-sable',
+    alt: 'Robe longue corail à manches évasées, ceinture nouée, portée avec un chapeau de paille',
+    nom: 'Robe Sable',
+    couleur: 'Corail',
+    prix: 119,
+    note: 'Longue et fluide, manches évasées, ceinture nouée',
   },
-  { id: 'top', nom: 'Top Écume', prix: 59, forme: 'top', coloris: ['naturel', 'sauge', 'ciel'], note: 'Bretelles réglables' },
-  { id: 'foulard', nom: 'Foulard Alizé', prix: 39, forme: 'foulard', coloris: ['terracotta', 'ciel'], note: 'Bords effilochés à la main' },
-  { id: 'cabas', nom: 'Cabas Marché', prix: 45, forme: 'cabas', coloris: ['naturel', 'encre'], note: 'Lin épais, anses en cuir' },
+  {
+    id: 'combishort',
+    photo: 'combishort-dune',
+    alt: 'Combishort kaki à fines bretelles et ceinture à boucle ronde',
+    nom: 'Combishort Dune',
+    couleur: 'Kaki',
+    prix: 85,
+    note: 'Fines bretelles, ceinture à boucle',
+    rayon: 'autres',
+    hauteur: 0.86,
+    crochet: 0.5,
+  },
+  {
+    id: 'poncho',
+    photo: 'poncho-alize',
+    alt: 'Poncho en maille ajourée écrue à franges, sur un cintre en bois',
+    nom: 'Poncho Alizé',
+    couleur: 'Écru',
+    prix: 69,
+    note: 'Maille ajourée, franges',
+    unique: true,
+    rayon: 'autres',
+    hauteur: 0.86,
+    crochet: 0.47,
+  },
+  {
+    id: 'veste',
+    photo: 'veste-tisserand',
+    alt: 'Veste en denim brut, col en velours côtelé camel, sur un cintre',
+    nom: 'Veste Tisserand',
+    couleur: 'Denim brut',
+    prix: 139,
+    note: 'Col en velours côtelé camel',
+    rayon: 'autres',
+    hauteur: 0.74,
+    crochet: 0.47,
+  },
+  {
+    id: 'cabas',
+    photo: 'cabas-marche',
+    alt: 'Grand cabas couleur kraft à longues anses',
+    nom: 'Cabas Marché',
+    couleur: 'Kraft',
+    prix: 25,
+    note: 'Grand format, longues anses',
+    unique: true,
+    rayon: 'table',
+    hauteur: 0.56,
+  },
 ];
 
 export const tailles = ['XS', 'S', 'M', 'L', 'XL'];
 
 export const engagements = [
-  { valeur: 250, suffixe: ' km', label: 'entre le champ et l’atelier' },
-  { valeur: 100, suffixe: ' %', label: 'de lin cultivé en France' },
+  { valeur: 8, suffixe: '', label: 'pièces, choisies une à une' },
+  { valeur: 100, suffixe: ' %', label: 'de fibres naturelles' },
   { valeur: 0, suffixe: ' g', label: 'de plastique dans nos colis' },
 ];
 
 export const etapes = [
-  { titre: 'Le champ', texte: 'Le lin pousse en Normandie, sans irrigation, en cent jours.' },
-  { titre: 'Le tissage', texte: 'Il est filé et tissé dans le Nord, à moins de 100 km de Lille.' },
-  { titre: 'La teinture', texte: 'Des pigments végétaux : garance, indigo, réséda.' },
-  { titre: 'La couture', texte: 'Chaque pièce est coupée et cousue dans notre atelier lillois.' },
+  { titre: 'Les matières', texte: 'Coton, denim, velours, maille : des fibres naturelles, choisies pour durer.' },
+  { titre: 'La sélection', texte: 'Peu de pièces, mais de belles coupes, essayées et portées avant d’entrer en boutique.' },
+  { titre: 'Les retouches', texte: 'Ourlets et ajustements faits sur place, dans notre atelier lillois.' },
+  { titre: 'L’entretien', texte: 'Chaque pièce part avec ses conseils de lavage, pour la garder longtemps.' },
 ];
 
 export const livraison = [
@@ -87,23 +148,23 @@ export const livraison = [
 ];
 
 export const avis = [
-  { nom: 'Pauline', texte: 'La chemise Ondine est devenue ma pièce préférée. Elle s’adoucit à chaque lavage.' },
-  { nom: 'Bastien', texte: 'Enfin un pantalon en lin qui tombe bien. Colis soigné, livré en deux jours.' },
-  { nom: 'Léonie', texte: 'La robe Brise en terracotta : on me demande où je l’ai trouvée à chaque fois.' },
+  { nom: 'Pauline', texte: 'La chemise Ondine est devenue ma pièce préférée. Le chambray s’adoucit à chaque lavage.' },
+  { nom: 'Bastien', texte: 'La veste Tisserand tombe parfaitement. Colis soigné, livré en deux jours.' },
+  { nom: 'Léonie', texte: 'La robe Brise en velours bordeaux : on me demande où je l’ai trouvée à chaque fois.' },
 ];
 
 export const faq = [
   {
-    q: 'Comment laver le lin ?',
-    a: 'À 30 °C, sur l’envers, sans adoucissant. Séchez à plat : le lin se froisse naturellement, c’est ce qui fait son charme.',
+    q: 'Comment laver mes vêtements ?',
+    a: 'À 30 °C, sur l’envers, sans adoucissant. Séchez à plat : les fibres naturelles durent plus longtemps.',
   },
   {
     q: 'Comment choisir ma taille ?',
     a: 'Nos coupes sont amples. Si vous hésitez entre deux tailles, prenez la plus petite. Le guide des tailles est sur chaque fiche.',
   },
   {
-    q: 'Le lin rétrécit-il ?',
-    a: 'Nos tissus sont prélavés : le rétrécissement est inférieur à 2 %, à condition de respecter le lavage à 30 °C.',
+    q: 'Mes vêtements vont-ils rétrécir ?',
+    a: 'Nos pièces sont prélavées : le rétrécissement reste inférieur à 2 %, à condition de respecter le lavage à 30 °C.',
   },
   { q: 'Puis-je essayer en boutique ?', a: 'Bien sûr, du mardi au samedi, 10 h – 19 h, au 9 rue des Tisserands à Lille.' },
 ];

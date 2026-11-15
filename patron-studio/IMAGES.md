@@ -146,6 +146,27 @@ Matières, meubles et lumière : **Poly Haven, licence CC0** (mêmes fichiers qu
 
 Construits en code : murs, comptoir, four à sole, fenêtre et rayon de soleil, planches, farine en suspension.
 
+### Atelier Lin (boutique)
+
+Détail complet des photos : `demos/boutique/photos/LISEZ-MOI.md`.
+- Intro : vraie scène 3D construite en code (`src/three/Boutique3D.jsx`) : devanture peinte, vitrine, porte vitrée et
+  enseigne, puis l'intérieur (murs clairs, parquet, portants en bois). Les vêtements sont de vraies photos détourées,
+  suspendues à des crochets 3D : rayon « chemises & hauts » à gauche, « autres styles » à droite, cabas sur la table.
+- Collection : 8 pièces, toutes avec une vraie photo (les silhouettes dessinées et le choix de coloris sont supprimés :
+  une photo ne se recolore pas). Les robes, photographiées portées, ne sont pas dans la boutique 3D.
+
+Matières, meubles et lumière : **Poly Haven, licence CC0** (mêmes fichiers que Bâti Nord), dans `demos/boutique/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Parquet | `textures/wood_floor-*` | https://polyhaven.com/a/wood_floor |
+| Relief des murs (couleur unie) | `textures/white_plaster_02-*` | https://polyhaven.com/a/white_plaster_02 |
+| Trottoir | `textures/concrete_floor_02-*` | https://polyhaven.com/a/concrete_floor_02 |
+| Plantes | `modeles/potted_plant_04.glb` | https://polyhaven.com/a/potted_plant_04 |
+| Reflets (photo 360°) | `maison-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/small_empty_house |
+
+Construits en code : devanture, porte, vitrine, enseigne, murs, portants, crochets, table, spots.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

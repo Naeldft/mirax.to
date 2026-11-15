@@ -3,18 +3,18 @@ import DemoFooter from '@demos/shared/components/DemoFooter.jsx';
 import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
 import Header, { Logo } from './components/Header';
-import { Atelier, Boutique, Collection, FaqSection, Hero, Livraison, Panier } from './components/Sections';
+import Hero from './components/Hero';
+import { Atelier, Boutique, Collection, FaqSection, Livraison, Panier } from './components/Sections';
 import { boutique, navigation } from './data/site';
 
 export default function App() {
   const [ready, setReady] = useState(false);
-  const [couleur, setCouleur] = useState('naturel');
   const [items, setItems] = useState([]);
   const [panierOuvert, setPanierOuvert] = useState(false);
   useScrollRefresh();
 
   const ajouter = useCallback((p) => {
-    const key = `${p.id}-${p.coloris}-${p.taille}`;
+    const key = `${p.id}-${p.taille}`;
     setItems((list) => {
       const deja = list.find((it) => it.key === key);
       if (deja) return list.map((it) => (it.key === key ? { ...it, qte: it.qte + 1 } : it));
@@ -42,7 +42,7 @@ export default function App() {
       />
       <Header count={nb} onCart={() => setPanierOuvert(true)} />
       <main>
-        <Hero onReady={() => setReady(true)} couleur={couleur} setCouleur={setCouleur} />
+        <Hero onReady={() => setReady(true)} />
         <Collection onAdd={ajouter} />
         <Atelier />
         <Livraison />

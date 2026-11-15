@@ -1,17 +1,14 @@
-import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
+import Photo from '@demos/shared/components/Photo.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { emailOk, formatEuros, telOk } from '@demos/shared/lib/validation.js';
-import { avis, boutique, coloris, engagements, etapes, faq, livraison, produits, tailles } from '../data/site';
+import { avis, boutique, engagements, etapes, faq, livraison, produits, tailles } from '../data/site';
 
-const ClothScene = lazy(() => import('../three/ClothScene'));
-const hexDe = (id) => coloris.find((c) => c.id === id)?.hex ?? '#d8ccb6';
-const nomDe = (id) => coloris.find((c) => c.id === id)?.nom ?? id;
 
 /** Bouton dont le libellé glisse au survol. */
 export function Btn(allProps) {
@@ -42,127 +39,10 @@ function Titre({ tag, children, intro, id, centre }) {
 }
 
 /** Pastilles de couleur (boutons radio accessibles). */
-function Swatches({ ids, value, onChange, name, size = 'h-8 w-8' }) {
-  return (
-    <div role="radiogroup" aria-label={name} className="flex flex-wrap gap-2.5">
-      {ids.map((id) => (
-        <button
-          key={id}
-          type="button"
-          role="radio"
-          aria-checked={value === id}
-          aria-label={nomDe(id)}
-          title={nomDe(id)}
-          onClick={() => onChange(id)}
-          className={`${size} rounded-full ring-offset-2 ring-offset-ivoire transition-transform hover:scale-110 ${value === id ? 'ring-1 ring-encre' : 'ring-1 ring-black/10'}`}
-          style={{ background: hexDe(id) }}
-        />
-      ))}
-    </div>
-  );
-}
-
 /* ---------------------------------------------------------------- */
-
-export function Hero({ onReady, couleur, setCouleur }) {
-  const section = useRef(null);
-  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady });
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      gsap.from('[data-ligne]', { yPercent: 110, duration: 1.3, stagger: 0.12, ease: 'expo.out', delay: 0.3 });
-      gsap.from('[data-in]', { opacity: 0, y: 16, stagger: 0.1, duration: 0.9, delay: 0.9, ease: 'power2.out' });
-      // au défilement, le texte s'efface doucement pendant que la chemise pivote
-      gsap.to('[data-fond]', {
-        y: -40,
-        ease: 'none',
-        scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom bottom', scrub: true },
-      });
-    }, section);
-    return () => ctx.revert();
-  }, [reduced]);
-  return (
-    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[190svh]'}`} aria-label="Accueil">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[radial-gradient(ellipse_60%_55%_at_70%_40%,#fbfaf7,transparent_75%)]">
-        {load3d && (
-          <Suspense fallback={null}>
-            <ClothScene color={hexDe(couleur)} progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] bg-gradient-to-t from-ivoire via-ivoire/85 to-transparent md:hidden" />
-        <div
-          data-fond
-          className="pointer-events-none relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-8 md:justify-center md:px-8 md:pb-0"
-        >
-          <p data-in className="etiquette">
-            {boutique.accroche}
-          </p>
-          <h1 className="mt-4 text-[clamp(3.3rem,12vw,7rem)] leading-[0.95]">
-            <span className="block overflow-hidden pb-1">
-              <span data-ligne className="block">
-                Le lin,
-              </span>
-            </span>
-            <span className="block overflow-hidden pb-1">
-              <span data-ligne className="block italic text-gris">
-                tout simplement.
-              </span>
-            </span>
-          </h1>
-          <p data-in className="mt-5 max-w-md leading-relaxed text-gris max-md:hidden">
-            {boutique.intro}
-          </p>
-          <div data-in className="pointer-events-auto mt-6 flex items-center gap-4">
-            <Swatches ids={coloris.map((c) => c.id)} value={couleur} onChange={setCouleur} name="Couleur de la chemise" />
-            <p className="text-sm text-gris" aria-live="polite">
-              {nomDe(couleur)}
-            </p>
-          </div>
-          <div data-in className="pointer-events-auto mt-6 flex flex-wrap gap-3">
-            <Btn href="#collection">Voir la collection</Btn>
-            <Btn href="#atelier" variant="ligne" className="max-sm:hidden">
-              Notre atelier
-            </Btn>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------------------------------------------------------- */
-
-/** Silhouettes de vêtements dessinées (une par forme), teintées par le coloris choisi. */
-const FORMES = {
-  chemise: 'M38 10 Q50 20 62 10 L80 16 L98 46 L84 54 L76 38 L77 108 Q50 103 23 108 L24 38 L16 54 L2 46 L20 16 Z',
-  robe: 'M36 8 L44 8 Q50 16 56 8 L64 8 L66 30 L72 44 L92 110 Q50 116 8 110 L28 44 L34 30 Z',
-  pantalon: 'M24 8 L76 8 L80 30 L86 110 L60 110 L52 40 L48 40 L40 110 L14 110 L20 30 Z',
-  top: 'M34 14 L38 14 L42 28 Q50 32 58 28 L62 14 L66 14 L70 36 L74 92 Q50 96 26 92 L30 36 Z',
-  foulard: 'M14 20 L86 14 L80 34 L84 52 L64 50 L70 108 L58 100 L50 108 L46 52 L16 50 L20 34 Z',
-  cabas: 'M18 40 L82 40 L88 108 L12 108 Z M34 40 Q34 12 50 12 Q66 12 66 40',
-};
-
-function Silhouette({ forme, hex }) {
-  const d = FORMES[forme];
-  const [corps, anse] = forme === 'cabas' ? d.split(' M') : [d];
-  return (
-    <svg viewBox="0 0 100 120" className="h-full w-full" aria-hidden="true">
-      <defs>
-        <pattern id={`trame-${forme}`} width="3" height="3" patternUnits="userSpaceOnUse">
-          <path d="M0 0h3M0 0v3" stroke="rgba(0,0,0,0.07)" strokeWidth="0.6" />
-        </pattern>
-      </defs>
-      {anse && <path d={`M${anse}`} fill="none" stroke="#7a5536" strokeWidth="3" />}
-      <path d={corps} fill={hex} style={{ transition: 'fill 0.5s' }} />
-      <path d={corps} fill={`url(#trame-${forme})`} />
-      <path d={corps} fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="0.6" />
-    </svg>
-  );
-}
 
 function Produit({ p, onAdd }) {
-  const [col, setCol] = useState(p.coloris[0]);
-  const [taille, setTaille] = useState(p.forme === 'foulard' || p.forme === 'cabas' ? 'TU' : '');
+  const [taille, setTaille] = useState(p.unique ? 'TU' : '');
   const [erreur, setErreur] = useState(false);
   const [ajoute, setAjoute] = useState(false);
   const img = useRef(null);
@@ -173,7 +53,7 @@ function Produit({ p, onAdd }) {
       setErreur(true);
       return;
     }
-    onAdd({ id: p.id, nom: p.nom, prix: p.prix, forme: p.forme, coloris: col, taille });
+    onAdd({ id: p.id, nom: p.nom, prix: p.prix, photo: p.photo, couleur: p.couleur, taille });
     setAjoute(true);
     setTimeout(() => setAjoute(false), 1600);
     if (!reduced && img.current) gsap.fromTo(img.current, { scale: 0.94 }, { scale: 1, duration: 0.6, ease: 'elastic.out(1, 0.5)' });
@@ -182,19 +62,23 @@ function Produit({ p, onAdd }) {
     <li data-reveal className="min-w-0">
       <article className="group flex h-full flex-col">
         <div className="relative aspect-[4/5] overflow-hidden bg-blanc">
-          <div ref={img} className="absolute inset-[12%] transition-transform duration-700 group-hover:scale-105 group-hover:-rotate-2">
-            <Silhouette forme={p.forme} hex={hexDe(col)} />
+          <div ref={img} className="absolute inset-0">
+            <Photo
+              nom={p.photo}
+              alt={p.alt}
+              sizes="(min-width: 1024px) 31vw, (min-width: 640px) 47vw, 100vw"
+              width="800"
+              height="1000"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
           </div>
-          <p className="absolute left-4 top-4 text-xs tracking-[0.2em] text-gris uppercase">{nomDe(col)}</p>
+          <p className="absolute left-4 top-4 bg-ivoire/85 px-2 py-1 text-xs uppercase tracking-[0.2em] text-encre">{p.couleur}</p>
         </div>
         <div className="mt-4 flex items-baseline justify-between gap-3">
           <h3 className="text-2xl">{p.nom}</h3>
           <p className="shrink-0 tabular-nums">{formatEuros(p.prix)}</p>
         </div>
         <p className="mt-1 text-sm text-gris">{p.note}</p>
-        <div className="mt-4">
-          <Swatches ids={p.coloris} value={col} onChange={setCol} name={`Coloris de ${p.nom}`} size="h-7 w-7" />
-        </div>
         {!unique && (
           <fieldset className="mt-4">
             <legend className="sr-only">Taille de {p.nom}</legend>
@@ -243,7 +127,7 @@ export function Collection({ onAdd }) {
           <Titre
             tag="Collection été"
             id="col-titre"
-            intro="Six pièces, cinq teintes végétales. Choisissez votre coloris, votre taille, c’est dans le panier."
+            intro="Huit pièces en matières naturelles. Choisissez votre taille, c’est dans le panier."
           >
             Les essentiels
           </Titre>
@@ -292,16 +176,16 @@ export function Atelier() {
         aria-hidden="true"
         className="pointer-events-none absolute -right-8 top-24 select-none font-display text-[14rem] leading-none text-sable/30 md:text-[22rem]"
       >
-        Lin
+        Atelier
       </p>
       <div className="relative mx-auto grid max-w-7xl gap-14 lg:grid-cols-2">
         <div>
           <Titre
             tag="L’atelier"
             id="atelier-titre"
-            intro="Du champ normand à notre atelier lillois, chaque étape se fait en France, à moins de 250 km."
+            intro="De la sélection des matières aux retouches, tout se fait dans notre atelier lillois."
           >
-            Du champ à la couture
+            Choisir, ajuster, durer
           </Titre>
           <ul className="mt-12 grid grid-cols-3 gap-4">
             {engagements.map((e) => (
@@ -371,7 +255,7 @@ export function FaqSection() {
     <section id="faq" ref={scope} className="section bg-ivoire" aria-labelledby="faq-titre">
       <div className="mx-auto max-w-3xl">
         <Titre tag="Questions fréquentes" id="faq-titre" centre>
-          Prendre soin du lin
+          Prendre soin de vos vêtements
         </Titre>
         <div className="mt-12 border-t border-lin">
           <Faq
@@ -551,8 +435,8 @@ export function Panier({ open, onClose, items, setQty, clear }) {
                 <ul className="divide-y divide-lin">
                   {items.map((it) => (
                     <li key={it.key} className="flex gap-4 py-4">
-                      <div className="h-24 w-20 shrink-0 bg-blanc p-2">
-                        <Silhouette forme={it.forme} hex={hexDe(it.coloris)} />
+                      <div className="h-24 w-20 shrink-0 overflow-hidden bg-blanc">
+                        <Photo nom={it.photo} alt="" sizes="64px" width="64" height="80" className="h-full w-full object-cover" />
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col">
                         <div className="flex justify-between gap-2">
@@ -560,7 +444,7 @@ export function Panier({ open, onClose, items, setQty, clear }) {
                           <p className="tabular-nums">{formatEuros(it.prix * it.qte)}</p>
                         </div>
                         <p className="text-sm text-gris">
-                          {nomDe(it.coloris)} · {it.taille === 'TU' ? 'Taille unique' : `Taille ${it.taille}`}
+                          {it.couleur} · {it.taille === 'TU' ? 'Taille unique' : `Taille ${it.taille}`}
                         </p>
                         <div className="mt-auto flex items-center gap-1 pt-2">
                           <button
