@@ -9,17 +9,14 @@ import { clientes, looks, salon } from '../data/site';
 // La scène 3D (three.js) est chargée à part, après l'affichage du texte.
 const Salon3D = lazy(() => import('../three/Salon3D'));
 
-// mêmes repères que la scène (three/Salon3D.jsx, ARRETS)
-const ARRETS = [
-  [0.25, 0.39],
-  [0.47, 0.61],
-  [0.69, 0.83],
-];
+// mêmes repères que la scène (three/Salon3D.jsx, ARRETS) : un arrêt par client
+const ARRETS = clientes.map((_, i) => [0.2 + i * 0.17, 0.2 + i * 0.17 + 0.11]);
 const FIN = [0.9, 0.97];
 
 /**
  * Accueil Atelier Mèche : un vrai salon en 3D. On passe la porte, la caméra avance dans le salon et s'arrête
- * derrière chaque cliente (vraie photo détourée, vue de dos, assise dans son fauteuil), à droite puis à gauche ;
+ * près de chaque client (mannequin à la coupe sculptée, assis dans son fauteuil), à droite puis à gauche, en tournant
+ * un peu autour ;
  * le nom de la prestation, le prix et « Réserver » s'affichent à côté. Fondu vers les prestations.
  * Sans 3D ou avec « réduire les animations » : une vraie photo et les mêmes informations en liste.
  */
@@ -115,10 +112,8 @@ export default function Hero({ onReady }) {
     </div>
   );
 
-  const photoLook = (nom) => looks.find((l) => l.titre === nom);
-
   if (!avec3d) {
-    const p0 = photoLook(clientes[0].look);
+    const p0 = looks[0];
     return (
       <section id="accueil" ref={section} aria-label="Accueil : Atelier Mèche, salon de coiffure" className="bg-encre">
         <div className="relative flex min-h-[100svh] items-end overflow-hidden md:items-center">
@@ -126,7 +121,7 @@ export default function Hero({ onReady }) {
           <div className="absolute inset-0 bg-gradient-to-t from-encre via-encre/60 to-transparent md:bg-gradient-to-r" />
           <div className="relative z-10">{Intro}</div>
         </div>
-        <ul className="mx-auto grid max-w-6xl gap-6 bg-creme px-5 py-14 md:grid-cols-3 md:px-12">
+        <ul className="mx-auto grid max-w-6xl gap-6 bg-creme px-5 py-14 md:grid-cols-4 md:px-12">
           {clientes.map((c) => (
             <li key={c.look}>
               <p className="numero text-lg">{c.look}</p>
@@ -140,7 +135,7 @@ export default function Hero({ onReady }) {
   }
 
   return (
-    <section id="accueil" ref={section} aria-label="Accueil : Atelier Mèche, salon de coiffure" className="relative bg-encre" style={{ height: '620svh' }}>
+    <section id="accueil" ref={section} aria-label="Accueil : Atelier Mèche, salon de coiffure" className="relative bg-encre" style={{ height: '720svh' }}>
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         <div className={`absolute inset-0 bg-encre transition-opacity duration-700 ${pret3d ? 'opacity-0' : 'opacity-100'}`} />
         {charger3d && (
@@ -158,7 +153,6 @@ export default function Hero({ onReady }) {
         </div>
         {/* devant chaque cliente : la prestation, le prix, « Réserver » */}
         {clientes.map((c, i) => {
-          const l = photoLook(c.look);
           return (
             <div
               key={c.look}
@@ -169,10 +163,10 @@ export default function Hero({ onReady }) {
             >
               <div className="rounded-3xl bg-creme/92 p-5 text-encre shadow-[0_20px_50px_-25px_rgb(0_0_0/0.5)] backdrop-blur md:p-7">
                 <p className="numero text-lg">
-                  {['i.', 'ii.', 'iii.'][i]} {c.look}
+                  {['i.', 'ii.', 'iii.', 'iv.'][i]} {c.look}
                 </p>
                 <h2 className="mt-1 text-[clamp(1.7rem,6vw,2.6rem)] leading-[1]">{c.prestation}</h2>
-                {l?.texte && <p className="mt-2 hidden text-taupe md:block">{l.texte}</p>}
+                <p className="mt-2 hidden text-taupe md:block">{c.texte}</p>
                 <div className="mt-4 flex items-center justify-between gap-4">
                   <span className="font-display text-3xl">{c.prix} €</span>
                   <a href="#reserver" className="btn btn-encre !min-h-11 !py-2" tabIndex={arret === i ? 0 : -1}>

@@ -2,14 +2,15 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import Mannequin, { TETE_Y } from './Mannequin';
 
 /* ------------------------------------------------------------------
    Intro 3D d'Atelier Mèche (pilotée par le défilement, progres 0 → 1).
    Un vrai salon : porte d'entrée vitrée, parquet en point de Hongrie, murs poudre, miroirs à cadre laiton,
    consoles en marbre, suspensions. Les fauteuils sont un vrai modèle 3D scanné (Poly Haven, CC0).
-   Les clientes sont de VRAIES photos détourées, vues de dos, assises dans les fauteuils ; les miroirs
-   reflètent le salon. La caméra s'arrête derrière chaque cliente, à droite puis à gauche.
-   Plan B (prévu par la démo) : une place sans cliente montre la vraie photo de la coupe dans le miroir.
+   Les clients sont des mannequins construits en code (three/Mannequin.jsx), chacun avec la coupe sculptée de sa
+   prestation ; les miroirs reflètent le salon. La caméra s'arrête près de chaque client, à droite puis à gauche,
+   et tourne un peu autour pour montrer le volume de la coupe.
 ------------------------------------------------------------------- */
 
 const BASE = import.meta.env.BASE_URL;
@@ -25,9 +26,10 @@ const POUDRE = '#efd8cf';
 
 /** Les postes de coiffure : côté (1 droite, -1 gauche) et position le long du salon. */
 export const POSTES = [
-  { cote: 1, z: -2.9 },
-  { cote: -1, z: -5.2 },
-  { cote: 1, z: -7.5 },
+  { cote: 1, z: -2.5 },
+  { cote: -1, z: -4.3 },
+  { cote: 1, z: -6.1 },
+  { cote: -1, z: -7.9 },
 ];
 const MIROIR = { l: 1.0, h: 1.35, y: 1.6 };
 const FAUTEUIL_DU_MUR = 1.05;
@@ -173,7 +175,7 @@ function Salle({ taille }) {
 }
 
 /** Poste de coiffure : miroir (reflet du salon), console en marbre, fauteuil ; la cliente, ou la photo au miroir. */
-function Poste({ poste, envMiroir, marbre, laiton, cliente, texPhoto }) {
+function Poste({ poste, envMiroir, marbre, laiton, client }) {
   const { cote, z } = poste;
   const xMur = cote * L;
   const rot = -cote * (Math.PI / 2); // face à l'allée
@@ -196,13 +198,6 @@ function Poste({ poste, envMiroir, marbre, laiton, cliente, texPhoto }) {
           <planeGeometry args={[0.12, 1.5]} />
           <meshBasicMaterial color="#ffffff" transparent opacity={0.07} depthWrite={false} />
         </mesh>
-        {/* plan B : la vraie photo de la coupe, comme un écran discret dans le miroir */}
-        {texPhoto && (
-          <mesh position={[0, 0.08, 0.016]} userData={{ miroir: true }}>
-            <planeGeometry args={[MIROIR.l * 0.74, (MIROIR.l * 0.74 * texPhoto.image.height) / texPhoto.image.width]} />
-            <meshBasicMaterial map={texPhoto} toneMapped={false} />
-          </mesh>
-        )}
       </group>
       {/* console en marbre sous le miroir */}
       <group position={[xMur - cote * 0.2, 0.86, z]} rotation-y={rot}>
@@ -214,12 +209,21 @@ function Poste({ poste, envMiroir, marbre, laiton, cliente, texPhoto }) {
         </mesh>
       </group>
       {/* le fauteuil, tourné vers le miroir */}
-      <primitive object={fauteuil} position={[xFauteuil, 0, z]} rotation-y={cote * (Math.PI / 2)} />
+      <group position={[xFauteuil, 0, z]} rotation-y={cote * (Math.PI / 2)}>
+        <primitive object={fauteuil} />
+        {/* lumière du poste : douce, côté miroir, elle modèle le visage */}
+        <pointLight position={[0.75, 1.85, 0.35]} color="#ffe2c4" intensity={0.8} distance={2.4} decay={1.6} />
+        {/* le client, assis, tourné vers le miroir */}
+        {client && (
+          <group position={[0, 0.0, -0.13]}>
+            <Mannequin coupe={client.coupe} cheveux={client.cheveux} homme={client.homme} />
+          </group>
+        )}
+      </group>
       <mesh rotation-x={-Math.PI / 2} position={[xFauteuil, 0.006, z]}>
         <planeGeometry args={[1.3, 1.3]} />
         <meshBasicMaterial map={ombre()} transparent depthWrite={false} />
       </mesh>
-      {cliente}
       <Etagere x={-xMur} z={z} cote={-cote} laiton={laiton} />
     </group>
   );
@@ -255,31 +259,6 @@ function Plante(props) {
 }
 
 /**
- * La cliente : vraie photo détourée, vue de dos, assise dans le fauteuil (face au miroir).
- * Éclairée par la lumière de la scène (MeshStandard), bas fondu dans le dossier, ombre portée au sol.
- */
-function Cliente({ poste, tex, reglage }) {
-  const { cote, z } = poste;
-  const x = cote * (L - FAUTEUIL_DU_MUR) - cote * reglage.recul;
-  const h = reglage.hauteur;
-  const l = (h * tex.image.width) / tex.image.height;
-  const ref = useRef();
-  useFrame(() => {
-    // une très légère respiration
-    if (ref.current) ref.current.position.y = reglage.y + h / 2 + Math.sin(horloge.maintenant() * 1.3 + z) * 0.002;
-  });
-  return (
-    // tournée vers la caméra de l'arrêt (vue de trois quarts arrière) : la photo reste de face
-    <group position={[x, 0, z]} rotation-y={-cote * (Math.PI / 2) + cote * 0.5}>
-      <mesh ref={ref} position={[reglage.dx ?? 0, reglage.y + h / 2, 0]} renderOrder={3} castShadow={false}>
-        <planeGeometry args={[l, h]} />
-        <meshStandardMaterial map={tex} transparent alphaTest={0.02} roughness={0.85} envMapIntensity={0.25} color="#fff1e6" />
-      </mesh>
-    </group>
-  );
-}
-
-/**
  * Le reflet de chaque miroir : le salon (fauteuils, clientes, étagères d'en face) photographié à 360° devant ce
  * miroir, quelques images après le chargement, sans les miroirs eux-mêmes. Calculé une fois : léger sur téléphone.
  */
@@ -301,75 +280,66 @@ function Reflet({ cible, poste }) {
   return null;
 }
 
-/* ---------- caméra : [progression, position, point visé] ---------- */
-function vueDerriere(poste, portrait) {
-  const { cote, z } = poste;
-  const xF = cote * (L - FAUTEUIL_DU_MUR);
-  // derrière la cliente, légèrement de biais (vers l'entrée), le miroir au fond
-  const recul = portrait ? 2.2 : 1.85;
-  const pos = [xF - cote * recul, 1.78, z + 1.15];
-  const cible = [xF + cote * 0.3, portrait ? 1.05 : 1.38, z - 0.1];
-  if (!portrait) {
-    // ordinateur : le sujet passe à droite de l'écran (le texte est à gauche)
-    const dx = cible[0] - pos[0];
-    const dz = cible[2] - pos[2];
-    const n = Math.hypot(dx, dz);
-    cible[0] += (dz / n) * 0.5;
-    cible[2] -= (dx / n) * 0.5;
-  }
-  return [pos, cible];
-}
-
-function trajet(portrait) {
-  const v = POSTES.map((p) => vueDerriere(p, portrait));
-  return [
-    [0.0, [0, 1.6, 6.2], [0, 1.6, 0]],
-    [0.04, [0, 1.6, 5.6], [0, 1.6, 0]],
-    [0.13, [0, 1.6, 0.9], [0, 1.5, -6]],
-    [0.17, [0, 1.6, 0.2], [0.5, 1.4, -4]],
-    [0.27, ...v[0]],
-    [0.37, ...v[0]],
-    [0.49, ...v[1]],
-    [0.59, ...v[1]],
-    [0.71, ...v[2]],
-    [0.81, ...v[2]],
-    [0.92, [0, 1.6, -5.6], [0, 1.5, FOND]],
-    [1.0, [0, 1.6, -6.2], [0, 1.5, FOND]],
-  ];
-}
-export const ARRETS = [
-  [0.25, 0.39],
-  [0.47, 0.61],
-  [0.69, 0.83],
+/* ---------- caméra : elle avance dans l'allée, puis tourne un peu autour de chaque client ---------- */
+export const ARRETS = POSTES.map((_, i) => [0.2 + i * 0.17, 0.2 + i * 0.17 + 0.11]);
+const ENTREE = [
+  [0.0, [0, 1.6, 6.2], [0, 1.6, 0]],
+  [0.04, [0, 1.6, 5.6], [0, 1.6, 0]],
+  [0.12, [0, 1.6, 0.9], [0, 1.5, -6]],
+  [0.15, [0, 1.6, 0.2], [0.5, 1.4, -4]],
 ];
+const SORTIE = [
+  [0.92, [0, 1.6, -5.4], [0, 1.5, FOND]],
+  [1.0, [0, 1.6, -6.0], [0, 1.5, FOND]],
+];
+
+/** Vue autour du client i, à l'angle a (0 : de dos, depuis l'allée ; π/2 : de profil, côté entrée ; au-delà : trois quarts face). */
+function vueAutour(i, a, portrait, pos, cible) {
+  const { cote, z } = POSTES[i];
+  const hx = cote * (L - FAUTEUIL_DU_MUR) + cote * 0.05;
+  const r = portrait ? 1.25 : 1.05;
+  pos.set(hx - cote * Math.cos(a) * r, 1.62, z + Math.sin(a) * r);
+  cible.set(hx, TETE_Y - (portrait ? 0.22 : 0.08), z);
+  if (!portrait) {
+    // ordinateur : le client à droite de l'écran (le texte est à gauche)
+    const dx = cible.x - pos.x;
+    const dz = cible.z - pos.z;
+    const n = Math.hypot(dx, dz);
+    cible.x += (dz / n) * 0.42;
+    cible.z -= (dx / n) * 0.42;
+  }
+}
 
 function Camera({ progres, refPorte }) {
   const { camera, size } = useThree();
-  const a = useMemo(() => new THREE.Vector3(), []);
-  const b = useMemo(() => new THREE.Vector3(), []);
-  const c = useMemo(() => new THREE.Vector3(), []);
+  const p0 = useMemo(() => new THREE.Vector3(), []);
+  const c0 = useMemo(() => new THREE.Vector3(), []);
+  const p1 = useMemo(() => new THREE.Vector3(), []);
+  const c1 = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
     const portrait = size.width / size.height < 1;
-    const T = trajet(portrait);
     if (progres.lisse === undefined) progres.lisse = progres.current;
     progres.lisse += (progres.current - progres.lisse) * 0.08;
     const p = progres.lisse;
+    // la suite des « poses » : entrée, puis pour chaque client une arrivée et un départ (en tournant), puis la sortie
+    const poses = [...ENTREE.map(([t, a, b]) => [t, (pp, cc) => (pp.set(...a), cc.set(...b))])];
+    ARRETS.forEach(([ta, tb], i) => {
+      poses.push([ta, (pp, cc) => vueAutour(i, 1.25, portrait, pp, cc)]);
+      poses.push([tb, (pp, cc) => vueAutour(i, 2.25, portrait, pp, cc)]);
+    });
+    SORTIE.forEach(([t, a, b]) => poses.push([t, (pp, cc) => (pp.set(...a), cc.set(...b))]));
     let i = 1;
-    while (i < T.length - 1 && p > T[i][0]) i++;
-    const [t0, p0, c0] = T[i - 1];
-    const [t1, p1, c1] = T[i];
-    const k = doux((p - t0) / (t1 - t0));
-    a.set(...p0).lerp(b.set(...p1), k);
-    c.set(...c0).lerp(b.set(...c1), k);
-    // dehors, sur ordinateur : la façade à droite du titre
-    const dehors = portrait ? 0 : 1 - doux(p / 0.1);
-    a.x -= 1.5 * dehors;
-    c.x -= 1.5 * dehors;
-    // une légère rotation pendant l'arrêt derrière chaque cliente (relief des photos)
-    a.x += Math.sin(p * 40) * 0.06 * (1 - dehors);
-    camera.position.copy(a);
-    camera.lookAt(c);
-    camera.fov = portrait ? 64 : 50;
+    while (i < poses.length - 1 && p > poses[i][0]) i++;
+    const [t0, f0] = poses[i - 1];
+    const [t1, f1] = poses[i];
+    const r = (p - t0) / (t1 - t0);
+    // pendant l'arrêt (tour lent autour du client) : mouvement régulier ; entre deux clients : départ et arrivée en douceur
+    const k = i % 2 === 0 && i > 4 && i < poses.length - 2 ? Math.min(1, Math.max(0, r)) : doux(r);
+    f0(p0, c0);
+    f1(p1, c1);
+    camera.position.copy(p0.lerp(p1, k));
+    camera.lookAt(c0.lerp(c1, k));
+    camera.fov = portrait ? 60 : 46;
     camera.updateProjectionMatrix();
     if (refPorte.current) refPorte.current.rotation.y = 1.4 * doux((p - 0.06) / 0.06);
   });
@@ -397,7 +367,7 @@ function Ambiance({ taille }) {
     env.mapping = THREE.EquirectangularReflectionMapping;
     env.colorSpace = THREE.SRGBColorSpace;
     scene.environment = env;
-    scene.environmentIntensity = 0.45;
+    scene.environmentIntensity = 0.32;
     return () => {
       scene.environment = null;
     };
@@ -427,10 +397,7 @@ function Pret({ onReady }) {
   return null;
 }
 
-/**
- * clientes : [{ photo (nom de la photo détourée, public/scene/clientes/<photo>-1024|512.webp), photoMiroir (plan B),
- *   reglage : { hauteur, y, recul, dx } }] — une par poste.
- */
+/** clientes : [{ coupe, cheveux, homme? }], un par poste (voir data/site.js). */
 function Scene({ taille, clientes, refPorte, petit }) {
   const marbre = useMatiere('marble_01', { taille, env: 0.8, repeat: [0.6, 0.6] });
   const laiton = useMemo(() => new THREE.MeshStandardMaterial({ color: LAITON, roughness: 0.3, metalness: 1 }), []);
@@ -438,15 +405,7 @@ function Scene({ taille, clientes, refPorte, petit }) {
     () => new THREE.MeshStandardMaterial({ color: '#f3e4dc', transparent: true, opacity: 0.18, roughness: 0.05, metalness: 0.3, depthWrite: false }),
     [],
   );
-  const reflets = useMemo(() => POSTES.map(() => new THREE.WebGLCubeRenderTarget(petit ? 128 : 256, { type: THREE.HalfFloatType })), [petit]);
-  const decoupes = useTexture(clientes.map((c) => (c.photo ? `${BASE}scene/clientes/${c.photo}-${petit ? 512 : 1024}.webp` : `${BASE}scene/clientes/vide.webp`)));
-  const miroirs = useTexture(clientes.map((c) => (c.photoMiroir ? `${BASE}images/${c.photoMiroir}-800.webp` : `${BASE}scene/clientes/vide.webp`)));
-  useMemo(() => {
-    [...decoupes, ...miroirs].forEach((t) => {
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = 8;
-    });
-  }, [decoupes, miroirs]);
+  const reflets = useMemo(() => POSTES.map(() => new THREE.WebGLCubeRenderTarget(petit ? 256 : 512, { type: THREE.HalfFloatType })), [petit]);
   return (
     <>
       <Ambiance taille={taille} />
@@ -459,8 +418,7 @@ function Scene({ taille, clientes, refPorte, petit }) {
           envMiroir={reflets[i].texture}
           marbre={marbre}
           laiton={laiton}
-          texPhoto={clientes[i].photoMiroir ? miroirs[i] : null}
-          cliente={clientes[i].photo ? <Cliente poste={poste} tex={decoupes[i]} reglage={clientes[i].reglage} /> : null}
+          client={clientes[i]}
         />
       ))}
       {POSTES.map((poste, i) => (
@@ -490,7 +448,7 @@ export default function Salon3D({ progres, clientes, leger, actif = true, onRead
       aria-hidden="true"
     >
       <Pilote />
-      <hemisphereLight args={['#fff1e4', '#8a6a5a', 0.65]} />
+      <hemisphereLight args={['#fff1e4', '#6a4a3a', 0.35]} />
       <Suspense fallback={null}>
         <Scene taille={taille} clientes={clientes} refPorte={refPorte} petit={petit} />
         <Camera progres={progres} refPorte={refPorte} />

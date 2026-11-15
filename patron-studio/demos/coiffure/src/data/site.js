@@ -47,8 +47,6 @@ export const prestations = [
     items: [
       { id: 'couleur', nom: 'Couleur racines', duree: 75, prix: 58 },
       { id: 'balayage', nom: 'Balayage sur mesure', duree: 150, prix: 120 },
-      { id: 'cuivre', nom: 'Couleur cuivrée, racines et longueurs', duree: 105, prix: 72 },
-      { id: 'fantaisie', nom: 'Coloration fantaisie (couleurs vives)', duree: 180, prix: 95 },
       { id: 'soin', nom: 'Soin profond à la kératine végétale', duree: 30, prix: 35 },
     ],
   },
@@ -116,22 +114,6 @@ export const looks = [
     texte: 'Mariage, cérémonie : un chignon souple, épinglé à la main, qui tient jusqu’au bout de la nuit.',
     prix: 'Chignon & coiffure d’événement · 65 €',
   },
-  {
-    photo: 'look-roux-cuivre',
-    alt: 'Longs cheveux roux cuivré, vus de dos, la cliente regarde par-dessus son épaule',
-    titre: 'Roux cuivré',
-    note: 'Couleur',
-    texte: 'Un roux profond et lumineux, des racines aux pointes, entretenu par un soin brillance.',
-    prix: 'Couleur cuivrée · 72 €',
-  },
-  {
-    photo: 'look-coloration-fantaisie',
-    alt: 'Longs cheveux ondulés en coloration fantaisie violet, rose, jaune et turquoise, vus de dos',
-    titre: 'Coloration fantaisie',
-    note: 'Couleur',
-    texte: 'Violet, rose, jaune, turquoise : des couleurs vives posées mèche par mèche, sur cheveux décolorés.',
-    prix: 'Coloration fantaisie · 95 €',
-  },
 ];
 
 export const chiffres = [
@@ -180,32 +162,13 @@ export const faq = [
 ];
 
 /**
- * Les clientes du salon 3D de l'accueil : vraie photo détourée (public/scene/clientes/<photo>-1024|512.webp),
- * vue de dos, assise dans un fauteuil ; reglage : hauteur de la photo (m), hauteur du bas (y), recul vers le miroir.
- * Plan B : sans photo détourée crédible, mettre photo: null et photoMiroir: '<photo du look>' (la photo s'affiche
- * dans le miroir et le fauteuil reste vide).
+ * Les clients du salon 3D de l'accueil : des mannequins construits en code (three/Mannequin.jsx), chacun avec la
+ * coupe sculptée de la prestation affichée. coupe : 'carre' | 'degrade' | 'longs' | 'chignon' ;
+ * cheveux : couleur naturelle (ou [racines, pointes] pour un balayage).
  */
 export const clientes = [
-  {
-    look: 'Balayage caramel',
-    photo: 'cliente-balayage',
-    reglage: { hauteur: 0.8, y: 0.86, recul: -0.08 },
-    prestation: 'Balayage sur mesure',
-    prix: 120,
-  },
-  {
-    look: 'Roux cuivré',
-    // plan B : la photo détourée ne paraissait pas assise (elle se retourne vers nous), le fauteuil reste vide
-    photo: null,
-    photoMiroir: 'look-roux-cuivre',
-    prestation: 'Couleur cuivrée, racines et longueurs',
-    prix: 72,
-  },
-  {
-    look: 'Coloration fantaisie',
-    photo: 'cliente-fantaisie',
-    reglage: { hauteur: 0.98, y: 0.68, recul: -0.08, dx: -0.09 },
-    prestation: 'Coloration fantaisie (couleurs vives)',
-    prix: 95,
-  },
+  { look: 'Carré lisse', coupe: 'carre', cheveux: '#5a3a26', prestation: 'Coupe, shampooing, brushing', prix: 52, texte: 'Un carré net à la mâchoire, raie sur le côté, lissé au brushing.' },
+  { look: 'Dégradé net', coupe: 'degrade', cheveux: '#211b17', homme: true, prestation: 'Coupe homme', prix: 28, texte: 'Côtés en dégradé à la tondeuse, dessus aux ciseaux, coiffé vers l’arrière.' },
+  { look: 'Balayage caramel', coupe: 'longs', cheveux: ['#4a2e1e', '#c99159'], prestation: 'Balayage sur mesure', prix: 120, texte: 'Des reflets caramel peints à la main, qui s’éclaircissent vers les pointes.' },
+  { look: 'Chignon', coupe: 'chignon', cheveux: '#2b1e16', prestation: 'Chignon & coiffure d’événement', prix: 65, texte: 'Cheveux tirés en arrière, chignon bas sur la nuque : élégant pour une cérémonie.' },
 ];
