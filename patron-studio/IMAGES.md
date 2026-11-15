@@ -190,12 +190,22 @@ Construits en code : façade, néons, menus lumineux, comptoir, passe-plat, plan
 ### Atelier Mèche (coiffure)
 
 Détail des photos : `demos/coiffure/photos/LISEZ-MOI.md`.
-- Intro : galerie 3D commune (`demos/shared/src/three/Galerie3D.jsx`, `components/HeroGalerie.jsx`) aux couleurs du
-  salon : une allée où les 4 vraies photos de coupes sont encadrées (cadre laiton, passe-partout, ombre, halo de
-  lumière) ; la caméra avance et pivote vers chacune, le texte et le prix à côté. Les ciseaux dessinés en 3D sont retirés.
-- Inspirations : 4 vraies photos (le « pixie texturé », sans photo, est retiré ; « Carré flou » devient « Brushing
-  souple », ce que montre la photo).
-- Aucune texture ni modèle externe : décor construit en code.
+- Intro : vrai salon en 3D construit en code (`src/three/Salon3D.jsx`) : porte d'entrée vitrée, parquet, murs poudre,
+  miroirs à cadre laiton (reflet du salon calculé dans la scène), consoles en marbre, étagères, suspensions. Les clientes
+  sont de vraies photos détourées, vues de dos, assises dans les fauteuils ; une place est en « plan B » (fauteuil vide,
+  vraie photo dans le miroir). Les ciseaux dessinés en 3D et la galerie de tableaux sont retirés.
+- Inspirations : 6 vraies photos (le « pixie texturé », sans photo, est retiré ; « Carré flou » devient « Brushing souple »).
+
+Modèle, matières et lumière : **Poly Haven, licence CC0**, dans `demos/coiffure/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Fauteuils de coiffure (modèle 3D scanné) | `modeles/fauteuil.glb` | https://polyhaven.com/a/BarberShopChair_01 |
+| Plantes | `modeles/potted_plant_04.glb` | https://polyhaven.com/a/potted_plant_04 |
+| Parquet en point de Hongrie | `textures/herringbone_parquet-*` | https://polyhaven.com/a/herringbone_parquet |
+| Relief des murs (couleur unie) | `textures/white_plaster_02-*` | https://polyhaven.com/a/white_plaster_02 |
+| Consoles | `textures/marble_01-*` | https://polyhaven.com/a/marble_01 |
+| Lumière d'ambiance (photo 360°) | `maison-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/small_empty_house |
 
 ## Images de partage (réseaux sociaux)
 
