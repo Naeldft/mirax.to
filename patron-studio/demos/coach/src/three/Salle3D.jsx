@@ -562,11 +562,12 @@ const POSES = {
    Une vidéo courte par offre, en boucle et sans son, sur un écran de la salle. Elle passe par le même rendu que
    la scène (reflets de la dalle de verre, rendu filmique, grain, vignettage, profondeur de champ), donc s'y fond.
    Seule la vidéo de l'arrêt en cours est lue ; elle n'est chargée qu'à l'approche (version légère sur téléphone). */
+const Y_ECRAN = 2.0;
 export const VIDEOS = {
-  decouverte: { l: 1.7, h: 0.956 },
-  solo: { l: 1.7, h: 0.956 },
-  duo: { l: 1.7, h: 0.956 },
-  groupe: { l: 0.66, h: 1.17 },
+  decouverte: { l: 1.5, h: 0.844 },
+  solo: { l: 1.5, h: 0.844 },
+  duo: { l: 1.5, h: 0.844 },
+  groupe: { l: 0.6, h: 1.067 },
 };
 
 function Video({ nom, l, h, i, progres, def }) {
@@ -643,7 +644,7 @@ function EcranMural({ poste, i, progres, def, m }) {
   const { l, h } = VIDEOS[id];
   const x = cote * (cote > 0 ? L - 0.05 : L - 0.3);
   return (
-    <group position={[x, 2.3, z]} rotation-y={-cote * (Math.PI / 2)}>
+    <group position={[x, Y_ECRAN, z]} rotation-y={-cote * (Math.PI / 2)}>
       <mesh material={m.nylon} position={[0, 0, -0.025]}>
         <boxGeometry args={[l + 0.05, h + 0.05, 0.04]} />
       </mesh>
@@ -653,8 +654,8 @@ function EcranMural({ poste, i, progres, def, m }) {
       {/* devant la verrière, l'écran est suspendu au plafond par deux câbles */}
       {cote < 0 &&
         [-1, 1].map((s) => (
-          <mesh key={s} material={m.zinc} position={[s * l * 0.4, (HAUT - 2.3 + h / 2) / 2, -0.03]}>
-            <cylinderGeometry args={[0.004, 0.004, HAUT - 2.3 - h / 2, 6]} />
+          <mesh key={s} material={m.zinc} position={[s * l * 0.4, (HAUT - Y_ECRAN + h / 2) / 2, -0.03]}>
+            <cylinderGeometry args={[0.004, 0.004, HAUT - Y_ECRAN - h / 2, 6]} />
           </mesh>
         ))}
     </group>
@@ -798,7 +799,7 @@ function vue(i, a, portrait, pos, cible) {
   const r = portrait ? 4.4 : 3.9;
   // a : angle autour du poste (0 : de face depuis l'allée, + : vers l'entrée)
   pos.set(cx - cote * Math.cos(a) * r, 1.95, z + Math.sin(a) * r);
-  cible.set(cx, portrait ? 0.95 : 1.3, z);
+  cible.set(cx, portrait ? 0.95 : 1.42, z);
   if (!portrait) {
     const dx = cible.x - pos.x;
     const dz = cible.z - pos.z;
