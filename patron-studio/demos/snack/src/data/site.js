@@ -93,18 +93,18 @@ export const produits = [
     cat: 'burgers',
     nom: 'Le Brasier',
     prix: 10.5,
-    desc: 'Smash saisi à feu vif, pepper jack fondu, jalapeños et sauce au piment fumé. Pour ceux qui aiment quand ça pique.',
+    desc: 'Pain rouge au paprika fumé, effiloché de bœuf, fromage fondu, sauce piquante et salade croquante. Pour ceux qui aiment quand ça pique.',
     allergenes: ['gluten', 'lait', 'oeufs', 'sesame'],
     tags: ['piment'],
   },
   {
-    id: 'maroilles',
+    id: 'oeuf-bacon',
     photo: 'burger-chti',
     cat: 'burgers',
-    nom: 'Le Ch’ti',
+    nom: 'L’Œuf-Bacon',
     prix: 11.5,
-    desc: 'Smash, maroilles fondu qui coule, oignons confits à la bière du Nord et une pointe de moutarde à l’ancienne.',
-    allergenes: ['gluten', 'lait', 'oeufs', 'sesame', 'sulfites'],
+    desc: 'Smash, bacon croustillant, œuf au plat, cheddar fondu, tomate et salade dans un pain brioché au sésame.',
+    allergenes: ['gluten', 'lait', 'oeufs', 'sesame', 'moutarde'],
     tags: [],
   },
   {
@@ -227,7 +227,7 @@ export const chiffres = [
 
 export const avis = [
   { nom: 'Mehdi', texte: 'Le meilleur smash de Lille, la croûte du steak est parfaite. Les frites sont vraiment maison.' },
-  { nom: 'Clara', texte: 'Commandé en ligne à 12 h 05, récupéré à 12 h 20. Le Ch’ti au maroilles, une tuerie.' },
+  { nom: 'Clara', texte: 'Commandé en ligne à 12 h 05, récupéré à 12 h 20. L’Œuf-Bacon, une tuerie.' },
   { nom: 'Antoine', texte: 'Enfin un vrai burger veggie qui n’est pas une option au rabais. Le Green est top.' },
 ];
 

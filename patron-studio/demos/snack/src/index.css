@@ -67,3 +67,10 @@
   .photo { transition: none; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* flèches de l'accueil 3D (changer de burger) */
+.cr-fleche {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 999px;
+  border: 1px solid rgb(243 236 226 / 0.3); color: var(--color-creme); transition: background-color 0.25s, border-color 0.25s;
+}
+.cr-fleche:hover { background: rgb(255 107 26 / 0.18); border-color: var(--color-braise); }

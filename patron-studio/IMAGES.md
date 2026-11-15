@@ -167,6 +167,26 @@ Matières, meubles et lumière : **Poly Haven, licence CC0** (mêmes fichiers qu
 
 Construits en code : devanture, porte, vitrine, enseigne, murs, portants, crochets, table, spots.
 
+### Crunch! (snack)
+
+Détail complet des photos : `demos/snack/photos/LISEZ-MOI.md`.
+- Intro : vraie scène 3D construite en code (`src/three/Snack3D.jsx`) : devanture de nuit et néon « CRUNCH! »,
+  salle en briques sombres, néons, menus lumineux, comptoir, plancha et hotte. Les 5 burgers sont de vraies photos
+  détourées, posées sur des planches sur le passe-plat ; le burger change au défilement, aux flèches ou au doigt.
+- Recettes adaptées aux photos : « Le Ch’ti » (maroilles) devient « L’Œuf-Bacon », et la recette du Brasier suit sa photo.
+
+Matières et lumière : **Poly Haven, licence CC0**, dans `demos/snack/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Murs et façade en brique | `textures/dark_brick_wall-*` | https://polyhaven.com/a/dark_brick_wall |
+| Carrelage de la cuisine | `textures/long_white_tiles-*` | https://polyhaven.com/a/long_white_tiles |
+| Sol et trottoir | `textures/concrete_floor_02-*` | https://polyhaven.com/a/concrete_floor_02 |
+| Comptoir et planches | `textures/wood_table_001-*` | https://polyhaven.com/a/wood_table_001 |
+| Reflets (photo 360°) | `neon-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/neon_photostudio |
+
+Construits en code : façade, néons, menus lumineux, comptoir, passe-plat, plancha, hotte, lampes, fumée.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

@@ -1,10 +1,8 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
-import { gsap } from '@demos/shared/lib/gsap.js';
 import { formatEuros, telOk } from '@demos/shared/lib/validation.js';
 import { allergenes, avis, categories, chiffres, faq, formule, horaires, photos, produits, snack } from '../data/site';
 
@@ -73,101 +71,6 @@ function Titre({ tag, children, intro, id, centre }) {
 const TAGS = { veggie: 'Végétarien', piment: 'Épicé', star: 'Le plus commandé' };
 
 /* ---------------------------------------------------------------- */
-
-export function Hero({ onReady }) {
-  const section = useRef(null);
-  const cadre = useRef(null);
-  const img = useRef(null);
-  const reduced = useReducedMotion();
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      // entrée : léger dézoom de la photo, puis le texte apparaît en fondu
-      gsap.fromTo(cadre.current, { scale: 1.12 }, { scale: 1, duration: 2.4, ease: 'power2.out' });
-      gsap.from('[data-in]', { opacity: 0, y: 26, duration: 1, stagger: 0.09, ease: 'power3.out', delay: 0.35 });
-      // au défilement : la photo zoome doucement et glisse moins vite que la page (parallaxe)
-      gsap.to(img.current, {
-        scale: 1.14,
-        yPercent: 7,
-        ease: 'none',
-        scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom top', scrub: true },
-      });
-      gsap.to('[data-texte]', {
-        yPercent: -12,
-        opacity: 0.15,
-        ease: 'none',
-        scrollTrigger: { trigger: section.current, start: 'top top', end: 'bottom top', scrub: true },
-      });
-    }, section);
-    return () => ctx.revert();
-  }, [reduced]);
-  return (
-    <section id="accueil" ref={section} className="relative h-[100svh] overflow-hidden bg-nuit md:min-h-[620px]" aria-label="Accueil">
-      {/* emplacement photo : photos.accueil (voir photos/LISEZ-MOI.md) */}
-      <div
-        ref={cadre}
-        className="absolute inset-x-0 top-14 mx-auto h-[46svh] w-[min(94vw,37svh)] [@media(max-height:720px)]:h-[42svh] [@media(max-height:720px)]:w-[min(94vw,34svh)] origin-center [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)] md:inset-y-0 md:left-[38%] md:right-0 md:top-0 md:mx-0 md:h-full md:w-auto md:[mask-image:none]"
-      >
-        <Photo
-          nom={photos.accueil}
-          imgRef={img}
-          prioritaire
-          onLoad={onReady}
-          sizes="(min-width: 768px) 62vw, 100vw"
-          alt="Double smash burger au cheddar fondu, pickles et pain brioché toasté, sur fond sombre"
-          width="1200"
-          height="1800"
-          className="h-full w-full object-cover object-[50%_40%] transition-opacity duration-700 md:object-[50%_60%]"
-        />
-        {/* fondus vers le noir pour la lisibilité du texte */}
-        <div className="absolute inset-0 max-md:hidden md:bg-gradient-to-r md:from-nuit md:via-nuit/30 md:to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-nuit/70 to-transparent max-md:hidden" />
-      </div>
-      {/* lueur de braise */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-40 left-1/2 h-80 w-[120%] -translate-x-1/2 rounded-[100%] bg-braise/20 blur-3xl md:left-[65%] md:w-[60%]"
-      />
-      <div data-texte className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-24 md:justify-center md:px-8 md:pb-0">
-        <p data-in className="surtitre">
-          {snack.accroche}
-        </p>
-        <h1 className="mt-3 text-[clamp(3rem,12vw,8.2rem)] md:mt-4 [@media(max-height:600px)]:text-[2.5rem]">
-          <span data-in className="block">
-            Smash.
-          </span>
-          <span data-in className="block bg-gradient-to-r from-braise via-[#ff8a2b] to-flamme bg-clip-text pb-1 text-transparent">
-            Crunch.
-          </span>
-          <span data-in className="block">
-            Miam.
-          </span>
-        </h1>
-        <p data-in className="mt-5 max-w-md text-lg leading-relaxed text-creme/80 max-sm:hidden">
-          {snack.intro}
-        </p>
-        <div data-in className="mt-7 flex flex-wrap gap-3">
-          <a href="#commande" className="btn btn-braise px-8 text-lg">
-            Commander
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M4 10h11M11 5l5 5-5 5" />
-            </svg>
-          </a>
-          <a href="#carte" className="btn btn-ligne max-sm:hidden">
-            Voir la carte
-          </a>
-        </div>
-        <ul data-in className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-creme/70 max-md:[@media(max-height:720px)]:hidden">
-          <li>
-            <span className="text-flamme">★ 4,8</span> · 1 200 avis
-          </li>
-          <li>Prêt en {snack.retraitMinutes} min</li>
-          <li className="max-sm:hidden">Bœuf des Hauts-de-France</li>
-        </ul>
-      </div>
-    </section>
-  );
-}
 
 export function Bandeau() {
   const mots = ['Bœuf du Nord', 'Frites maison', 'Pain brioché local', 'Sauces maison', 'Cuit à la minute'];

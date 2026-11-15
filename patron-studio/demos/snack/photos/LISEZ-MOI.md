@@ -15,8 +15,8 @@ Les photos de la carte sont recadrées au format 4:3 (le cadrage suit automatiqu
 | `accueil-smash-burger` | Grande photo de l'accueil | **vertical** (2:3), sujet au centre |
 | `burger-classic` | Carte : Le Crunch Classic | 4:3 |
 | `burger-fume` | Carte : Le Fumé | 4:3 |
-| `burger-brasier` | Carte : Le Brasier | 4:3 |
-| `burger-chti` | Carte : Le Ch’ti | 4:3 |
+| `burger-brasier` | Carte : Le Brasier (pain rouge, effiloché, fromage fondu, salade) | 4:3 |
+| `burger-chti` | Carte : L’Œuf-Bacon (bacon, œuf au plat, cheddar, tomate, salade) | 4:3 |
 | `burger-green` | Carte : Le Green | 4:3 |
 | `poulet-tenders` | Carte : Tenders × 5 | 4:3 |
 | `poulet-wrap` | Carte : Wrap Crispy | 4:3 |
@@ -61,3 +61,9 @@ restaurant, afin que les clients voient ce qu'ils mangeront vraiment.
 | ambiance-burger-frites | https://images.unsplash.com/photo-1561758033-d89a9ad46330 |
 | ambiance-black-bun | https://images.unsplash.com/photo-1582196016295-f8c8bd4b3a99 |
 | ambiance-salle | https://images.unsplash.com/photo-1615297928064-24977384d0da |
+
+## Accueil 3D (`public/scene/burgers/`)
+
+Les 5 burgers posés sur le passe-plat de l'accueil 3D sont les mêmes photos, **détourées** (fond transparent,
+WebP 1 024 et 512 px) : `burger-classic`, `burger-fume`, `burger-brasier`, `burger-chti`, `burger-green`.
+Pour changer un burger de l'accueil : détourez la nouvelle photo et gardez le même nom.

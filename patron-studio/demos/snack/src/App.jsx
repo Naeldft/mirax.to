@@ -4,7 +4,8 @@ import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
 import { formatEuros } from '@demos/shared/lib/validation.js';
 import Header, { Logo } from './components/Header';
-import { Allergenes, Avis, Bandeau, Carte, Commande, FaqSection, Hero, Infos } from './components/Sections';
+import Hero from './components/Hero';
+import { Allergenes, Avis, Bandeau, Carte, Commande, FaqSection, Infos } from './components/Sections';
 import { formule, navigation, produits, snack } from './data/site';
 
 const Telephone = () => (
@@ -56,7 +57,7 @@ export default function App() {
       />
       <Header />
       <main>
-        <Hero onReady={() => setReady(true)} />
+        <Hero onReady={() => setReady(true)} ajouter={ajouter} />
         <Bandeau />
         <Carte ajouter={ajouter} quantites={quantites} />
         <Commande lignes={lignes} setQte={setQte} menus={menus} setMenus={setMenus} vider={vider} />
