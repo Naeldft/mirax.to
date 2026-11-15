@@ -97,7 +97,7 @@ export const chiffres = [
   { valeur: 98, suffixe: ' %', label: 'de chantiers livrés à la date prévue' },
 ];
 
-/** Réalisations. type : filtre ; dessin : variante d'illustration (générée en SVG). */
+/** Réalisations. type : filtre. Chaque réalisation a sa vraie photo : le titre décrit ce que la photo montre. */
 export const realisations = [
   {
     id: 1,
@@ -108,7 +108,6 @@ export const realisations = [
     lieu: 'Bondues',
     surface: '142 m²',
     duree: '9 mois',
-    dessin: { etages: 2, toit: 'plat', couleur: '#f4f1ea', bardage: '#8a6a4a' },
   },
   {
     id: 2,
@@ -119,18 +118,16 @@ export const realisations = [
     lieu: 'Marcq-en-Barœul',
     surface: '35 m²',
     duree: '3 mois',
-    dessin: { etages: 1, toit: 'plat', couleur: '#dfe3e6', bardage: '#2b2b2b', extension: true },
   },
   {
     id: 3,
-    photo: 'realisation-longere', // photos/realisation-longere.jpg
-    alt: 'Maison traditionnelle en brique et pierre, pelouse au premier plan',
-    type: 'renovation',
-    titre: 'Longère rénovée',
+    photo: 'realisation-plain-pied', // photos/realisation-plain-pied.jpg
+    alt: 'Maison de plain-pied en brique et enduit blanc, pelouse au premier plan',
+    type: 'maison',
+    titre: 'Maison de plain-pied',
     lieu: 'Templemars',
-    surface: '180 m²',
-    duree: '7 mois',
-    dessin: { etages: 1, toit: 'pente', couleur: '#b35c3c', bardage: '#b35c3c' },
+    surface: '132 m²',
+    duree: '8 mois',
   },
   {
     id: 4,
@@ -141,29 +138,26 @@ export const realisations = [
     lieu: 'Villeneuve-d’Ascq',
     surface: '118 m²',
     duree: '8 mois',
-    dessin: { etages: 2, toit: 'pente', couleur: '#ffffff', bardage: '#c9b28d' },
   },
   {
     id: 5,
-    photo: 'realisation-surelevation', // photos/realisation-surelevation.jpg
-    alt: 'Volume contemporain en bardage bois posé sur une maison enduite',
-    type: 'extension',
-    titre: 'Surélévation',
+    photo: 'realisation-maison-architecte', // photos/realisation-maison-architecte.jpg
+    alt: 'Maison contemporaine : enduit blanc, volume bardé de bois rouge, grandes baies vitrées',
+    type: 'maison',
+    titre: 'Maison d’architecte',
     lieu: 'Lille Fives',
-    surface: '48 m²',
-    duree: '4 mois',
-    dessin: { etages: 2, toit: 'plat', couleur: '#a9443a', bardage: '#3a3f44', surelevation: true },
+    surface: '165 m²',
+    duree: '10 mois',
   },
   {
     id: 6,
     photo: 'realisation-maison-de-ville', // photos/realisation-maison-de-ville.jpg
     alt: 'Maison de ville étroite à façade enduite, entrée éclairée',
     type: 'renovation',
-    titre: 'Maison de ville',
+    titre: 'Maison de ville rénovée',
     lieu: 'Roubaix',
     surface: '96 m²',
     duree: '5 mois',
-    dessin: { etages: 2, toit: 'pente', couleur: '#9e4b34', bardage: '#9e4b34' },
   },
 ];
 

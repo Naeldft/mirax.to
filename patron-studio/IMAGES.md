@@ -87,6 +87,40 @@ Détail complet des photos : `demos/location-voitures/photos/LISEZ-MOI.md`.
 
 Détourages : rembg (BiRefNet). Construits en code : sol, lignes rouges, rampes lumineuses, traits de vitesse, places de parking, étiquettes.
 
+### Bâti Nord (BTP)
+
+Détail complet des photos : `demos/btp/photos/LISEZ-MOI.md`.
+- Intro : maison 3D claire construite en code (`src/three/Maison3D.jsx`) : façade et porte d'entrée, fondations
+  (béton, semelles, ferraillage), séjour et cuisine, escalier, chambre sous la charpente avec puits de lumière.
+  Les phrases du site sont peintes sur les murs.
+- 2 vraies photos de réalisations encadrées au mur du séjour ; `realisation-maison-familiale` est affichée pendant le
+  chargement, et à la place de la 3D sans WebGL ou avec « réduire les animations ».
+- Réalisations : 6 vraies photos, titres adaptés à ce que montre chaque photo (les dessins de maisons sont supprimés).
+
+Matières, meubles et lumière : **Poly Haven, licence CC0**, dans `demos/btp/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Parquet, escalier, charpente, porte | `textures/wood_floor-*` | https://polyhaven.com/a/wood_floor |
+| Relief des murs intérieurs (couleur unie) | `textures/white_plaster_02-*` | https://polyhaven.com/a/white_plaster_02 |
+| Relief de la façade (couleur unie) | `textures/white_rough_plaster-*` | https://polyhaven.com/a/white_rough_plaster |
+| Béton (dalle, semelles, soubassement) | `textures/concrete_floor_02-*` | https://polyhaven.com/a/concrete_floor_02 |
+| Terre du fond de fouille | `textures/excavated_soil_wall-*` | https://polyhaven.com/a/excavated_soil_wall |
+| Mur en blocs béton apparent | `textures/concrete_block_wall-*` | https://polyhaven.com/a/concrete_block_wall |
+| Tapis, couette | `textures/rough_linen-*` | https://polyhaven.com/a/rough_linen |
+| Plan de travail | `textures/marble_01-*` | https://polyhaven.com/a/marble_01 |
+| Pelouse | `textures/leafy_grass-*` | https://polyhaven.com/a/leafy_grass |
+| Canapé | `modeles/sofa_02.glb` | https://polyhaven.com/a/sofa_02 |
+| Table basse | `modeles/modern_coffee_table_01.glb` | https://polyhaven.com/a/modern_coffee_table_01 |
+| Plante en pot | `modeles/potted_plant_04.glb` | https://polyhaven.com/a/potted_plant_04 |
+| Tabourets de bar | `modeles/bar_chair_round_01.glb` | https://polyhaven.com/a/bar_chair_round_01 |
+| Table de chevet | `modeles/side_table_01.glb` | https://polyhaven.com/a/side_table_01 |
+| Suspensions | `modeles/modern_ceiling_lamp_01.glb` | https://polyhaven.com/a/modern_ceiling_lamp_01 |
+| Reflets intérieurs (photo 360°) | `maison-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/small_empty_house |
+| Jardin et ciel autour de la maison (photo 360°) | `jardin-2048.jpg`, `-1024.jpg` | https://polyhaven.com/a/meadow_2 |
+
+Construits en code : murs, dalles, fenêtres, porte, escalier, toit et chevrons, lit, cuisine, ferraillage, baladeuses.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).
