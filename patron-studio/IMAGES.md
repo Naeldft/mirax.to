@@ -191,10 +191,11 @@ Construits en code : façade, néons, menus lumineux, comptoir, passe-plat, plan
 
 Détail des photos : `demos/coiffure/photos/LISEZ-MOI.md`.
 - Intro : vrai salon en 3D construit en code (`src/three/Salon3D.jsx`) : porte d'entrée vitrée, parquet, murs poudre,
-  miroirs à cadre laiton (reflet du salon calculé dans la scène), consoles en marbre, étagères, suspensions. Les clientes
-  sont de vraies photos détourées, vues de dos, assises dans les fauteuils ; une place est en « plan B » (fauteuil vide,
-  vraie photo dans le miroir). Les ciseaux dessinés en 3D et la galerie de tableaux sont retirés.
-- Inspirations : 6 vraies photos (le « pixie texturé », sans photo, est retiré ; « Carré flou » devient « Brushing souple »).
+  miroirs à cadre laiton (reflet du salon calculé dans la scène), consoles en marbre, étagères, suspensions.
+  Les 4 clients sont des mannequins de vitrine sculptés en code (`src/three/Mannequin.jsx`) : tête lisse et mate,
+  cape anthracite au logo du salon, coupes sculptées en couleurs naturelles (carré, dégradé, balayage, chignon).
+  Aucune photo dans l'intro ; les ciseaux dessinés en 3D et la galerie de tableaux sont retirés.
+- Inspirations : 4 vraies photos (le « pixie texturé », sans photo, est retiré ; « Carré flou » devient « Brushing souple »).
 
 Modèle, matières et lumière : **Poly Haven, licence CC0**, dans `demos/coiffure/public/scene/`.
 

@@ -168,7 +168,7 @@ export const faq = [
  */
 export const clientes = [
   { look: 'Carré lisse', coupe: 'carre', cheveux: '#5a3a26', prestation: 'Coupe, shampooing, brushing', prix: 52, texte: 'Un carré net à la mâchoire, raie sur le côté, lissé au brushing.' },
-  { look: 'Dégradé net', coupe: 'degrade', cheveux: '#1d1815', homme: true, vue: 'dos', prestation: 'Coupe homme', prix: 28, texte: 'Côtés en dégradé à la tondeuse, dessus aux ciseaux, coiffé vers l’arrière.' },
+  { look: 'Dégradé net', coupe: 'degrade', cheveux: '#14100e', homme: true, vue: 'dos', prestation: 'Coupe homme', prix: 28, texte: 'Cheveux courts, côtés et nuque en dégradé à la tondeuse, finitions aux ciseaux.' },
   { look: 'Balayage caramel', coupe: 'longs', cheveux: ['#3b2416', '#d39a5c'], prestation: 'Balayage sur mesure', prix: 120, texte: 'Des reflets caramel peints à la main, qui s’éclaircissent vers les pointes.' },
   { look: 'Chignon', coupe: 'chignon', cheveux: '#3a271b', vue: 'dos', prestation: 'Chignon & coiffure d’événement', prix: 65, texte: 'Cheveux tirés en arrière, chignon bas sur la nuque : élégant pour une cérémonie.' },
 ];

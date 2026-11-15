@@ -10,8 +10,6 @@ visage reconnaissable sans l’accord écrit de la personne.
 | `look-brushing-souple` | Brushing souple | Brushing à la brosse ronde sur cheveux mi-longs |
 | `look-balayage-caramel` | Balayage caramel | Cheveux longs ondulés au balayage caramel, de dos |
 | `look-degrade-net` | Dégradé net | Coupe homme dégradée, vue de dos (photo recadrée pour retirer une inscription) |
-| `look-roux-cuivre` | Roux cuivré | Longs cheveux roux, vus de dos (la cliente regarde par-dessus son épaule) |
-| `look-coloration-fantaisie` | Coloration fantaisie | Longs cheveux ondulés violet, rose, jaune, turquoise, vus de dos |
 | `look-chignon-boheme` | Chignon bohème | Chignon souple épinglé, de dos, mains de la coiffeuse |
 
 L’équipe (Léa, Samir, Inès) est présentée sans photo : ajoutez des portraits uniquement avec l’accord des personnes.
@@ -24,13 +22,9 @@ L’équipe (Léa, Samir, Inès) est présentée sans photo : ajoutez des portra
 | look-balayage-caramel | https://images.unsplash.com/photo-1522337360788-8b13dee7a37e |
 | look-degrade-net | https://images.unsplash.com/photo-1622286342621-4bd786c2447c (recadrée) |
 | look-chignon-boheme | https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3 |
-| look-roux-cuivre | https://images.unsplash.com/photo-1526510747491-58f928ec870f |
-| look-coloration-fantaisie | https://images.unsplash.com/photo-1554519515-242161756769 |
 
-## Accueil 3D : le salon (`public/scene/`)
+## Accueil 3D : le salon
 
-Les clientes assises dans les fauteuils sont de vraies photos **détourées**, vues de dos (`clientes/cliente-*.webp`,
-contour nettoyé, bas fondu dans le dossier) : balayage caramel et coloration fantaisie. Pour le roux cuivré, la photo
-détourée ne paraissait pas assise (elle se retourne vers nous) : le fauteuil reste vide et la vraie photo s'affiche dans
-le miroir (« plan B », réglé dans `clientes` de `src/data/site.js`).
-Pour ajouter une cliente : une photo de dos, seule, sans les mains du coiffeur ; détourez-la et réglez sa taille.
+L'accueil est un salon en 3D construit en code (`src/three/Salon3D.jsx`). Les clients sont des mannequins de vitrine
+sculptés en code (`src/three/Mannequin.jsx`), chacun avec la coupe de la prestation affichée (réglages dans
+`clientes`, `src/data/site.js`). Aucune photo n'y est utilisée.

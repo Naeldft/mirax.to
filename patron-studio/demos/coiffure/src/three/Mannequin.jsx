@@ -171,17 +171,16 @@ function Carre({ couleur }) {
 }
 
 function Degrade({ couleur }) {
-  // coupe homme : côtés très courts (dégradé vers la peau), dessus plus long, coiffé vers l'arrière
-  const m = useMemo(() => matiereCheveux(couleur), [couleur]);
+  // coupe homme : cheveux courts, côtés et nuque en dégradé vers la peau
   const cotes = useMemo(() => {
-    const geo = new THREE.SphereGeometry(0.104, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.6);
+    const geo = new THREE.SphereGeometry(0.106, 96, 48, 0, Math.PI * 2, 0, Math.PI * 0.66);
     // dégradé : la couleur des cheveux se fond vers la peau en bas
     const pos = geo.attributes.position;
     const c0 = new THREE.Color(couleur);
-    const c1 = new THREE.Color(PEAU).lerp(c0, 0.35);
+    const c1 = new THREE.Color(PEAU);
     const cols = [];
     for (let i = 0; i < pos.count; i++) {
-      const t = THREE.MathUtils.clamp((0.045 - pos.getY(i)) / 0.07, 0, 1);
+      const t = THREE.MathUtils.clamp((-0.005 - pos.getY(i)) / 0.045, 0, 1);
       const c = c0.clone().lerp(c1, t);
       cols.push(c.r, c.g, c.b);
     }
@@ -194,14 +193,8 @@ function Degrade({ couleur }) {
   );
   return (
     <group>
-      <mesh geometry={cotes} material={mCotes} rotation-x={-0.12} />
-      {/* le dessus : une calotte un peu plus épaisse, au ras du crâne, avec une petite houppe vers l'avant */}
-      <mesh material={m} rotation-x={-0.18} scale={[1.0, 1.0, 1.03]}>
-        <sphereGeometry args={[0.112, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.33]} />
-      </mesh>
-      <mesh material={m} position={[0, 0.098, 0.05]} rotation-x={-0.6} scale={[0.75, 0.28, 0.7]}>
-        <sphereGeometry args={[0.07, 32, 16]} />
-      </mesh>
+      <mesh geometry={cotes} material={mCotes} scale={[0.98, 1.17, 1.04]} />
+
     </group>
   );
 }
@@ -245,7 +238,7 @@ function Chignon({ couleur }) {
   const calotte = useMemo(() => new THREE.SphereGeometry(0.106, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.52), []);
   return (
     <group>
-      <mesh geometry={calotte} material={m} rotation-x={-0.42} />
+      <mesh geometry={calotte} material={m} rotation-x={-0.26} scale={[0.96, 1.14, 1.04]} />
       {/* le chignon : un gros tore torsadé, bas sur la nuque */}
       <mesh material={m} position={[0, -0.035, -0.125]} rotation-x={0.25}>
         <torusGeometry args={[0.05, 0.034, 24, 64]} />
