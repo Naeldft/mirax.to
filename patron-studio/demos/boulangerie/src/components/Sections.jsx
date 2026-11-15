@@ -1,6 +1,5 @@
-import { lazy, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Photo from '@demos/shared/components/Photo.jsx';
-import ScrollStory from '@demos/shared/components/ScrollStory.jsx';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
@@ -9,8 +8,6 @@ import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { formatEuros, isoLocal, parseIso, telOk } from '@demos/shared/lib/validation.js';
 import { ardoise, avis, categories, chiffres, faq, horaires, maison, nuit, produits, retraits } from '../data/site';
-
-const BakeryScene = lazy(() => import('../three/BakeryScene'));
 
 function Titre({ surtitre, children, intro, id, center }) {
   return (
@@ -27,159 +24,6 @@ function Titre({ surtitre, children, intro, id, center }) {
         </p>
       )}
     </div>
-  );
-}
-
-// une ambiance par étape : farine, mie, dorure, croûte
-const FONDS = [
-  ['#fbf1de', '#f0e2c6'],
-  ['#f6e6c6', '#e6cfa6'],
-  ['#f6d9a3', '#e2b26a'],
-  ['#e9c9a3', '#c9976a'],
-];
-
-/**
- * Accueil « à faire défiler » : le pain 3D lève et dore au fil des étapes,
- * qui présentent les pains, les viennoiseries puis les pâtisseries.
- */
-export function Hero({ onReady }) {
-  const scope = useRef(null);
-  const reduced = useReducedMotion();
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      gsap.from('[data-mot]', { y: 60, opacity: 0, duration: 1.1, stagger: 0.12, ease: 'power3.out', delay: 0.3 });
-      gsap.from('[data-in]', { y: 20, opacity: 0, duration: 0.9, stagger: 0.1, delay: 0.8 });
-    }, scope);
-    return () => ctx.revert();
-  }, [reduced]);
-
-  const steps = [
-    {
-      fond: FONDS[0],
-      mot: 'Levain',
-      encre: '#2b1d12',
-      motOpacite: 0.08,
-      contenu: (
-        <div ref={scope} className="max-w-xl md:max-w-[44%]">
-          <p data-in className="surtitre">
-            {maison.accroche}
-          </p>
-          <h1 className="mt-3 text-[clamp(3rem,12vw,7rem)] leading-[0.92]">
-            <span data-mot className="block">
-              Pétri la nuit,
-            </span>
-            <span data-mot className="block italic text-dore">
-              doré au matin.
-            </span>
-          </h1>
-          <p data-in className="mt-4 hidden max-w-sm text-lg text-croute/85 md:block">
-            {maison.intro}
-          </p>
-          <div data-in className="mt-6 flex gap-3">
-            <a href="#commande" className="btn btn-croute flex-1 md:flex-none">
-              Commander
-            </a>
-            <a href="#pains" className="btn btn-ligne flex-1 md:flex-none">
-              Nos pains
-            </a>
-          </div>
-        </div>
-      ),
-    },
-    ...categories.map((c, i) => ({
-      fond: FONDS[i + 1] ?? FONDS[0],
-      mot: c.label,
-      encre: '#2b1d12',
-      motOpacite: 0.08,
-      contenu: (
-        <div className="max-w-xl md:max-w-[42%]">
-          <p className="craie text-3xl text-croute">{['Au four…', 'Pur beurre', 'Le dimanche'][i] ?? ''}</p>
-          <h2 className="mt-1 text-[clamp(2.8rem,12vw,6.5rem)] leading-[0.92]">{c.label}</h2>
-          <ul className="mt-4 divide-y divide-croute/15 border-y border-croute/15">
-            {produits
-              .filter((p) => p.categorie === c.id)
-              .slice(0, 3)
-              .map((p) => (
-                <li key={p.id} className="flex items-baseline justify-between gap-4 py-2.5 text-base">
-                  <span>{p.nom}</span>
-                  <span className="shrink-0 font-serif text-xl font-bold text-croute">{formatEuros(p.prix)}</span>
-                </li>
-              ))}
-          </ul>
-          <a href="#commande" className="btn btn-croute mt-5">
-            Commander
-          </a>
-        </div>
-      ),
-    })),
-  ];
-
-  return (
-    <ScrollStory
-      id="accueil"
-      label="Accueil : Maison Levain, boulangerie"
-      steps={steps}
-      onReady={onReady}
-      className="papier"
-      indicateur="text-croute"
-      motClass="font-serif italic text-[clamp(5rem,24vw,22rem)] leading-none"
-      scene={(api) => <BakeryScene {...api} />}
-    />
-  );
-}
-
-/** Formes de produits dessinées (remplaçables par des photos). */
-function Dessin({ p }) {
-  const c = p.categorie;
-  return (
-    <svg viewBox="0 0 160 110" className="h-full w-full" aria-hidden="true">
-      <ellipse cx="80" cy="96" rx="58" ry="6" fill="#7a4a24" opacity="0.12" />
-      {c === 'pain' &&
-        (p.id === 'tradition' ? (
-          <g>
-            <rect x="12" y="52" width="136" height="34" rx="17" fill="#c98a3e" />
-            {[30, 58, 86, 114].map((x) => (
-              <path key={x} d={`M${x} 60l16 12`} stroke="#f1d39b" strokeWidth="5" strokeLinecap="round" />
-            ))}
-          </g>
-        ) : (
-          <g>
-            <ellipse cx="80" cy="66" rx="58" ry="26" fill={p.id === 'seigle' ? '#7a4a24' : '#b97a38'} />
-            <path d="M48 60l20-12M70 66l20-12M92 72l20-12" stroke="#ecc98d" strokeWidth="5" strokeLinecap="round" />
-            {p.id === 'cereales' &&
-              [40, 60, 80, 100, 120].map((x) => <circle key={x} cx={x} cy={58 + (x % 3) * 4} r="2.5" fill="#f5ecdc" />)}
-          </g>
-        ))}
-      {c === 'viennoiserie' &&
-        (p.id === 'croissant' ? (
-          <path d="M24 78c10-30 40-44 56-44s46 14 56 44c-14-8-24-6-30 2-8-10-18-12-26-12s-18 2-26 12c-6-8-16-10-30-2Z" fill="#d9a04e" />
-        ) : p.id === 'kouign' ? (
-          <g>
-            <rect x="34" y="40" width="92" height="48" rx="10" fill="#d9a04e" />
-            {[50, 70, 90, 110].map((x) => (
-              <line key={x} x1={x} y1="44" x2={x} y2="84" stroke="#b97a38" strokeWidth="3" />
-            ))}
-          </g>
-        ) : (
-          <g>
-            <rect x="34" y="46" width="92" height="40" rx="12" fill="#c98a3e" />
-            <rect x="50" y="56" width="60" height="6" rx="3" fill="#3b2116" />
-          </g>
-        ))}
-      {c === 'patisserie' &&
-        (p.id === 'flan' ? (
-          <g>
-            <path d="M40 50h80l-6 38H46Z" fill="#f2cf6e" />
-            <rect x="40" y="44" width="80" height="10" rx="4" fill="#9b5a2a" />
-          </g>
-        ) : (
-          <g>
-            <ellipse cx="80" cy="70" rx="64" ry="22" fill="#d9a04e" />
-            <ellipse cx="80" cy="64" rx="52" ry="16" fill="#8b4f22" />
-          </g>
-        ))}
-    </svg>
   );
 }
 
@@ -227,21 +71,15 @@ export function Pains() {
               key={p.id}
               className="group rounded-3xl bg-papier p-5 transition-transform duration-500 hover:-translate-y-1 hover:rotate-[-0.5deg]"
             >
-              <div
-                className={`relative transition-transform duration-700 ${p.photo ? '-mx-5 -mt-5 mb-1 aspect-[4/3] overflow-hidden rounded-t-3xl' : 'h-32 group-hover:scale-105'}`}
-              >
-                {p.photo ? (
-                  <Photo
-                    nom={p.photo}
-                    alt={p.alt}
-                    sizes="(min-width: 1024px) 23vw, (min-width: 640px) 46vw, 100vw"
-                    width="800"
-                    height="600"
-                    className="h-full w-full object-cover duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <Dessin p={p} />
-                )}
+              <div className="relative -mx-5 -mt-5 mb-1 aspect-[4/3] overflow-hidden rounded-t-3xl transition-transform duration-700">
+                <Photo
+                  nom={p.photo}
+                  alt={p.alt}
+                  sizes="(min-width: 1024px) 23vw, (min-width: 640px) 46vw, 100vw"
+                  width="800"
+                  height="600"
+                  className="h-full w-full object-cover duration-700 group-hover:scale-105"
+                />
                 {p.tag && (
                   <span className="craie absolute left-3 top-3 -rotate-6 rounded-full bg-ble/80 px-3 text-xl text-croute">{p.tag}</span>
                 )}

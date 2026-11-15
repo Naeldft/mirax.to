@@ -121,6 +121,31 @@ Matières, meubles et lumière : **Poly Haven, licence CC0**, dans `demos/btp/pu
 
 Construits en code : murs, dalles, fenêtres, porte, escalier, toit et chevrons, lit, cuisine, ferraillage, baladeuses.
 
+### Maison Levain (boulangerie)
+
+Détail complet des photos : `demos/boulangerie/photos/LISEZ-MOI.md`.
+- Intro : vraie scène 3D construite en code (`src/three/Fournil3D.jsx`) : boutique au petit matin, comptoir en bois
+  et pierre, four à sole au fond, deux ardoises, soleil par la fenêtre. Les pains sont de vraies photos détourées,
+  debout sur des planches qui glissent sur le côté ; la loupe montre la croûte, ou la mie quand la photo la montre.
+- Carte : 7 produits, tous avec une vraie photo (gaufre, tarte au sucre et flan retirés, faute de photo fidèle ;
+  « Seigle & raisins » devenu « Pain de seigle », la photo ne montrant pas de raisins).
+
+Matières, meubles et lumière : **Poly Haven, licence CC0** (mêmes fichiers que Forno Vivo), dans `demos/boulangerie/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Plan du comptoir, planches, étagères | `textures/wood_table_001-*` | https://polyhaven.com/a/wood_table_001 |
+| Murs, façade en pierre du comptoir | `textures/clay_plaster-*` | https://polyhaven.com/a/clay_plaster |
+| Sol | `textures/brick_floor_02-*` | https://polyhaven.com/a/brick_floor_02 |
+| Mur du fournil | `textures/brown_brick_02-*` | https://polyhaven.com/a/brown_brick_02 |
+| Paniers | `modeles/wicker_basket_01.glb` | https://polyhaven.com/a/wicker_basket_01 |
+| Ardoises | `modeles/standing_chalkboard_01.glb` | https://polyhaven.com/a/standing_chalkboard_01 |
+| Suspensions | `modeles/hanging_industrial_lamp.glb` | https://polyhaven.com/a/hanging_industrial_lamp |
+| Planche à découper | `modeles/wooden_cutting_board.glb` | https://polyhaven.com/a/wooden_cutting_board |
+| Reflets (photo 360°) | `ambiance-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/warm_restaurant_night |
+
+Construits en code : murs, comptoir, four à sole, fenêtre et rayon de soleil, planches, farine en suspension.
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

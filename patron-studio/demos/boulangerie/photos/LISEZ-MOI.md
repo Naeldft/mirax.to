@@ -1,28 +1,38 @@
 # Photos de Maison Levain
 
-Déposez votre photo dans ce dossier **avec le même nom**, puis relancez `./construire-dossier-ovh.sh`
-(versions WebP 800 et 1 600 px créées automatiquement). Tant qu’un produit n’a pas de photo, sa carte
-garde son dessin.
+Règle : uniquement de vraies photos qui montrent **exactement** ce que dit le texte (aucune image IA, aucun dessin,
+aucun rendu 3D). Un produit sans photo fidèle est retiré de la carte.
 
-| Emplacement | Produit | Description attendue |
+Pour changer une photo : déposez la vôtre dans ce dossier **avec le même nom**, puis relancez
+`./construire-dossier-ovh.sh` (versions WebP 800 et 1 600 px créées automatiquement).
+
+## Produits
+
+| Fichier | Produit | Photo d'origine (Unsplash) |
 |---|---|---|
-| `pain-tradition` | Baguette tradition | Baguettes tradition dorées, grigne ouverte (photo actuelle : assortiment de pains, à remplacer par des baguettes seules) |
-| `pain-campagne` | Pain de campagne au levain | Grosse boule farinée, croûte épaisse |
-| `pain-seigle` | Seigle & raisins | Pain de seigle foncé, idéalement coupé pour montrer les raisins |
-| `pain-cereales` | Pain aux céréales | Pain tranché, graines visibles |
-| `viennoiserie-croissant` | Croissant pur beurre | Croissants dorés feuilletés |
-| `viennoiserie-pain-chocolat` | Pain au chocolat | Plaque de pains au chocolat |
-| `kouign` | Gaufre fourrée à la vergeoise | **À FOURNIR** : gaufre fine du Nord fourrée à la vergeoise, coupée. Puis `photo: 'kouign'` dans `src/data/site.js` |
-| `tarte-sucre` | Tarte au sucre | **À FOURNIR** : tarte au sucre du Nord entière, dessus caramélisé |
-| `flan` | Flan pâtissier | **À FOURNIR** : part de flan vanille, dessus brûlé |
+| pain-tradition | Baguette tradition (baguettes farinées côte à côte) | https://images.unsplash.com/photo-1597079910443-60c43fc4f729 |
+| pain-campagne | Pain de campagne au levain | https://images.unsplash.com/photo-1589367920969-ab8e050bbb04 |
+| pain-seigle | Pain de seigle (tranché, mie visible) | https://images.unsplash.com/photo-1549931319-a545dcf3bc73 |
+| pain-mie | Pain de mie (tranché) | https://images.unsplash.com/photo-1598373182133-52452f7691ef |
+| viennoiserie-croissant | Croissant pur beurre | https://images.unsplash.com/photo-1555507036-ab1f4038808a |
+| viennoiserie-pain-chocolat | Pain au chocolat (plaque) | https://images.unsplash.com/photo-1483695028939-5bb13f8648b0 |
+| viennoiserie-brioche | Brioche pur beurre | https://images.unsplash.com/photo-1620921568790-c1cf8984624c |
 
-## Origine (Unsplash, licence libre, usage commercial autorisé)
+## Accueil 3D (`public/scene/pains/`)
 
-| Fichier | Photo d'origine |
-|---|---|
-| pain-tradition | https://images.unsplash.com/photo-1608198093002-ad4e005484ec |
-| pain-campagne | https://images.unsplash.com/photo-1589367920969-ab8e050bbb04 |
-| pain-seigle | https://images.unsplash.com/photo-1509440159596-0249088772ff |
-| pain-cereales | https://images.unsplash.com/photo-1534620808146-d33bb39128b2 |
-| viennoiserie-croissant | https://images.unsplash.com/photo-1555507036-ab1f4038808a |
-| viennoiserie-pain-chocolat | https://images.unsplash.com/photo-1483695028939-5bb13f8648b0 |
+Les pains posés sur les planches sont de vraies photos **détourées** (fond transparent, WebP 1 024 et 512 px) :
+
+| Fichier | Produit | Photo d'origine (Unsplash) |
+|---|---|---|
+| campagne-* | Pain de campagne (boule farinée, de profil) | https://images.unsplash.com/photo-1586444248902-2f64eddc13df |
+| seigle-* | Pain de seigle tranché (la loupe montre la mie) | https://images.unsplash.com/photo-1549931319-a545dcf3bc73 |
+| brioche-* | Brioche pur beurre | https://images.unsplash.com/photo-1620921568790-c1cf8984624c |
+| mie-* | Pain de mie tranché (la loupe montre la mie) | https://images.unsplash.com/photo-1598373182133-52452f7691ef |
+| croissant-* | Croissants | https://images.unsplash.com/photo-1555507036-ab1f4038808a |
+| tradition-* | Baguettes, dans le panier au bout du comptoir | https://images.unsplash.com/photo-1597079910443-60c43fc4f729 |
+
+Pour changer un pain de l'accueil : détourez la nouvelle photo (fond transparent), gardez le même nom, et réglez
+`plateau` (largeur réelle, position de la mie) dans `src/data/site.js`.
+
+Pour un vrai client : photographiez ses propres pains.
+Licence Unsplash : usage commercial autorisé, sans attribution obligatoire.

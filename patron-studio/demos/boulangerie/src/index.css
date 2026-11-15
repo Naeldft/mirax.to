@@ -56,3 +56,11 @@
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* flèches de l'accueil 3D (changer de pain) */
+.lv-fleche {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 999px;
+  border: 1px solid rgb(251 246 236 / 0.3); color: var(--color-farine); transition: background-color 0.25s, border-color 0.25s;
+}
+.lv-fleche:hover { background: rgb(251 246 236 / 0.12); border-color: rgb(251 246 236 / 0.6); }
+.lv-fleche:focus-visible { outline: 2px solid var(--color-ble); outline-offset: 3px; }
