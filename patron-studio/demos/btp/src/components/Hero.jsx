@@ -106,7 +106,7 @@ export default function Hero({ onReady }) {
       <p data-hero-in className="etiquette">
         {entreprise.accroche}
       </p>
-      <h1 className="mt-3 text-[clamp(2.5rem,min(11.5vw,8svh),4.5rem)] leading-[0.9] md:text-[clamp(3rem,min(5.6vw,10svh),6.2rem)]">
+      <h1 className="mt-3 text-[clamp(2.5rem,min(11.5vw,8svh),4.5rem)] leading-[0.9] md:text-[clamp(3rem,min(4.6vw,10svh),6.2rem)]">
         {['On bâtit.', 'Vous', 'emménagez.'].map((l, i) => (
           <span key={l} className="block overflow-hidden">
             <span data-line className={`block ${i ? 'text-plan' : ''}`}>
