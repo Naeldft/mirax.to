@@ -105,6 +105,7 @@ function Salle({ taille }) {
     [],
   );
   const enseigne = useMemo(() => texte([['Atelier Mèche', 150]], { couleur: '#e9c98f' }), []);
+  const enseigneFond = useMemo(() => texte([['Atelier Mèche', 150]], { couleur: '#9a6a3a' }), []);
   return (
     <group>
       {/* dehors */}
@@ -154,6 +155,18 @@ function Salle({ taille }) {
       <mesh position={[0, HAUT / 2, FOND]} material={mur}>
         <planeGeometry args={[2 * L, HAUT]} />
       </mesh>
+      {/* au fond : l'enseigne peinte du salon, encadrée de laiton */}
+      <mesh position={[0, 1.95, FOND + 0.014]}>
+        <planeGeometry args={[2.8, 0.7]} />
+        <meshBasicMaterial map={enseigneFond} transparent toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 1.95, FOND + 0.004]} material={m.laiton}>
+        <boxGeometry args={[3.2, 1.0, 0.006]} />
+      </mesh>
+      <mesh position={[0, 1.95, FOND + 0.01]}>
+        <planeGeometry args={[3.12, 0.92]} />
+        <meshStandardMaterial color="#f3e2d8" roughness={0.9} />
+      </mesh>
       {/* suspensions en laiton le long du salon */}
       {[-1.8, -4.1, -6.4, -8.4].map((z) => (
         <group key={z} position={[0, HAUT - 0.65, z]}>
@@ -180,7 +193,18 @@ function Poste({ poste, envMiroir, marbre, laiton, client }) {
   const xMur = cote * L;
   const rot = -cote * (Math.PI / 2); // face à l'allée
   const { scene } = useGLTF(`${BASE}scene/modeles/fauteuil.glb`);
-  const fauteuil = useMemo(() => scene.clone(true), [scene]);
+  // le fauteuil, sans son appui-tête (coupé au-dessus du dossier) : vu de dos, rien ne cache la tête du client
+  const fauteuil = useMemo(() => {
+    const f = scene.clone(true);
+    const coupe = [new THREE.Plane(new THREE.Vector3(0, -1, 0), 1.29)];
+    f.traverse((o) => {
+      if (o.isMesh) {
+        o.material = o.material.clone();
+        o.material.clippingPlanes = coupe;
+      }
+    });
+    return f;
+  }, [scene]);
   const xFauteuil = xMur - cote * FAUTEUIL_DU_MUR;
   return (
     <group>
@@ -296,11 +320,12 @@ const SORTIE = [
 ];
 
 /** Vue autour du client i, à l'angle a (0 : de dos, depuis l'allée ; π/2 : de profil, côté entrée ; au-delà : trois quarts face). */
-function vueAutour(i, a, portrait, pos, cible) {
+function vueAutour(i, a, portrait, pos, cible, dos = false) {
   const { cote, z } = POSTES[i];
   const hx = cote * (L - FAUTEUIL_DU_MUR) + cote * 0.05;
   const r = portrait ? 1.25 : 1.05;
-  pos.set(hx - cote * Math.cos(a) * r, 1.62, z + Math.sin(a) * r);
+  // vu de dos, la caméra est plus haute : l'appui-tête ne masque pas le haut de la coupe
+  pos.set(hx - cote * Math.cos(a) * r, dos ? 1.88 : 1.62, z + Math.sin(a) * r);
   cible.set(hx, TETE_Y - (portrait ? 0.22 : 0.08), z);
   if (!portrait) {
     // ordinateur : le client à droite de l'écran (le texte est à gauche)
@@ -327,9 +352,10 @@ function Camera({ progres, refPorte, clientsVues }) {
     const poses = [...ENTREE.map(([t, a, b]) => [t, (pp, cc) => (pp.set(...a), cc.set(...b))])];
     ARRETS.forEach(([ta, tb], i) => {
       // coupes courtes et chignons : on tourne par l'arrière ; coupes encadrant le visage : de profil à trois quarts face
-      const [a0, a1] = clientsVues[i] === 'dos' ? [0.35, 1.25] : [1.25, 2.25];
-      poses.push([ta, (pp, cc) => vueAutour(i, a0, portrait, pp, cc)]);
-      poses.push([tb, (pp, cc) => vueAutour(i, a1, portrait, pp, cc)]);
+      const [a0, a1] = clientsVues[i] === 'dos' ? [0.55, 1.35] : [1.25, 2.25];
+      const dos = clientsVues[i] === 'dos';
+      poses.push([ta, (pp, cc) => vueAutour(i, a0, portrait, pp, cc, dos)]);
+      poses.push([tb, (pp, cc) => vueAutour(i, a1, portrait, pp, cc, dos)]);
     });
     SORTIE.forEach(([t, a, b]) => poses.push([t, (pp, cc) => (pp.set(...a), cc.set(...b))]));
     let i = 1;
@@ -337,12 +363,28 @@ function Camera({ progres, refPorte, clientsVues }) {
     const [t0, f0] = poses[i - 1];
     const [t1, f1] = poses[i];
     const r = (p - t0) / (t1 - t0);
-    // pendant l'arrêt (tour lent autour du client) : mouvement régulier ; entre deux clients : départ et arrivée en douceur
-    const k = i % 2 === 0 && i > 4 && i < poses.length - 2 ? Math.min(1, Math.max(0, r)) : doux(r);
+    // segments : 4 + 2j = arrivée au client j (depuis l'entrée ou le client précédent), 5 + 2j = tour lent autour de lui
+    const n = ARRETS.length;
+    const tour = i % 2 === 1 && i >= 5 && i <= 3 + 2 * n;
+    const passage = i % 2 === 0 && i >= 4 && i <= 4 + 2 * (n - 1);
+    // pendant le tour : mouvement régulier ; entre deux clients : départ et arrivée en douceur
+    const k = tour ? Math.min(1, Math.max(0, r)) : doux(r);
     f0(p0, c0);
     f1(p1, c1);
     camera.position.copy(p0.lerp(p1, k));
     camera.lookAt(c0.lerp(c1, k));
+    // entre deux clients, la caméra passe en arc au-dessus des fauteuils : un dossier ne cache jamais une tête
+    if (passage && i > 4) {
+      const arc = Math.sin(Math.PI * Math.min(1, Math.max(0, r)));
+      camera.position.y += 0.45 * arc;
+      // pendant le passage, le regard file vers le fond du salon (il ne plonge jamais vers le sol)
+      const loin = Math.pow(arc, 1.5) * 0.85;
+      camera.lookAt(
+        c0.x + (camera.position.x * 0.2 - c0.x) * loin,
+        c0.y + (1.45 - c0.y) * loin,
+        c0.z + (Math.max(FOND + 1.5, camera.position.z - 3) - c0.z) * loin,
+      );
+    }
     camera.fov = portrait ? 60 : 46;
     camera.updateProjectionMatrix();
     if (refPorte.current) refPorte.current.rotation.y = 1.4 * doux((p - 0.06) / 0.06);
@@ -446,6 +488,7 @@ export default function Salon3D({ progres, clientes, leger, actif = true, onRead
       onCreated={({ gl, scene }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.05;
+        gl.localClippingEnabled = true;
         scene.background = new THREE.Color('#2a211d');
         scene.fog = new THREE.Fog('#2a211d', 12, 26);
       }}
