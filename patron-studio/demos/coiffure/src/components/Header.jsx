@@ -36,7 +36,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-[60] transition-colors duration-500 ${scrolled || open ? 'bg-creme/90 backdrop-blur-md' : ''}`}
+        className={`fixed inset-x-0 top-0 z-[60] bg-creme/90 backdrop-blur-md transition-colors duration-500 ${scrolled || open ? 'shadow-[0_1px_0_rgb(28_26_26/0.08)]' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:h-20 md:px-8">
           <a href="#accueil" className="flex min-h-11 items-center gap-2" aria-label={`${salon.nom}, retour à l’accueil`}>
