@@ -158,7 +158,7 @@ function Camera({ progres, n }) {
       const { cote, x, z } = placeCadre(Math.min(i, n - 1));
       const recul = portrait ? 3.3 : 2.9;
       pos.set(x - cote * recul * 0.75, 1.55, z + recul * 0.62);
-      cib.set(x, HAUTEUR - (portrait ? 0.55 : 0), z);
+      cib.set(x, HAUTEUR - (portrait ? 0.75 : 0), z);
       if (!portrait) {
         // décale la visée pour laisser la place du texte à gauche
         const d = new THREE.Vector3().subVectors(cib, pos).normalize();

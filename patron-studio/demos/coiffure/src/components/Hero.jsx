@@ -77,10 +77,10 @@ export default function Hero({ onReady }) {
       classes={{
         section: 'bg-creme text-encre',
         voile: 'bg-gradient-to-t from-creme/95 via-creme/50 to-transparent md:bg-gradient-to-r md:from-creme/90 md:via-creme/40 md:to-transparent',
-        carte: 'rounded-3xl bg-creme/90 p-6 shadow-[0_20px_50px_-25px_rgb(0_0_0/0.35)] backdrop-blur md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none',
+        carte: 'rounded-3xl bg-creme/90 p-5 shadow-[0_20px_50px_-25px_rgb(0_0_0/0.35)] backdrop-blur md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none',
         surtitre: 'numero text-lg',
-        titre: 'mt-1 text-[clamp(2.6rem,9vw,5.5rem)] leading-[0.9]',
-        texte: 'mt-3 max-w-md text-lg text-taupe',
+        titre: 'mt-1 text-[clamp(2.2rem,9vw,5.5rem)] leading-[0.9]',
+        texte: 'mt-3 hidden max-w-md text-lg text-taupe md:block',
         fin: 'bg-creme',
       }}
       fin={
