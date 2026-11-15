@@ -208,6 +208,39 @@ Modèle, matières et lumière : **Poly Haven, licence CC0**, dans `demos/coiffu
 | Consoles | `textures/marble_01-*` | https://polyhaven.com/a/marble_01 |
 | Lumière d'ambiance (photo 360°) | `maison-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/small_empty_house |
 
+### Pulse Coaching (coach sportif)
+
+- Intro : salle de sport premium en 3D (`demos/coach/src/three/Salle3D.jsx`), rendue de façon photoréaliste
+  (matières PBR, lumière HDRI, soleil par la verrière avec ombres douces, occlusion ambiante, reflets au sol,
+  rendu filmique AgX, profondeur de champ, grain et vignettage). Matériel construit en code à l'échelle ;
+  athlètes = mannequins sculptés en code (`src/three/Athlete.jsx`), en décor. Aucune illustration.
+- Vraies vidéos de séance : une par offre, en boucle et sans son, sur les écrans de la salle.
+
+Vidéos : **Pexels, licence Pexels** (gratuite, usage commercial autorisé, sans attribution obligatoire),
+recadrées, raccourcies à 8 s, sans son, dans `demos/coach/public/scene/videos/` (`-hd` ordinateur 960 px,
+`-sd` téléphone 576 px, en MP4 H.264 et WebM VP9, plus une image d'attente `-affiche.jpg`).
+
+| Offre | Fichier | Source Pexels |
+|---|---|---|
+| Séance découverte (kettlebell) | `decouverte-*` | https://www.pexels.com/video/elderly-man-lifting-kettlebell-7319944/ |
+| Coaching individuel (squat à la barre) | `solo-*` | https://www.pexels.com/video/side-view-of-a-man-doing-barbell-squats-5319759/ |
+| Duo (médecine-ball à deux) | `duo-*` | https://www.pexels.com/video/couple-working-out-together-4866863/ |
+| Petit groupe | `groupe-*` | https://www.pexels.com/video/people-working-out-6326753/ |
+| Coaching en ligne (séance devant l'ordinateur) | `enligne-*` | https://www.pexels.com/video/woman-doing-yoga-in-front-of-a-laptop-6583383/ |
+
+Matières, modèle et lumière : **Poly Haven, licence CC0**, dans `demos/coach/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Sol en dalles de caoutchouc | `pbr/rubber_tiles-*` | https://polyhaven.com/a/rubber_tiles |
+| Murs et plafond en béton | `pbr/concrete_wall_008-*` | https://polyhaven.com/a/concrete_wall_008 |
+| Parquet de chêne (murs, plateforme, box) | `pbr/oak_wood_planks-*` | https://polyhaven.com/a/oak_wood_planks |
+| Cuir des bancs | `pbr/brown_leather-*` | https://polyhaven.com/a/brown_leather |
+| Caoutchouc granuleux (disques, haltères, tapis) | `pbr/rubberized_track-*` | https://polyhaven.com/a/rubberized_track |
+| Tôle des platines du rack | `pbr/metal_plate-*` | https://polyhaven.com/a/metal_plate |
+| Plantes | `modeles/potted_plant_04.glb` | https://polyhaven.com/a/potted_plant_04 |
+| Lumière d'ambiance (HDRI, désaturée et réchauffée) | `gym-1k.hdr`, `gym-512.hdr` | https://polyhaven.com/a/crossfit_gym |
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

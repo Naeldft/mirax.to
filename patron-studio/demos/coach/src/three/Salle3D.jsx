@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, MeshReflectorMaterial, useGLTF } from '@react-three/drei';
+import { Environment, MeshReflectorMaterial, useGLTF, useTexture } from '@react-three/drei';
 import { DepthOfField, EffectComposer, N8AO, Noise, ToneMapping, Vignette } from '@react-three/postprocessing';
 import { BlendFunction, ToneMappingMode } from 'postprocessing';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
@@ -558,13 +558,115 @@ const POSES = {
   etirement: { epaules: [3.0, 0.1], ouverture: [0.15, 0.4], coudes: [0.1, 0.2], tete: 0.2 },
 };
 
-function Poste({ poste, m }) {
+/* ---------- les vraies vidéos de séance (Pexels, licence libre) ----------
+   Une vidéo courte par offre, en boucle et sans son, sur un écran de la salle. Elle passe par le même rendu que
+   la scène (reflets de la dalle de verre, rendu filmique, grain, vignettage, profondeur de champ), donc s'y fond.
+   Seule la vidéo de l'arrêt en cours est lue ; elle n'est chargée qu'à l'approche (version légère sur téléphone). */
+export const VIDEOS = {
+  decouverte: { l: 1.7, h: 0.956 },
+  solo: { l: 1.7, h: 0.956 },
+  duo: { l: 1.7, h: 0.956 },
+  groupe: { l: 0.66, h: 1.17 },
+};
+
+function Video({ nom, l, h, i, progres, def }) {
+  const affiche = useTexture(`${BASE}scene/videos/${nom}-affiche.jpg`);
+  const [video] = useState(() => {
+    const v = document.createElement('video');
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.preload = 'none';
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    return v;
+  });
+  const etat = useRef({ charge: false, pret: false });
+  const { tex, mat } = useMemo(() => {
+    affiche.colorSpace = THREE.SRGBColorSpace;
+    const t = new THREE.VideoTexture(video);
+    t.colorSpace = THREE.SRGBColorSpace;
+    // dalle d'écran : l'image est émise, une vitre légèrement brillante reflète la salle par-dessus
+    const m = new THREE.MeshStandardMaterial({ color: '#000000', emissive: '#ffffff', emissiveIntensity: 1.15, emissiveMap: affiche, roughness: 0.14, metalness: 0, envMapIntensity: 0.5 });
+    return { tex: t, mat: m };
+  }, [video, affiche]);
+  useEffect(
+    () => () => {
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+      tex.dispose();
+    },
+    [video, tex],
+  );
+  useFrame(() => {
+    const p = progres.lisse ?? 0;
+    const [ta, tb] = ARRETS[i];
+    const proche = p > ta - 0.12 && p < tb + 0.08;
+    const e = etat.current;
+    if (proche && !e.charge) {
+      e.charge = true;
+      for (const [ext, type] of [
+        ['mp4', 'video/mp4'],
+        ['webm', 'video/webm'],
+      ]) {
+        const s = document.createElement('source');
+        s.src = `${BASE}scene/videos/${nom}-${def}.${ext}`;
+        s.type = type;
+        video.appendChild(s);
+      }
+      video.preload = 'auto';
+      video.load();
+    }
+    if (!e.charge) return;
+    if (!e.pret && video.readyState >= 2) {
+      e.pret = true;
+      mat.emissiveMap = tex;
+      mat.needsUpdate = true;
+    }
+    if (IMAGE_PAR_IMAGE) {
+      // enregistrement image par image : la vidéo suit l'horloge de la scène
+      if (video.readyState >= 1 && !video.seeking && video.duration) video.currentTime = horloge.t % video.duration;
+    } else if (proche && video.paused) video.play().catch(() => {});
+    else if (!proche && !video.paused) video.pause();
+  });
+  return (
+    <mesh material={mat}>
+      <planeGeometry args={[l, h]} />
+    </mesh>
+  );
+}
+
+/** Écran mural (béton) ou suspendu devant la verrière : cadre noir fin, dalle vidéo. */
+function EcranMural({ poste, i, progres, def, m }) {
+  const { id, cote, z } = poste;
+  const { l, h } = VIDEOS[id];
+  const x = cote * (cote > 0 ? L - 0.05 : L - 0.3);
+  return (
+    <group position={[x, 2.3, z]} rotation-y={-cote * (Math.PI / 2)}>
+      <mesh material={m.nylon} position={[0, 0, -0.025]}>
+        <boxGeometry args={[l + 0.05, h + 0.05, 0.04]} />
+      </mesh>
+      <group position={[0, 0, 0.0]}>
+        <Video nom={id} l={l} h={h} i={i} progres={progres} def={def} />
+      </group>
+      {/* devant la verrière, l'écran est suspendu au plafond par deux câbles */}
+      {cote < 0 &&
+        [-1, 1].map((s) => (
+          <mesh key={s} material={m.zinc} position={[s * l * 0.4, (HAUT - 2.3 + h / 2) / 2, -0.03]}>
+            <cylinderGeometry args={[0.004, 0.004, HAUT - 2.3 - h / 2, 6]} />
+          </mesh>
+        ))}
+    </group>
+  );
+}
+
+function Poste({ poste, m, i, progres, def }) {
   const { id, cote, z } = poste;
   const x = cote * X_POSTE;
   // le poste regarde vers l'allée (vers -x à droite, +x à gauche), légèrement vers l'entrée
   const rot = -cote * (Math.PI / 2) + cote * 0.35;
   const kb = <Kettlebell />;
-  const ecranTex = useMemo(() => neon('EN DIRECT', ACIDE, 150), []);
   return (
     <group position={[x, 0, z]} rotation-y={rot}>
       {id === 'decouverte' && (
@@ -657,10 +759,9 @@ function Poste({ poste, m }) {
             <mesh position={[0, 1.3, 0]} material={m.acier}>
               <boxGeometry args={[1.5, 0.88, 0.06]} />
             </mesh>
-            <mesh position={[0, 1.3, 0.032]}>
-              <planeGeometry args={[1.42, 0.8]} />
-              <meshBasicMaterial map={ecranTex} toneMapped={false} color="#cfe8a8" />
-            </mesh>
+            <group position={[0, 1.3, 0.032]}>
+              <Video nom="enligne" l={1.42} h={0.8} i={i} progres={progres} def={def} />
+            </group>
             {[-0.6, 0.6].map((dx) => (
               <mesh key={dx} position={[dx, 0.43, 0]} material={m.acier}>
                 <boxGeometry args={[0.05, 0.86, 0.05]} />
@@ -697,7 +798,7 @@ function vue(i, a, portrait, pos, cible) {
   const r = portrait ? 4.4 : 3.9;
   // a : angle autour du poste (0 : de face depuis l'allée, + : vers l'entrée)
   pos.set(cx - cote * Math.cos(a) * r, 1.95, z + Math.sin(a) * r);
-  cible.set(cx, portrait ? 0.75 : 1.0, z);
+  cible.set(cx, portrait ? 0.95 : 1.3, z);
   if (!portrait) {
     const dx = cible.x - pos.x;
     const dz = cible.z - pos.z;
@@ -836,14 +937,17 @@ function Pret({ onReady }) {
   return null;
 }
 
-function Scene({ def, reflets }) {
+function Scene({ def, reflets, progres }) {
   const m = useMateriel(def);
   return (
     <>
       <Ambiance def={def} />
       <Salle def={def} reflets={reflets} />
-      {POSTES.map((p) => (
-        <Poste key={p.id} poste={p} m={m} />
+      {POSTES.map((p, i) => (
+        <Poste key={p.id} poste={p} m={m} i={i} progres={progres} def={def} />
+      ))}
+      {POSTES.filter((p) => VIDEOS[p.id]).map((p) => (
+        <EcranMural key={`e${p.id}`} poste={p} i={POSTES.indexOf(p)} progres={progres} def={def} m={m} />
       ))}
       <Ombres />
     </>
@@ -876,7 +980,7 @@ export default function Salle3D({ progres, leger, actif = true, onReady }) {
       <hemisphereLight args={['#f3ece2', '#2a2420', 0.18]} />
       {!leger && <Soleil taille={complet ? 2048 : 1024} />}
       <Suspense fallback={null}>
-        <Scene def={def} reflets={complet} />
+        <Scene def={def} reflets={complet} progres={progres} />
         <Camera progres={progres} foyer={foyer} />
         {!leger && <Effets niveau={complet ? 'complet' : 'leger'} foyer={foyer} />}
         <Pret onReady={onReady} />
