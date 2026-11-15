@@ -26,6 +26,8 @@ const brut = fs.mkdtempSync(path.join(os.tmpdir(), 'captures-'));
     for (const d of DEMOS) {
       const p = await ctx.newPage();
       await p.goto(`${BASE}/demos/${d}/`, { waitUntil: 'networkidle' });
+      // l'écran de chargement doit avoir disparu (la 3D peut être lente à préparer sans carte graphique)
+      await p.waitForFunction(() => !document.querySelector('div.fixed[role="status"]'), null, { timeout: 120000 }).catch(() => {});
       await p.waitForTimeout(8000); // la 3D et les animations d'entrée se posent
       await p.screenshot({ path: path.join(brut, `${d}-${n}.png`), timeout: 240000 });
       await p.close();
