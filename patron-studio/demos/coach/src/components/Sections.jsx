@@ -1,15 +1,13 @@
-import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { emailOk, telOk } from '@demos/shared/lib/validation.js';
 import { avis, chiffres, coach, faq, jours, objectifs, piliers, planning, programmes, typesSeance } from '../data/site';
 
-const PulseScene = lazy(() => import('../three/PulseScene'));
 
 function Titre({ tag, children, intro, id }) {
   return (
@@ -26,86 +24,6 @@ function Titre({ tag, children, intro, id }) {
         </p>
       )}
     </div>
-  );
-}
-
-export function Hero({ onReady }) {
-  const section = useRef(null);
-  const stats = useRef({ bpm: 72, reps: 0 });
-  const bpm = useRef(null);
-  const reps = useRef(null);
-  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady });
-  // affichage du cardio et des répétitions (sans re-rendu React)
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (bpm.current) bpm.current.textContent = stats.current.bpm;
-      if (reps.current) reps.current.textContent = stats.current.reps;
-    }, 150);
-    return () => clearInterval(id);
-  }, []);
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      gsap.from('[data-mot]', { yPercent: 100, skewY: 8, duration: 0.9, stagger: 0.08, ease: 'power4.out', delay: 0.25 });
-      gsap.from('[data-in]', { opacity: 0, y: 20, stagger: 0.08, duration: 0.7, delay: 0.7 });
-    }, section);
-    return () => ctx.revert();
-  }, [reduced]);
-  return (
-    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[200svh]'}`} aria-label="Accueil">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[radial-gradient(ellipse_55%_50%_at_70%_55%,rgb(198_255_61/0.12),transparent_70%)]">
-        {load3d && (
-          <Suspense fallback={null}>
-            <PulseScene progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} stats={stats} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-noir via-noir/80 to-transparent md:hidden" />
-        <div className="pointer-events-none relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-8 md:justify-center md:px-8 md:pb-0">
-          <p data-in className="tag">
-            {coach.accroche}
-          </p>
-          <h1 className="mt-3 text-[clamp(3.6rem,15vw,10rem)] leading-[0.88]">
-            <span className="block overflow-hidden">
-              <span data-mot className="block">
-                Plus fort.
-              </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span data-mot className="contour block">
-                Chaque
-              </span>
-            </span>
-            <span className="block overflow-hidden">
-              <span data-mot className="block text-acide">
-                semaine.
-              </span>
-            </span>
-          </h1>
-          <div data-in className="mt-5 flex gap-6 font-display text-xl uppercase" aria-hidden="true">
-            <p>
-              <span ref={bpm} className="text-4xl text-acide tabular-nums">
-                72
-              </span>{' '}
-              BPM
-            </p>
-            <p>
-              <span ref={reps} className="text-4xl tabular-nums">
-                0
-              </span>{' '}
-              reps
-            </p>
-          </div>
-          <div data-in className="pointer-events-auto mt-6 flex gap-3">
-            <a href="#essai" className="btn btn-acide">
-              Séance offerte
-            </a>
-            <a href="#programmes" className="btn btn-ligne">
-              Programmes
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
