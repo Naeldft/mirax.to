@@ -73,6 +73,22 @@ function neon(texte, couleur, taille = 200) {
   return t;
 }
 
+function degradeCiel() {
+  const c = document.createElement('canvas');
+  c.width = 4;
+  c.height = 256;
+  const g = c.getContext('2d');
+  const d = g.createLinearGradient(0, 0, 0, 256);
+  d.addColorStop(0, '#fbf8f2');
+  d.addColorStop(0.6, '#e9e4da');
+  d.addColorStop(1, '#cfc8bb');
+  g.fillStyle = d;
+  g.fillRect(0, 0, 4, 256);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 /* ---------- la salle ---------- */
 function Sol({ def, reflets }) {
   // dalles de caoutchouc 1 m × 1 m, joints fins ; sur ordinateur, un reflet très diffus (caoutchouc satiné)
@@ -116,7 +132,8 @@ function Salle({ def, reflets }) {
   const m = useMemo(
     () => ({
       led: new THREE.MeshBasicMaterial({ color: '#fff6ea', toneMapped: false }),
-      jour: new THREE.MeshBasicMaterial({ color: '#f2eee6', toneMapped: false }),
+      // verrière : un ciel clair, plus lumineux en haut (dégradé), légèrement chaud
+      jour: new THREE.MeshBasicMaterial({ map: degradeCiel(), toneMapped: false }),
       // menuiseries de la verrière : acier thermolaqué noir, légèrement brossé
       acier: new THREE.MeshStandardMaterial({ color: '#1d1d1f', roughness: 0.45, metalness: 0.75, normalMap: b.normal, roughnessMap: b.rugosite }),
       acide: new THREE.MeshBasicMaterial({ color: ACIDE, toneMapped: false }),
@@ -602,11 +619,11 @@ function Poste({ poste, m }) {
           <group position={[-1.35, 0, -0.5]} rotation-y={0.3}>
             <Halteres m={m} />
           </group>
-          <group position={[-1.15, 0, 0.75]} rotation-y={0.45}>
+          <group position={[1.75, 0, -1.0]} rotation-y={-0.5}>
             <Banc m={m} dossier={0.6} />
           </group>
           {/* une paire d'haltères posée au sol, au pied du banc */}
-          <group position={[-0.55, 0.045, 1.05]} rotation-y={0.3}>
+          <group position={[-0.75, 0.045, 0.85]} rotation-y={0.3}>
             <Haltere m={m} kg={12} />
           </group>
         </>
@@ -729,7 +746,7 @@ function Camera({ progres, foyer }) {
 
 /** Lumière et reflets d'une vraie salle de sport : HDRI Poly Haven (crossfit gym), neutralisée et réchauffée. */
 function Ambiance({ def }) {
-  return <Environment files={`${BASE}scene/gym-${def === 'hd' ? '1k' : '512'}.hdr`} environmentIntensity={0.55} />;
+  return <Environment files={`${BASE}scene/gym-${def === 'hd' ? '1k' : '512'}.hdr`} environmentIntensity={0.42} />;
 }
 
 /** Le soleil rasant entre par la verrière : ombres douces au sol, rais de lumière entre les montants. */
@@ -739,10 +756,10 @@ function Soleil({ taille }) {
     <>
       <primitive object={cible} position={[0, 0, -6.5]} />
       <directionalLight
-        position={[-10, 5.2, -3.5]}
+        position={[-10, 9, -3]}
         target={cible}
         color="#ffe2c2"
-        intensity={2.4}
+        intensity={3.2}
         castShadow
         shadow-mapSize={[taille, taille]}
         shadow-bias={-0.0004}
@@ -782,7 +799,7 @@ function Effets({ niveau, foyer }) {
         <N8AO aoRadius={0.55} distanceFalloff={0.5} intensity={2.4} quality="medium" color="#0a0806" />
         <DepthOfField ref={dof} target={foyer} worldFocusRange={2.6} bokehScale={2.2} resolutionScale={0.5} />
         <ToneMapping mode={ToneMappingMode.AGX} />
-        <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.35} />
+        <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.16} />
         <Vignette offset={0.28} darkness={0.55} />
       </EffectComposer>
     );
@@ -791,7 +808,7 @@ function Effets({ niveau, foyer }) {
     <EffectComposer multisampling={0}>
       <N8AO aoRadius={0.5} distanceFalloff={0.5} intensity={2.2} quality="performance" halfRes depthAwareUpsampling color="#0a0806" />
       <ToneMapping mode={ToneMappingMode.AGX} />
-      <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.3} />
+      <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.14} />
       <Vignette offset={0.28} darkness={0.5} />
     </EffectComposer>
   );
