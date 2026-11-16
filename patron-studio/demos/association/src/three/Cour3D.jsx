@@ -292,7 +292,7 @@ const POSES = {
   // l'enfant arrose : bras droit tendu vers l'avant avec l'arrosoir, l'autre détendu
   arrose: { epaules: [0.08, 0.95], ouverture: [0.14, 0.08], coudes: [0.2, 0.25], tete: 0.3, teteY: -0.2 },
   // aide aux devoirs : élèves assis, les deux mains posées sur le cahier
-  eleve: { bassinY: 0.66, bassinX: 0.12, hanches: [1.5, 1.5], genoux: [1.5, 1.5], ecart: [0.1, 0.1], tete: 0.45, rotBras: [-0.17, -0.098], epaules: [0.589, 0.572], ouverture: [-0.05, 0.017], coudes: [2.118, 1.937] },
+  eleve: { bassinY: 0.62, bassinX: 0.15, hanches: [1.5, 1.5], genoux: [1.45, 1.45], ecart: [0.1, 0.1], tete: 0.45, rotBras: [-0.169, -0.188], epaules: [0.558, 0.572], ouverture: [-0.031, -0.042], coudes: [1.752, 1.705] },
   // la bénévole, assise en bout de table, une main posée, l'autre montre le cahier
   benevoleDevoirs: { bassinY: 0.66, bassinX: 0.12, hanches: [1.5, 1.5], genoux: [1.5, 1.5], ecart: [0.1, 0.1], tete: 0.3, teteY: 0.35, rotBras: [-0.458, -0.116], epaules: [0.567, 0.576], ouverture: [-0.031, 0.316], coudes: [0.912, 0.902] },
   // repair café : debout derrière l'établi, les deux mains sur le grille-pain ouvert
@@ -401,17 +401,17 @@ function Devoirs({ m }) {
           </mesh>
         )),
       )}
-      <mesh material={m.planches} position={[0, 0.44, -0.86]} castShadow>
+      <mesh material={m.planches} position={[0, 0.44, -0.84]} castShadow>
         <boxGeometry args={[1.5, 0.04, 0.3]} />
       </mesh>
       {[-0.65, 0.65].map((x) => (
-        <mesh key={x} material={m.planches} position={[x, 0.21, -0.86]}>
+        <mesh key={x} material={m.planches} position={[x, 0.21, -0.84]}>
           <boxGeometry args={[0.05, 0.42, 0.26]} />
         </mesh>
       ))}
       {/* deux élèves assis de l'autre côté de la table, face à nous, les mains sur leur cahier */}
       {[-0.38, 0.32].map((x, i) => (
-        <group key={x} position={[x, 0, -0.86]} scale={0.68}>
+        <group key={x} position={[x, 0, -0.8]} scale={0.78}>
           <Personnage pose={POSES.eleve} haut={i ? '#4a7bd0' : '#f2b84b'} bas="#2f3a4a" peau={i ? '#a5876c' : '#c9ac8f'} />
         </group>
       ))}
