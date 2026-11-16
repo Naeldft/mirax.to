@@ -241,6 +241,31 @@ Matières, modèle et lumière : **Poly Haven, licence CC0**, dans `demos/coach/
 | Plantes | `modeles/potted_plant_04.glb` | https://polyhaven.com/a/potted_plant_04 |
 | Lumière d'ambiance (HDRI, désaturée et réchauffée) | `gym-1k.hdr`, `gym-512.hdr` | https://polyhaven.com/a/crossfit_gym |
 
+### Lumen Studio (photographe)
+
+Détail des photos : `demos/photographe/photos/LISEZ-MOI.md`.
+- Intro : vrai studio photo 3D dans un loft (`src/three/Studio3D.jsx`) : 4 plateaux (portrait, famille, mariage,
+  entreprise) avec fond papier, boîte à lumière, réflecteur, appareil sur trépied et écran de contrôle qui montre
+  la vraie photo de la séance. Modèles = mannequins habillés sculptés en code (`shared/src/three/Personnage.jsx`),
+  mains placées par calcul (cinématique inverse). Rendu photoréaliste identique à Pulse.
+- Portfolio : les 9 compositions dessinées sont remplacées par 9 vraies photos Pexels (titres adaptés).
+
+Photos : **Pexels, licence Pexels** (gratuite, usage commercial autorisé) : 9 photos de portfolio + 4 sur l'écran
+de contrôle de l'intro (liste et liens dans le LISEZ-MOI).
+
+Modèles, matières et lumière : **Poly Haven, licence CC0**, dans `demos/photographe/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Appareil photo | `modeles/Camera_01.glb` | https://polyhaven.com/a/Camera_01 |
+| Tabouret | `modeles/wooden_stool_01.glb` | https://polyhaven.com/a/wooden_stool_01 |
+| Plantes | `modeles/potted_plant_01.glb` | https://polyhaven.com/a/potted_plant_01 |
+| Parquet | `pbr/rectangular_parquet-*` | https://polyhaven.com/a/rectangular_parquet |
+| Mur de briques blanchies | `pbr/whitewashed_brick-*` | https://polyhaven.com/a/whitewashed_brick |
+| Enduit (fond, plafond) | `pbr/white_plaster_02-*` | https://polyhaven.com/a/white_plaster_02 |
+| Tissu des boîtes à lumière | `pbr/velour_velvet-*` | https://polyhaven.com/a/velour_velvet |
+| Lumière d'ambiance (HDRI, désaturée et réchauffée) | `studio-1k.hdr`, `studio-512.hdr` | https://polyhaven.com/a/photo_studio_loft_hall |
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).

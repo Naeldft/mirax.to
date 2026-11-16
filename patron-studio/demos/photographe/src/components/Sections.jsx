@@ -79,7 +79,7 @@ function Lightbox({ liste, index, setIndex }) {
         </button>
       </div>
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-4">
-        <Photo key={photo.id} photo={photo} className="max-h-full w-full max-w-3xl animate-[fadeIn_0.4s_ease]" />
+        <Photo key={photo.id} photo={photo} className="max-h-full w-full max-w-3xl !object-contain animate-[fadeIn_0.4s_ease]" sizes="100vw" />
         <button
           type="button"
           onClick={() => setIndex((i) => (i - 1 + liste.length) % liste.length)}
@@ -100,7 +100,7 @@ function Lightbox({ liste, index, setIndex }) {
       <div className="px-5 py-5 text-center">
         <p className="font-display text-2xl italic">{photo.titre}</p>
         <p className="mono mt-1">
-          {photo.cat} · {photo.exif}
+          {photo.cat} · {photo.lieu}
         </p>
       </div>
     </div>
@@ -159,7 +159,7 @@ export function Portfolio() {
                 <Photo photo={p} className="h-full w-full transition-transform duration-700 group-hover:scale-105" />
                 <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
                   <span className="block font-display text-lg italic">{p.titre}</span>
-                  <span className="mono block !text-papier/60">{p.exif}</span>
+                  <span className="mono block !text-papier/60">{p.lieu}</span>
                 </span>
               </button>
             </li>

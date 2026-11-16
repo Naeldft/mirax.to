@@ -52,8 +52,7 @@ export default function App() {
           </nav>
         </div>
         <p className="mx-auto mt-8 max-w-7xl text-[13px] text-papier/40">
-          © {new Date().getFullYear()} {studio.nom} · {studio.mention} · Photos du portfolio : illustrations dessinées pour la
-          démonstration.
+          © {new Date().getFullYear()} {studio.nom} · {studio.mention} · Photos du portfolio : Pexels (licence Pexels).
         </p>
       </footer>
       <DemoFooter

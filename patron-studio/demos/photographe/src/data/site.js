@@ -3,8 +3,7 @@
  *  LUMEN STUDIO — textes et données (photographe fictif).
  * ============================================================
  *  Numéro de téléphone : tranche 01 99 00 … réservée à la fiction.
- *  Les « photos » du portfolio sont des compositions dessinées en code
- *  (aucune image externe) : remplacez-les par de vraies photos pour un client.
+ *  Les photos du portfolio sont de vraies photos Pexels (sources : photos/LISEZ-MOI.md).
  */
 
 export const studio = {
@@ -31,91 +30,20 @@ export const navigation = [
 export const categories = ['Tout', 'Mariage', 'Portrait', 'Famille', 'Entreprise'];
 
 /**
- * Portfolio. scene : composition dessinée (voir Photo.jsx).
- * exif : réglages affichés comme sur une vraie fiche photo.
+ * Portfolio : vraies photos Pexels (licence Pexels, usage commercial autorisé), sources dans photos/LISEZ-MOI.md.
+ * nom : fichier dans photos/ (optimisé en public/images/<nom>-800.webp et -1600.webp).
+ * lieu : légende courte affichée sous la photo (à la place de réglages inventés).
  */
 export const photos = [
-  {
-    id: 1,
-    titre: 'Sous le chêne',
-    cat: 'Mariage',
-    scene: 'couple',
-    ton: ['#f3c58a', '#c4704b', '#2b1d1a'],
-    exif: '85 mm · f/1.8 · 1/500 s',
-    format: 'haut',
-  },
-  {
-    id: 2,
-    titre: 'Lumière de fenêtre',
-    cat: 'Portrait',
-    scene: 'portrait',
-    ton: ['#d9d2c5', '#7c6f62', '#1c1a18'],
-    exif: '50 mm · f/2 · 1/250 s',
-    format: 'carre',
-  },
-  {
-    id: 3,
-    titre: 'Dune du Pilat',
-    cat: 'Famille',
-    scene: 'dune',
-    ton: ['#f6d9a8', '#d99a5b', '#4a6a7a'],
-    exif: '35 mm · f/5.6 · 1/1000 s',
-    format: 'large',
-  },
-  {
-    id: 4,
-    titre: 'Les mains',
-    cat: 'Mariage',
-    scene: 'mains',
-    ton: ['#efe2d0', '#b89478', '#3a2b24'],
-    exif: '100 mm macro · f/2.8 · 1/320 s',
-    format: 'carre',
-  },
-  {
-    id: 5,
-    titre: 'L’équipe Garonne',
-    cat: 'Entreprise',
-    scene: 'equipe',
-    ton: ['#cfd8dc', '#607d8b', '#1d262b'],
-    exif: '35 mm · f/4 · 1/200 s',
-    format: 'large',
-  },
-  {
-    id: 6,
-    titre: 'Contre-jour',
-    cat: 'Portrait',
-    scene: 'profil',
-    ton: ['#ffcf8a', '#e07a4a', '#16110f'],
-    exif: '85 mm · f/1.4 · 1/2000 s',
-    format: 'haut',
-  },
-  {
-    id: 7,
-    titre: 'Premier bain de mer',
-    cat: 'Famille',
-    scene: 'vagues',
-    ton: ['#bfe0e6', '#5f9ea8', '#1f3b44'],
-    exif: '24 mm · f/8 · 1/800 s',
-    format: 'carre',
-  },
-  {
-    id: 8,
-    titre: 'Atelier du chai',
-    cat: 'Entreprise',
-    scene: 'chai',
-    ton: ['#e8c9a0', '#8a4b2f', '#1a0f0b'],
-    exif: '24 mm · f/2.8 · 1/60 s',
-    format: 'haut',
-  },
-  {
-    id: 9,
-    titre: 'Le lâcher de riz',
-    cat: 'Mariage',
-    scene: 'confettis',
-    ton: ['#f7efe6', '#d7a7a0', '#3b2d33'],
-    exif: '35 mm · f/2.8 · 1/1600 s',
-    format: 'large',
-  },
+  { id: 1, titre: 'Sous les arbres', cat: 'Mariage', nom: 'sous-les-arbres', format: 'haut', lieu: 'Séance couple, en extérieur', alt: 'Les mariés enlacés, le marié embrasse la tempe de la mariée, feuillage en fond' },
+  { id: 2, titre: 'Lumière de fenêtre', cat: 'Portrait', nom: 'lumiere-de-fenetre', format: 'haut', lieu: 'Portrait en lumière naturelle', alt: 'Jeune femme aux cheveux longs assise près d’une fenêtre, regard vers l’objectif' },
+  { id: 3, titre: 'En famille', cat: 'Famille', nom: 'en-famille', format: 'large', lieu: 'Séance famille, en pleine nature', alt: 'Un père, une mère et leurs deux filles serrés les uns contre les autres, en extérieur' },
+  { id: 4, titre: 'Les alliances', cat: 'Mariage', nom: 'les-alliances', format: 'carre', lieu: 'Détail, le jour J', alt: 'Les mains des mariés l’une dans l’autre, alliances et bague de fiançailles' },
+  { id: 5, titre: 'L’équipe en réunion', cat: 'Entreprise', nom: 'equipe-en-reunion', format: 'large', lieu: 'Reportage en entreprise', alt: 'Une équipe sourit autour d’un ordinateur portable, dans un bureau aux murs de briques blanches' },
+  { id: 6, titre: 'Contre-jour', cat: 'Portrait', nom: 'contre-jour', format: 'large', lieu: 'Portrait à l’heure dorée', alt: 'Silhouette d’une femme de profil à contre-jour, au coucher du soleil' },
+  { id: 7, titre: 'Premier bain de mer', cat: 'Famille', nom: 'premier-bain', format: 'large', lieu: 'Séance famille, à la plage', alt: 'Une famille court main dans la main dans les vagues, de dos' },
+  { id: 8, titre: 'Au chai', cat: 'Entreprise', nom: 'au-chai', format: 'large', lieu: 'Reportage métier, chai du Médoc', alt: 'Un chai à barriques, rangées de fûts de chêne et deux personnes au travail' },
+  { id: 9, titre: 'Le lâcher de riz', cat: 'Mariage', nom: 'lacher-de-riz', format: 'large', lieu: 'Reportage de mariage', alt: 'Les invités lancent du riz sur les mariés pendant la cérémonie, décor rouge et or' },
 ];
 
 export const prestations = [

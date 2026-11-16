@@ -385,19 +385,64 @@ function Ecran({ m, id, def, position, rotation }) {
 }
 
 /* ---------- les plateaux ---------- */
+// Poses calculées par cinématique inverse (mains posées exactement là où elles doivent être, jamais dans le vide).
 const POSES = {
-  // assise de trois quarts sur le tabouret, mains posées sur la cuisse, tête légèrement inclinée
-  assise: { bassinY: 0.68, bassinX: -0.06, hanches: [1.4, 1.2], genoux: [1.35, 1.55], ecart: [0.14, 0.04], epaules: [0.42, 0.3], ouverture: [0.02, 0.06], coudes: [0.95, 1.05], tete: 0.06, teteY: 0.3, torsion: 0.15 },
-  // debout, détendue, une main sur la hanche
-  hanche: { epaules: [0.1, -0.15], ouverture: [0.12, 0.55], coudes: [0.2, 1.9], rotBras: [0, 0.6], teteY: -0.15 },
-  // debout, bras le long du corps, un peu tourné
-  droit: { epaules: [0.06, 0.06], ouverture: [0.09, 0.09], coudes: [0.12, 0.12], teteY: 0.1 },
-  // bras croisés (portrait d'affaires)
-  croises: { epaules: [0.75, 0.75], ouverture: [0.15, 0.15], coudes: [1.75, 1.75], rotBras: [0.95, 0.95], tete: 0.04 },
-  // la main tendue vers l'autre (mariage)
-  mainTendue: { epaules: [0.45, 0.08], ouverture: [-0.25, 0.1], coudes: [0.5, 0.15], teteY: 0.35 },
-  enfant: { epaules: [0.25, 0.25], ouverture: [0.35, 0.35], coudes: [0.25, 0.25], tete: -0.12 },
+  // assise de trois quarts sur le tabouret, les deux mains posées sur les cuisses
+  assise: { bassinY: 0.68, bassinX: -0.06, hanches: [1.4, 1.2], genoux: [1.35, 1.55], ecart: [0.14, 0.04], tete: 0.06, teteY: 0.3, torsion: 0.15, rotBras: [-0.021, -0.244], epaules: [-0.05, 0.431], ouverture: [-0.015, -0.106], coudes: [1.21, 0.386] },
+  // portrait d'affaires : debout, les mains dans les poches du pantalon
+  poches: { tete: 0.04, teteY: -0.12, rotBras: [-0.187, -0.022], epaules: [-0.295, -0.334], ouverture: [0.049, -0.046], coudes: [0.833, 0.892] },
+  // famille : la mère pose la main sur l'épaule de l'enfant, l'autre bras détendu le long du corps
+  mere: { teteY: -0.25, tete: 0.1, epaules: [0.472, 0.06], ouverture: [0.152, 0.1], coudes: [0.239, 0.18], rotBras: [-0.022, 0] },
+  // le père pose aussi la main sur l'autre épaule de l'enfant
+  pere: { teteY: 0.2, tete: 0.1, rotBras: [0, -0.011], epaules: [0.08, 0.519], ouverture: [0.1, 0.13], coudes: [0.15, 0.153] },
+  enfant: { epaules: [0.05, 0.05], ouverture: [0.12, 0.12], coudes: [0.15, 0.15], tete: 0.12 },
+  // mariage : les mariés se tiennent la main ; la mariée tient son bouquet de l'autre main
+  marie: { teteY: 0.35, tete: 0.05, rotBras: [0, -0.079], epaules: [0.08, 0.288], ouverture: [0.1, -0.089], coudes: [0.15, 0.528] },
+  mariee: { teteY: -0.3, tete: 0.08, rotBras: [0.009, -0.454], epaules: [0.034, -0.164], ouverture: [0.023, 0.031], coudes: [1.168, 1.388] },
 };
+
+/** Bouquet de mariée : roses blanches et poudrées, feuillage, tiges liées d'un ruban. */
+function Bouquet() {
+  const m = useMemo(
+    () => ({
+      blanc: new THREE.MeshStandardMaterial({ color: '#f4efe6', roughness: 0.7 }),
+      poudre: new THREE.MeshStandardMaterial({ color: '#e9c9bd', roughness: 0.7 }),
+      feuille: new THREE.MeshStandardMaterial({ color: '#56664a', roughness: 0.8 }),
+      ruban: new THREE.MeshStandardMaterial({ color: '#efe6d6', roughness: 0.5 }),
+    }),
+    [],
+  );
+  const fleurs = useMemo(
+    () =>
+      Array.from({ length: 13 }, (_, i) => {
+        const a = i * 2.4;
+        const r = i === 0 ? 0 : 0.035 + (i % 3) * 0.018;
+        return { p: [Math.cos(a) * r, 0.11 + (i === 0 ? 0.02 : 0) - r * 0.4, Math.sin(a) * r], t: 0.026 + (i % 2) * 0.006, poudre: i % 3 === 1 };
+      }),
+    [],
+  );
+  return (
+    <group rotation-x={0.5}>
+      <mesh material={m.feuille} position={[0, 0.03, 0]}>
+        <cylinderGeometry args={[0.012, 0.018, 0.14, 10]} />
+      </mesh>
+      <mesh material={m.ruban} position={[0, 0.03, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 0.04, 16]} />
+      </mesh>
+      {fleurs.map((f, i) => (
+        <mesh key={i} material={f.poudre ? m.poudre : m.blanc} position={f.p} scale={[1, 0.8, 1]}>
+          <icosahedronGeometry args={[f.t, 1]} />
+        </mesh>
+      ))}
+      {[0, 1.3, 2.6, 3.9, 5.2].map((a) => (
+        <mesh key={a} material={m.feuille} position={[Math.cos(a) * 0.08, 0.09, Math.sin(a) * 0.08]} rotation={[Math.sin(a) * 0.9, 0, -Math.cos(a) * 0.9]} scale={[1, 0.25, 2]}>
+          <sphereGeometry args={[0.025, 8, 6]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 
 function Plateau({ poste, m, def }) {
   const { id, cote, z, papier } = poste;
@@ -416,10 +461,10 @@ function Plateau({ poste, m, def }) {
       {id === 'famille' && (
         <>
           <group position={[-0.42, 0, -0.1]} rotation-y={0.18}>
-            <Personnage pose={POSES.droit} homme haut="#2f3a45" bas="#c9bfae" />
+            <Personnage pose={POSES.pere} homme haut="#2f3a45" bas="#c9bfae" />
           </group>
           <group position={[0.46, 0, -0.05]} rotation-y={-0.2}>
-            <Personnage pose={POSES.hanche} haut="#d7c6ae" bas="#3d3a37" />
+            <Personnage pose={POSES.mere} haut="#d7c6ae" bas="#3d3a37" />
           </group>
           <group position={[0.03, 0, 0.22]} scale={0.62}>
             <Personnage pose={POSES.enfant} haut="#a9562f" bas="#36383d" />
@@ -429,24 +474,24 @@ function Plateau({ poste, m, def }) {
       {id === 'mariage' && (
         <>
           <group position={[-0.3, 0, -0.05]} rotation-y={0.55}>
-            <Personnage pose={POSES.mainTendue} homme haut="#1f2433" bas="#1f2433" chemise chaussure="#111" />
+            <Personnage pose={POSES.marie} homme haut="#1f2433" bas="#1f2433" chemise chaussure="#111" />
           </group>
           <group position={[0.32, 0, 0.02]} rotation-y={-0.6}>
-            <Personnage pose={{ ...POSES.droit, epaules: [0.4, 0.06], coudes: [0.6, 0.12] }} robe="#f3eee4" manches={false} haut="#f3eee4" chaussure="#e9e2d6" />
+            <Personnage pose={POSES.mariee} robe="#f3eee4" manches={false} haut="#f3eee4" chaussure="#e9e2d6" objets={[null, <Bouquet key="bouquet" />]} />
           </group>
         </>
       )}
       {id === 'entreprise' && (
         <group position={[0, 0, -0.1]} rotation-y={-0.15}>
-          <Personnage pose={POSES.croises} homme haut="#5a5e64" bas="#3e4146" chemise chaussure="#1a1512" />
+          <Personnage pose={POSES.poches} homme haut="#5a5e64" bas="#3e4146" chemise chaussure="#1a1512" />
         </group>
       )}
       {/* lumière principale à 45°, réflecteur de l'autre côté, appareil sur trépied, écran de contrôle */}
       <Octabox m={m} position={[-1.4, 2.05, 0.95]} cible={[0, 1.2, 0]} />
       <Reflecteur m={m} position={[0.95, 0.55, 1.25]} rotation={[-0.2, -0.75, 0]} />
-      <AppareilTrepied m={m} position={[-0.85, 0, 2.0]} rotation={-0.42} />
+      <AppareilTrepied m={m} position={[-1.05, 0, 1.45]} rotation={-0.63} />
       {/* l'écran de contrôle, du côté libre de l'image, tourné vers l'allée : la vraie photo de la séance */}
-      <Ecran m={m} id={id} def={def} position={[1.3, 1.5, 0.3]} rotation={[0, -0.5, 0]} />
+      <Ecran m={m} id={id} def={def} position={[1.05, 1.5, 0.55]} rotation={[0, -0.42, 0]} />
       {/* contre-jour chaud qui détache le sujet du fond */}
       <pointLight position={[0, 2.2, -0.9]} color="#ffcf9a" intensity={1.1} distance={2.6} decay={1.5} />
     </group>
