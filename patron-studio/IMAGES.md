@@ -266,6 +266,32 @@ Modèles, matières et lumière : **Poly Haven, licence CC0**, dans `demos/photo
 | Tissu des boîtes à lumière | `pbr/velour_velvet-*` | https://polyhaven.com/a/velour_velvet |
 | Lumière d'ambiance (HDRI, désaturée et réchauffée) | `studio-1k.hdr`, `studio-512.hdr` | https://polyhaven.com/a/photo_studio_loft_hall |
 
+### Les Racines (association)
+
+- Intro : la cour de la Maison des Racines en 3D (`demos/association/src/three/Cour3D.jsx`) : allée de terre,
+  pelouse, murs de briques, façade et enseigne peinte. Quatre coins : jardin partagé (bacs potagers, salades,
+  tomates), aide aux devoirs (pergola, table, cahiers), repair café (établi, outils, grille-pain, vélo), épicerie
+  solidaire (étal de cagettes, bocaux). Bénévoles et habitants : mannequins habillés (`shared/src/three/Personnage.jsx`),
+  mains placées par calcul. Légumes, mobilier et vélo construits en code. Aucune photo, aucune illustration.
+
+Modèles, matières et lumière : **Poly Haven, licence CC0**, dans `demos/association/public/scene/`.
+
+| Élément | Fichier | Source Poly Haven |
+|---|---|---|
+| Arbustes | `modeles/shrub_01.glb` | https://polyhaven.com/a/shrub_01 |
+| Plantes en pot | `modeles/potted_plant_02.glb` | https://polyhaven.com/a/potted_plant_02 |
+| Fleurs | `modeles/flower_gazania.glb` | https://polyhaven.com/a/flower_gazania |
+| Jardinière | `modeles/planter_box_01.glb` | https://polyhaven.com/a/planter_box_01 |
+| Caisses et cagettes | `modeles/wooden_crate_01.glb` | https://polyhaven.com/a/wooden_crate_01 |
+| Panier | `modeles/wicker_basket_01.glb` | https://polyhaven.com/a/wicker_basket_01 |
+| Marteau, clé à molette | `modeles/cross_pein_hammer.glb`, `modeles/adjustable_wrench.glb` | https://polyhaven.com/a/cross_pein_hammer · https://polyhaven.com/a/adjustable_wrench |
+| Terre des bacs | `pbr/farm_soil-*` | https://polyhaven.com/a/farm_soil |
+| Planches (bacs, pergola, établi) | `pbr/weathered_planks-*` | https://polyhaven.com/a/weathered_planks |
+| Briques des murs et de la façade | `pbr/red_brick_03-*` | https://polyhaven.com/a/red_brick_03 |
+| Allée de terre battue | `pbr/stony_dirt_path-*` | https://polyhaven.com/a/stony_dirt_path |
+| Pelouse | `pbr/grass_ground-*` | https://polyhaven.com/a/grass_ground |
+| Lumière et ciel (HDRI + JPG léger) | `jardin-hd.hdr`, `jardin-sd.hdr`, `ciel-hd.jpg`, `ciel-sd.jpg` | https://polyhaven.com/a/garden_nook |
+
 ## Images de partage (réseaux sociaux)
 
 `site/assets/social-*.webp` : texte seul sur fond noir (aucune photo, aucune illustration).
