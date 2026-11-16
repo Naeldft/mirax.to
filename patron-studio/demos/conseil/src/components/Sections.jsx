@@ -1,13 +1,15 @@
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
+import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { emailOk, isoLocal, telOk } from '@demos/shared/lib/validation.js';
-import { avis, cabinet, cas, expertises, faq, methode, offres, sujets } from '../data/site';
+import { avis, cabinet, cas, chiffres, expertises, faq, methode, offres, sujets } from '../data/site';
 
+const HorizonScene = lazy(() => import('../three/HorizonScene'));
 
 const Fleche = () => (
   <svg className="fleche h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
@@ -34,6 +36,67 @@ function Titre({ tag, children, intro, id, clair }) {
 }
 
 /* ---------------------------------------------------------------- */
+
+export function Hero({ onReady }) {
+  const section = useRef(null);
+  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady });
+  useLayoutEffect(() => {
+    if (reduced) return;
+    const ctx = gsap.context(() => {
+      gsap.from('[data-mot]', { yPercent: 105, duration: 1.1, stagger: 0.08, ease: 'expo.out', delay: 0.3 });
+      gsap.from('[data-in]', { opacity: 0, y: 12, stagger: 0.08, duration: 0.8, delay: 0.8 });
+    }, section);
+    return () => ctx.revert();
+  }, [reduced]);
+  return (
+    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[210svh]'}`} aria-label="Accueil">
+      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[radial-gradient(ellipse_60%_55%_at_70%_45%,#e7ecfb,#f4f2ec_70%)]">
+        {load3d && (
+          <Suspense fallback={null}>
+            <HorizonScene progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} />
+          </Suspense>
+        )}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[52%] bg-gradient-to-t from-papier via-papier/90 to-transparent md:hidden" />
+        <div className="pointer-events-none relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-8 md:justify-center md:px-8 md:pb-0">
+          <p data-in className="etiquette">
+            {cabinet.accroche}
+          </p>
+          <h1 className="mt-4 text-[clamp(3.3rem,11vw,7.5rem)] leading-[0.95]">
+            <span className="block overflow-hidden">
+              <span data-mot className="block">
+                Prenez le
+              </span>
+            </span>
+            <span className="block overflow-hidden pb-2">
+              <span data-mot className="block italic text-cobalt">
+                bon cap.
+              </span>
+            </span>
+          </h1>
+          <p data-in className="mt-4 max-w-md text-lg leading-relaxed text-gris">
+            {cabinet.intro}
+          </p>
+          <div data-in className="pointer-events-auto mt-6 flex flex-wrap gap-3">
+            <a href="#diagnostic" className="btn btn-cobalt">
+              Faire mon diagnostic express <Fleche />
+            </a>
+            <a href="#rendez-vous" className="btn btn-ligne max-sm:hidden">
+              Premier rendez-vous offert
+            </a>
+          </div>
+          <ul data-in className="mt-8 flex gap-8 max-md:hidden">
+            {chiffres.map((c) => (
+              <li key={c.label}>
+                <Counter value={c.valeur} suffix={c.suffixe} className="block font-display text-4xl" />
+                <span className="text-sm text-gris">{c.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /* ---------------------------------------------------------------- */
 
