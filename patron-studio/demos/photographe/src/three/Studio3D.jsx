@@ -626,9 +626,16 @@ function Effets({ niveau, foyer }) {
 }
 
 function Pilote() {
-  const { advance } = useThree();
+  const { advance, scene, camera } = useThree();
   useEffect(() => {
     if (!IMAGE_PAR_IMAGE) return;
+    // outils de contrôle (enregistrement image par image uniquement)
+    window.psDebug = () => {
+      const r = new THREE.Raycaster();
+      r.setFromCamera(new THREE.Vector2(0.3, 0), camera);
+      const h = r.intersectObjects(scene.children, true).slice(0, 4);
+      return { cam: camera.position.toArray().map((v) => +v.toFixed(2)), hits: h.map((x) => [x.distance.toFixed(2), x.object.geometry?.type, x.object.material?.color?.getHexString?.(), x.object.parent?.type]) };
+    };
     let ms = performance.now();
     horloge.t = ms / 1000;
     window.psAvancer = (pas) => {
@@ -636,7 +643,7 @@ function Pilote() {
       horloge.t = ms / 1000;
       advance(ms);
     };
-  }, [advance]);
+  }, [advance, scene, camera]);
   return null;
 }
 

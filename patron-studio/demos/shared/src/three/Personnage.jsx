@@ -79,13 +79,22 @@ export default function Personnage({
       haut: tissu(haut),
       bas: tissu(bas),
       robe: robe ? tissu(robe, { satin: true }) : null,
-      chemise: new THREE.MeshStandardMaterial({ color: '#f1efe9', roughness: 0.7 }),
+      chemise: new THREE.MeshStandardMaterial({ color: '#f1efe9', roughness: 0.7, side: THREE.DoubleSide }),
+      cravate: new THREE.MeshStandardMaterial({ color: '#2b2f3a', roughness: 0.55, side: THREE.DoubleSide }),
       chaussure: new THREE.MeshStandardMaterial({ color: chaussure, roughness: 0.45, envMapIntensity: 0.8 }),
     }),
     [peau, haut, bas, robe, chaussure],
   );
   const geoTete = useMemo(() => teteSculptee(homme), [homme]);
   const k = homme ? 1.06 : 1;
+  const vChemise = useMemo(() => {
+    const f = new THREE.Shape();
+    f.moveTo(-0.06 * k, 0);
+    f.lineTo(0.06 * k, 0);
+    f.lineTo(0, -0.21 * k);
+    f.closePath();
+    return new THREE.ShapeGeometry(f);
+  }, [k]);
   const torse = useMemo(() => {
     const prof = (homme
       ? [[0.001, 0], [0.13, 0], [0.124, 0.07], [0.12, 0.15], [0.134, 0.24], [0.154, 0.33], [0.17, 0.41], [0.167, 0.47], [0.132, 0.515], [0.06, 0.535], [0.001, 0.54]]
@@ -188,9 +197,13 @@ export default function Personnage({
           <mesh geometry={torse} material={robe ? m.robe : m.haut} position={[0, 0.02, 0]} castShadow receiveShadow />
           {/* col de chemise sous la veste */}
           {chemise && (
-            <mesh material={m.chemise} position={[0, 0.47 * k, 0.085 * k]} rotation-x={-0.35}>
-              <coneGeometry args={[0.05 * k, 0.16 * k, 3, 1, true]} />
-            </mesh>
+            // encolure de la veste ouverte : plastron de chemise blanche en V et cravate sombre
+            <group position={[0, 0.535 * k, 0.112 * k]} rotation-x={-0.16}>
+              <mesh material={m.chemise} geometry={vChemise} />
+              <mesh material={m.cravate} position={[0, -0.075 * k, 0.003]}>
+                <planeGeometry args={[0.024 * k, 0.15 * k]} />
+              </mesh>
+            </group>
           )}
           {/* trapèzes et cou */}
           <mesh material={robe || !manches ? m.peau : m.haut} position={[0, 0.535 * k, -0.005]} scale={[homme ? 2.1 : 1.8, 0.55, 1.05]} castShadow>
