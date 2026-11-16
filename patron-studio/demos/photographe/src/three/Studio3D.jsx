@@ -387,7 +387,7 @@ function Ecran({ m, id, def, position, rotation }) {
 /* ---------- les plateaux ---------- */
 const POSES = {
   // assise de trois quarts sur le tabouret, mains posées sur la cuisse, tête légèrement inclinée
-  assise: { bassinY: 0.66, hanches: [1.5, 1.35], genoux: [1.45, 1.7], ecart: [0.12, 0.02], epaules: [0.55, 0.35], ouverture: [0.05, 0.12], coudes: [0.9, 1.1], tete: 0.08, teteY: 0.25, torsion: 0.2 },
+  assise: { bassinY: 0.68, bassinX: -0.06, hanches: [1.4, 1.2], genoux: [1.35, 1.55], ecart: [0.14, 0.04], epaules: [0.42, 0.3], ouverture: [0.02, 0.06], coudes: [0.95, 1.05], tete: 0.06, teteY: 0.3, torsion: 0.15 },
   // debout, détendue, une main sur la hanche
   hanche: { epaules: [0.1, -0.15], ouverture: [0.12, 0.55], coudes: [0.2, 1.9], rotBras: [0, 0.6], teteY: -0.15 },
   // debout, bras le long du corps, un peu tourné
@@ -442,11 +442,11 @@ function Plateau({ poste, m, def }) {
         </group>
       )}
       {/* lumière principale à 45°, réflecteur de l'autre côté, appareil sur trépied, écran de contrôle */}
-      <Octabox m={m} position={[1.4, 2.05, 0.95]} cible={[0, 1.2, 0]} />
-      <Reflecteur m={m} position={[-1.0, 0.8, 0.95]} rotation={[0, 0.8, 0]} />
-      <AppareilTrepied m={m} position={[0.95, 0, 1.95]} rotation={0.46} />
-      {/* l'écran de contrôle, tourné vers l'allée : la vraie photo de la séance */}
-      <Ecran m={m} id={id} def={def} position={[-1.6, 1.35, 0.1]} rotation={[0, 0.5, 0]} />
+      <Octabox m={m} position={[-1.4, 2.05, 0.95]} cible={[0, 1.2, 0]} />
+      <Reflecteur m={m} position={[0.95, 0.55, 1.25]} rotation={[-0.2, -0.75, 0]} />
+      <AppareilTrepied m={m} position={[-0.85, 0, 2.0]} rotation={-0.42} />
+      {/* l'écran de contrôle, du côté libre de l'image, tourné vers l'allée : la vraie photo de la séance */}
+      <Ecran m={m} id={id} def={def} position={[1.3, 1.5, 0.3]} rotation={[0, -0.5, 0]} />
       {/* contre-jour chaud qui détache le sujet du fond */}
       <pointLight position={[0, 2.2, -0.9]} color="#ffcf9a" intensity={1.1} distance={2.6} decay={1.5} />
     </group>
