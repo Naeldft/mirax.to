@@ -205,7 +205,7 @@ export default function Hero({ onReady }) {
           ref={fin}
           className={`absolute inset-0 flex items-center justify-center bg-beton/90 px-5 opacity-0 ${finVisible ? '' : 'pointer-events-none'}`}
         >
-          <div className="max-w-xl text-center">
+          <div className="max-w-3xl text-center">
             <p className="etiquette">{entreprise.nomComplet}</p>
             <p className="mt-3 font-display text-[clamp(2.4rem,9vw,5rem)] uppercase leading-[0.9]">
               On bâtit.

@@ -37,7 +37,7 @@ export default function Services() {
               <div key={c.label} data-reveal className="bg-chantier p-5 md:p-7">
                 <dt className="sr-only">{c.label}</dt>
                 <dd>
-                  <Counter value={c.valeur} suffix={c.suffixe} className="block font-display text-4xl md:text-6xl" />
+                  <Counter value={c.valeur} suffix={c.suffixe} className="block font-display text-4xl md:text-5xl lg:text-6xl" />
                   <span className="mt-1 block font-cond text-base font-bold uppercase leading-tight tracking-wide">{c.label}</span>
                 </dd>
               </div>

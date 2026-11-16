@@ -223,7 +223,7 @@ export default function Hero({ onModel, onReady }) {
           ref={fin}
           className={`absolute inset-0 flex items-center justify-center bg-laque/85 px-5 opacity-0 ${finVisible ? '' : 'pointer-events-none'}`}
         >
-          <div className="max-w-xl text-center">
+          <div className="max-w-3xl text-center">
             <p className="surtitre">4 catégories · {modeles.length} modèles disponibles</p>
             <p className="mt-3 font-display text-[clamp(2.4rem,9vw,5rem)] font-bold uppercase leading-[0.92]">Choisissez, roulez.</p>
             <Engagements className="mx-auto mt-5 inline-block space-y-1 text-left" />

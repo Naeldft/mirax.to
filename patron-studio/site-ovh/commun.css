@@ -127,3 +127,6 @@ body[data-page] main .studio-copy p, body[data-page] main .reveal-ready > p { co
     display: inline-flex; align-items: center; min-height: 44px;
   }
 }
+main ul li:not(.preview-site *), .futur-grid li { font-size: 1rem !important; }
+/* bandeau défilant des métiers : chaque mot garde sa largeur, sans se tasser */
+.band-list li { flex-shrink: 0; white-space: nowrap; }

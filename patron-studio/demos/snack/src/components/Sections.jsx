@@ -579,7 +579,7 @@ export function Avis() {
                 value={c.valeur}
                 decimals={c.decimales || 0}
                 suffix={c.suffixe}
-                className="titre block text-4xl text-flamme md:text-6xl"
+                className="titre block text-[clamp(1.75rem,8vw,2.25rem)] text-flamme md:text-6xl"
               />
               <p className="mt-2 text-sm text-sable">{c.label}</p>
             </li>

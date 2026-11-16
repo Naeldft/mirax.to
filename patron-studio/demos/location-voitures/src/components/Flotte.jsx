@@ -83,7 +83,7 @@ export default function Flotte({ model, onModel }) {
                       className="h-full w-full object-cover duration-700 ease-out group-hover:scale-105"
                     />
                   </div>
-                  <ul className="grid grid-cols-4 gap-2 border-y border-ivoire/10 py-4 text-center text-xs text-ivoire/70">
+                  <ul className="grid grid-cols-4 gap-1 border-y border-ivoire/10 py-4 text-center text-xs text-ivoire/70 [&>li]:min-w-0 [&>li]:break-words [&>li]:hyphens-auto">
                     <li>
                       <Places className="mx-auto mb-1 text-lg text-course-vif" />
                       {m.places} places
