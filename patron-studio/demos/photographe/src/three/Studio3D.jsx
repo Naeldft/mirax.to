@@ -335,9 +335,9 @@ function Reflecteur({ m, position, rotation }) {
 }
 
 /** Appareil photo (modèle Poly Haven) sur un trépied, visant le sujet. */
-function AppareilTrepied({ m, position, h = 1.45 }) {
+function AppareilTrepied({ m, position, h = 1.45, rotation = 0 }) {
   return (
-    <group position={position}>
+    <group position={position} rotation-y={rotation}>
       {[0, 1, 2].map((i) => {
         const a = (i / 3) * Math.PI * 2 + 0.5;
         return (
@@ -349,7 +349,7 @@ function AppareilTrepied({ m, position, h = 1.45 }) {
       <mesh material={m.noir} position={[0, h - 0.02, 0]}>
         <cylinderGeometry args={[0.045, 0.05, 0.06, 20]} />
       </mesh>
-      <Modele nom="Camera_01" position={[0, h + 0.01, 0]} rotation-y={Math.PI} scale={1.4} />
+      <Modele nom="Camera_01" position={[0, h + 0.01, 0]} scale={1} />
     </group>
   );
 }
@@ -358,7 +358,7 @@ function AppareilTrepied({ m, position, h = 1.45 }) {
 function Ecran({ m, id, def, position, rotation }) {
   const photo = useTexture(`${BASE}scene/photos/${id}-${def}.webp`);
   const f = FORMATS[id];
-  const [l, h] = f < 1 ? [0.42, 0.42 / f] : [0.66, 0.66 / f];
+  const [l, h] = f < 1 ? [0.46, 0.46 / f] : [0.8, 0.8 / f];
   const mat = useMemo(() => {
     photo.colorSpace = THREE.SRGBColorSpace;
     photo.anisotropy = 8;
@@ -442,10 +442,11 @@ function Plateau({ poste, m, def }) {
         </group>
       )}
       {/* lumière principale à 45°, réflecteur de l'autre côté, appareil sur trépied, écran de contrôle */}
-      <Octabox m={m} position={[1.45, 2.05, 1.15]} cible={[0, 1.25, 0]} />
-      <Reflecteur m={m} position={[-1.25, 0.95, 0.75]} rotation={[0, 0.95, 0]} />
-      <AppareilTrepied m={m} position={[0.15, 0, 2.55]} />
-      <Ecran m={m} id={id} def={def} position={[-1.05, 1.32, 2.05]} rotation={[0, 0.55, 0]} />
+      <Octabox m={m} position={[1.4, 2.05, 0.95]} cible={[0, 1.2, 0]} />
+      <Reflecteur m={m} position={[-1.0, 0.8, 0.95]} rotation={[0, 0.8, 0]} />
+      <AppareilTrepied m={m} position={[0.95, 0, 1.95]} rotation={0.46} />
+      {/* l'écran de contrôle, tourné vers l'allée : la vraie photo de la séance */}
+      <Ecran m={m} id={id} def={def} position={[-1.6, 1.35, 0.1]} rotation={[0, 0.5, 0]} />
       {/* contre-jour chaud qui détache le sujet du fond */}
       <pointLight position={[0, 2.2, -0.9]} color="#ffcf9a" intensity={1.1} distance={2.6} decay={1.5} />
     </group>
