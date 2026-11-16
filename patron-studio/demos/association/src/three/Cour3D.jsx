@@ -173,6 +173,7 @@ function useVerdure() {
       feuille: new THREE.MeshStandardMaterial({ color: '#5f8a3a', roughness: 0.75, side: THREE.DoubleSide }),
       salade: new THREE.MeshStandardMaterial({ color: '#8dbb4f', roughness: 0.7, side: THREE.DoubleSide }),
       tomate: new THREE.MeshPhysicalMaterial({ color: '#c8361f', roughness: 0.35, clearcoat: 0.6 }),
+      tomateVerte: new THREE.MeshPhysicalMaterial({ color: '#8fae3c', roughness: 0.4, clearcoat: 0.4 }),
       tuteur: new THREE.MeshStandardMaterial({ color: '#a9895f', roughness: 0.9 }),
       courgette: new THREE.MeshStandardMaterial({ color: '#3f6b2a', roughness: 0.55 }),
       zinc: new THREE.MeshStandardMaterial({ color: '#9aa3a6', roughness: 0.35, metalness: 0.9 }),
@@ -195,25 +196,42 @@ function Salade({ v, position, s = 1 }) {
   );
 }
 
-/** Un pied de tomates sur son tuteur. */
-function PiedTomate({ v, position }) {
+/** Un pied de tomates sur son tuteur : tige, bouquets de feuilles dentelées, grappes de tomates. */
+function PiedTomate({ v, position, graine = 1 }) {
+  const feuilles = useMemo(() => {
+    const r = (i) => {
+      const x = Math.sin(i * 12.9898 + graine * 78.233) * 43758.5453;
+      return x - Math.floor(x);
+    };
+    return Array.from({ length: 26 }, (_, i) => {
+      const y = 0.12 + (i / 26) * 0.8;
+      const a = i * 2.39 + r(i) * 0.8;
+      const d = 0.05 + r(i + 40) * 0.11 * (1 - y * 0.4);
+      return { p: [Math.cos(a) * d, y, Math.sin(a) * d], rot: [r(i + 7) * 1.2, a, r(i + 9) * 1.1], s: 0.6 + r(i + 3) * 0.6 };
+    });
+  }, [graine]);
   return (
     <group position={position}>
-      <mesh material={v.tuteur} position={[0, 0.5, 0]}>
-        <cylinderGeometry args={[0.008, 0.01, 1.0, 6]} />
+      <mesh material={v.tuteur} position={[0, 0.55, 0]}>
+        <cylinderGeometry args={[0.008, 0.01, 1.1, 6]} />
       </mesh>
-      {[0.25, 0.45, 0.65, 0.85].map((y, i) => (
-        <mesh key={y} material={v.feuille} position={[Math.sin(i * 2) * 0.06, y, Math.cos(i * 2) * 0.06]} scale={[1.2, 0.6, 1]} castShadow>
-          <icosahedronGeometry args={[0.1, 1]} />
+      <mesh material={v.feuille} position={[0.02, 0.45, 0]}>
+        <cylinderGeometry args={[0.006, 0.009, 0.9, 6]} />
+      </mesh>
+      {feuilles.map((f, i) => (
+        <mesh key={i} material={i % 4 ? v.feuille : v.salade} position={f.p} rotation={f.rot} scale={[f.s, f.s * 0.18, f.s * 0.55]} castShadow>
+          <sphereGeometry args={[0.07, 8, 6]} />
         </mesh>
       ))}
       {[
-        [0.07, 0.35, 0.05],
-        [-0.05, 0.42, 0.07],
-        [0.04, 0.58, -0.07],
+        [0.06, 0.32, 0.05],
+        [-0.05, 0.38, 0.07],
+        [0.0, 0.34, 0.09],
+        [0.05, 0.58, -0.06],
+        [-0.06, 0.62, -0.03],
       ].map((p, i) => (
-        <mesh key={i} material={v.tomate} position={p} castShadow>
-          <sphereGeometry args={[0.035, 14, 10]} />
+        <mesh key={i} material={i === 2 ? v.tomateVerte : v.tomate} position={p} castShadow>
+          <sphereGeometry args={[0.032 + (i % 2) * 0.006, 14, 10]} />
         </mesh>
       ))}
     </group>
@@ -242,7 +260,7 @@ function Bac({ m, terre, v, largeur = 1.6, profondeur = 0.8, h = 0.4, cultures =
         [-0.55, -0.18, 0.19, 0.56].flatMap((x) =>
           [-0.18, 0.18].map((z) => <Salade key={`${x}${z}`} v={v} position={[x, h - 0.03, z]} s={0.9 + ((x * 7 + z * 3) % 0.2)} />),
         )}
-      {cultures === 'tomates' && [-0.5, 0, 0.5].map((x) => <PiedTomate key={x} v={v} position={[x, h - 0.03, 0]} />)}
+      {cultures === 'tomates' && [-0.5, 0, 0.5].map((x, i) => <PiedTomate key={x} v={v} graine={i + 1} position={[x, h - 0.03, 0]} />)}
     </group>
   );
 }
@@ -330,12 +348,7 @@ function vue(i, a, portrait, pos, cible) {
   const r = portrait ? 4.1 : 4.0;
   pos.set(cx - cote * Math.cos(a) * r, portrait ? 1.75 : 1.85, z + Math.sin(a) * r);
   cible.set(cx, portrait ? 0.8 : 1.0, z);
-  if (portrait) {
-    // téléphone : la visée glisse un peu vers l'écran de contrôle (côté +x du plateau) pour qu'il soit entier
-    const rot = -cote * (Math.PI / 2) + cote * 0.35;
-    cible.x += Math.cos(rot) * 0.45;
-    cible.z -= Math.sin(rot) * 0.45;
-  } else {
+  if (!portrait) {
     const dx = cible.x - pos.x;
     const dz = cible.z - pos.z;
     const n = Math.hypot(dx, dz);
