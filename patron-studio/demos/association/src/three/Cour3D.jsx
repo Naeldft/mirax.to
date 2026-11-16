@@ -176,6 +176,8 @@ function useVerdure() {
       tomateVerte: new THREE.MeshPhysicalMaterial({ color: '#8fae3c', roughness: 0.4, clearcoat: 0.4 }),
       tuteur: new THREE.MeshStandardMaterial({ color: '#a9895f', roughness: 0.9 }),
       courgette: new THREE.MeshStandardMaterial({ color: '#3f6b2a', roughness: 0.55 }),
+      carotte: new THREE.MeshStandardMaterial({ color: '#e07a2a', roughness: 0.6 }),
+      pomme: new THREE.MeshPhysicalMaterial({ color: '#b8342c', roughness: 0.4, clearcoat: 0.5 }),
       zinc: new THREE.MeshStandardMaterial({ color: '#9aa3a6', roughness: 0.35, metalness: 0.9 }),
     }),
     [],
@@ -289,7 +291,363 @@ const POSES = {
   aGenoux: { bassinY: 0.5, bassinX: 0.55, hanches: [1.45, 0.12], genoux: [1.45, 1.6], ecart: [0.12, 0.06], tete: 0.35, rotBras: [0.009, 0.061], epaules: [0.364, 0.34], ouverture: [0.001, -0.023], coudes: [1.056, 1.071] },
   // l'enfant arrose : bras droit tendu vers l'avant avec l'arrosoir, l'autre détendu
   arrose: { epaules: [0.08, 0.95], ouverture: [0.14, 0.08], coudes: [0.2, 0.25], tete: 0.3, teteY: -0.2 },
+  // aide aux devoirs : élèves assis, les deux mains posées sur le cahier
+  eleve: { bassinY: 0.66, bassinX: 0.12, hanches: [1.5, 1.5], genoux: [1.5, 1.5], ecart: [0.1, 0.1], tete: 0.45, rotBras: [-0.17, -0.098], epaules: [0.589, 0.572], ouverture: [-0.05, 0.017], coudes: [2.118, 1.937] },
+  // la bénévole, assise en bout de table, une main posée, l'autre montre le cahier
+  benevoleDevoirs: { bassinY: 0.66, bassinX: 0.12, hanches: [1.5, 1.5], genoux: [1.5, 1.5], ecart: [0.1, 0.1], tete: 0.3, teteY: 0.35, rotBras: [-0.458, -0.116], epaules: [0.567, 0.576], ouverture: [-0.031, 0.316], coudes: [0.912, 0.902] },
+  // repair café : debout derrière l'établi, les deux mains sur le grille-pain ouvert
+  repare: { bassinX: 0.2, tete: 0.4, rotBras: [-0.376, -0.166], epaules: [0.448, 0.428], ouverture: [0.087, -0.064], coudes: [0.987, 1.017] },
+  // le visiteur regarde, les mains jointes devant lui
+  regarde: { tete: 0.15, teteY: -0.3, rotBras: [-0.816, -0.72], epaules: [0.216, 0.218], ouverture: [-0.123, -0.132], coudes: [0.775, 0.75] },
+  // épicerie : la bénévole pose une main sur la cagette et tend le sac de l'autre
+  tend: { tete: 0.1, teteY: 0.25, rotBras: [-0.016, -0.018], epaules: [0.643, 0.67], ouverture: [0.059, 0.043], coudes: [0.114, 1.008] },
+  // la cliente porte son panier, l'autre bras détendu
+  panier: { teteY: -0.25, rotBras: [-0.188, 0], epaules: [0.283, 0.08], ouverture: [-0.046, 0.1], coudes: [0.719, 0.15] },
 };
+
+/* ---------- l'aide aux devoirs : une table sous la pergola ---------- */
+function papier(lignes = true, couleur = '#fbfaf5') {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 192;
+  const g = c.getContext('2d');
+  g.fillStyle = couleur;
+  g.fillRect(0, 0, 256, 192);
+  if (lignes) {
+    g.strokeStyle = '#a9c4de';
+    g.lineWidth = 1.5;
+    for (let y = 22; y < 192; y += 14) {
+      g.beginPath();
+      g.moveTo(8, y);
+      g.lineTo(248, y);
+      g.stroke();
+    }
+    g.strokeStyle = '#e5533d';
+    g.beginPath();
+    g.moveTo(34, 0);
+    g.lineTo(34, 192);
+    g.stroke();
+    // quelques lignes d'écriture
+    g.strokeStyle = '#33415c';
+    g.lineWidth = 2;
+    for (let y = 36; y < 120; y += 14) {
+      g.beginPath();
+      let x = 40;
+      g.moveTo(x, y - 2);
+      while (x < 200 + ((y * 7) % 40)) {
+        x += 6;
+        g.lineTo(x, y - 2 - Math.abs(Math.sin(x * 0.7)) * 5);
+      }
+      g.stroke();
+    }
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function Cahier({ position, rotation }) {
+  const m = useMemo(() => ({ page: new THREE.MeshStandardMaterial({ map: papier(), roughness: 0.9 }), couv: new THREE.MeshStandardMaterial({ color: '#4a7bd0', roughness: 0.7 }) }), []);
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh material={m.couv} position={[0, 0.002, 0]}>
+        <boxGeometry args={[0.36, 0.004, 0.25]} />
+      </mesh>
+      <mesh material={m.page} rotation-x={-Math.PI / 2} position={[0, 0.0045, 0]}>
+        <planeGeometry args={[0.34, 0.23]} />
+      </mesh>
+    </group>
+  );
+}
+
+function Devoirs({ m }) {
+  const mat = useMemo(
+    () => ({
+      crayon: new THREE.MeshStandardMaterial({ color: '#f2b84b', roughness: 0.6 }),
+      livres: ['#e5533d', '#1f4d3a', '#f2b84b', '#4a7bd0'].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75 })),
+      sac: new THREE.MeshStandardMaterial({ color: '#7fb069', roughness: 0.85, normalMap: grain(), normalScale: new THREE.Vector2(0.5, 0.5) }),
+    }),
+    [],
+  );
+  const H = 0.74;
+  return (
+    <group>
+      {/* pergola de bois : quatre poteaux, deux poutres, des chevrons */}
+      {[-1.15, 1.15].flatMap((x) =>
+        [-1.1, 0.75].map((z) => (
+          <mesh key={`${x}${z}`} material={m.planches} position={[x, 1.2, z]} castShadow>
+            <boxGeometry args={[0.1, 2.4, 0.1]} />
+          </mesh>
+        )),
+      )}
+      {[-1.1, 0.75].map((z) => (
+        <mesh key={z} material={m.planches} position={[0, 2.42, z]} castShadow>
+          <boxGeometry args={[2.6, 0.12, 0.1]} />
+        </mesh>
+      ))}
+      {Array.from({ length: 7 }, (_, i) => (
+        <mesh key={i} material={m.planches} position={[-1.2 + i * 0.4, 2.52, -0.18]} castShadow>
+          <boxGeometry args={[0.07, 0.08, 2.2]} />
+        </mesh>
+      ))}
+      {/* la table et ses bancs */}
+      <mesh material={m.planches} position={[0, H - 0.02, -0.2]} castShadow receiveShadow>
+        <boxGeometry args={[1.6, 0.04, 0.8]} />
+      </mesh>
+      {[-0.7, 0.7].flatMap((x) =>
+        [-0.5, 0.1].map((z) => (
+          <mesh key={`${x}${z}`} material={m.planches} position={[x, (H - 0.04) / 2, z]} castShadow>
+            <boxGeometry args={[0.06, H - 0.04, 0.06]} />
+          </mesh>
+        )),
+      )}
+      <mesh material={m.planches} position={[0, 0.44, -0.86]} castShadow>
+        <boxGeometry args={[1.5, 0.04, 0.3]} />
+      </mesh>
+      {[-0.65, 0.65].map((x) => (
+        <mesh key={x} material={m.planches} position={[x, 0.21, -0.86]}>
+          <boxGeometry args={[0.05, 0.42, 0.26]} />
+        </mesh>
+      ))}
+      {/* deux élèves assis de l'autre côté de la table, face à nous, les mains sur leur cahier */}
+      {[-0.38, 0.32].map((x, i) => (
+        <group key={x} position={[x, 0, -0.86]} scale={0.68}>
+          <Personnage pose={POSES.eleve} haut={i ? '#4a7bd0' : '#f2b84b'} bas="#2f3a4a" peau={i ? '#a5876c' : '#c9ac8f'} />
+        </group>
+      ))}
+      <Cahier position={[-0.38, H, -0.48]} rotation={[0, 0.05, 0]} />
+      <Cahier position={[0.32, H, -0.44]} rotation={[0, -0.08, 0]} />
+      <mesh material={mat.crayon} position={[-0.2, H + 0.008, -0.4]} rotation={[0, 0.6, Math.PI / 2]}>
+        <cylinderGeometry args={[0.004, 0.004, 0.16, 6]} />
+      </mesh>
+      {/* pile de livres et cartable */}
+      {mat.livres.map((l, i) => (
+        <mesh key={i} material={l} position={[0.62, H + 0.02 + i * 0.035, -0.32]} rotation-y={i * 0.25}>
+          <boxGeometry args={[0.22, 0.032, 0.16]} />
+        </mesh>
+      ))}
+      <mesh material={mat.sac} position={[-0.95, 0.18, -0.55]} rotation-y={0.4} castShadow>
+        <boxGeometry args={[0.32, 0.36, 0.14]} />
+      </mesh>
+      {/* la bénévole, en bout de table, montre le cahier */}
+      <mesh material={m.planches} position={[1.05, 0.44, -0.22]} castShadow>
+        <boxGeometry args={[0.36, 0.04, 0.36]} />
+      </mesh>
+      <group position={[1.05, 0, -0.22]} rotation-y={-Math.PI / 2 - 0.25}>
+        <Personnage pose={POSES.benevoleDevoirs} haut="#1f4d3a" bas="#c9bfae" />
+      </group>
+    </group>
+  );
+}
+
+/* ---------- le repair café : un établi, des outils, un grille-pain ouvert, un vélo ---------- */
+function Repair({ m }) {
+  const mat = useMemo(
+    () => ({
+      inox: new THREE.MeshStandardMaterial({ color: '#c9c9cb', roughness: 0.25, metalness: 1 }),
+      noir: new THREE.MeshStandardMaterial({ color: '#1b1b1d', roughness: 0.55 }),
+      rouge: new THREE.MeshStandardMaterial({ color: '#c7352a', roughness: 0.45, metalness: 0.3 }),
+      liege: new THREE.MeshStandardMaterial({ color: '#b98d5f', roughness: 0.9, normalMap: grain(), normalScale: new THREE.Vector2(0.8, 0.8) }),
+      pneu: new THREE.MeshStandardMaterial({ color: '#202022', roughness: 0.8 }),
+      cadre: new THREE.MeshStandardMaterial({ color: '#2f6f8f', roughness: 0.4, metalness: 0.5 }),
+      etiquette: new THREE.MeshStandardMaterial({ map: panneau('Repair café', 'On répare ensemble · gratuit'), roughness: 0.7 }),
+    }),
+    [],
+  );
+  const H = 0.92;
+  return (
+    <group>
+      {/* établi */}
+      <mesh material={m.planches} position={[0, H - 0.03, -0.25]} castShadow receiveShadow>
+        <boxGeometry args={[1.7, 0.06, 0.65]} />
+      </mesh>
+      {[-0.78, 0.78].flatMap((x) =>
+        [-0.5, 0.0].map((z) => (
+          <mesh key={`${x}${z}`} material={m.planches} position={[x, (H - 0.06) / 2, z]} castShadow>
+            <boxGeometry args={[0.07, H - 0.06, 0.07]} />
+          </mesh>
+        )),
+      )}
+      <mesh material={m.planches} position={[0, 0.2, -0.25]}>
+        <boxGeometry args={[1.6, 0.03, 0.55]} />
+      </mesh>
+      {/* panneau à outils et panonceau */}
+      <mesh material={mat.liege} position={[0, 1.55, -0.62]} castShadow>
+        <boxGeometry args={[1.5, 0.9, 0.03]} />
+      </mesh>
+      <mesh material={mat.etiquette} position={[0, 2.12, -0.62]}>
+        <boxGeometry args={[1.2, 0.3, 0.02]} />
+      </mesh>
+      <Modele nom="cross_pein_hammer" position={[-0.45, 1.6, -0.59]} rotation={[Math.PI / 2, 0, 0.3]} />
+      <Modele nom="adjustable_wrench" position={[0.1, 1.55, -0.59]} rotation={[Math.PI / 2, 0, -0.4]} />
+      {/* le grille-pain ouvert, entre ses mains, et son capot posé à côté */}
+      <group position={[-0.02, H, -0.06]}>
+        <mesh material={mat.inox} position={[0, 0.09, 0]} castShadow>
+          <boxGeometry args={[0.26, 0.18, 0.15]} />
+        </mesh>
+        <mesh material={mat.noir} position={[0, 0.181, 0]}>
+          <boxGeometry args={[0.18, 0.004, 0.06]} />
+        </mesh>
+      </group>
+      <mesh material={mat.inox} position={[0.42, H + 0.01, -0.12]} rotation={[0, 0.4, 0]}>
+        <boxGeometry args={[0.24, 0.02, 0.13]} />
+      </mesh>
+      <mesh material={mat.rouge} position={[-0.5, H + 0.06, -0.3]}>
+        <boxGeometry args={[0.36, 0.12, 0.18]} />
+      </mesh>
+      {/* le réparateur, derrière l'établi, face à nous ; un habitant regarde */}
+      <group position={[0, 0, -0.48]}>
+        <Personnage pose={POSES.repare} homme haut="#7a5b3a" bas="#2f3a4a" />
+      </group>
+      <group position={[1.05, 0, 0.35]} rotation-y={-1.0}>
+        <Personnage pose={POSES.regarde} homme haut="#c9bfae" bas="#3e4146" />
+      </group>
+      {/* un vélo à réparer, roue avant démontée */}
+      <group position={[-1.25, 0, 0.35]} rotation-y={0.9}>
+        <mesh material={mat.pneu} position={[-0.52, 0.34, 0]}>
+          <torusGeometry args={[0.32, 0.025, 10, 48]} />
+        </mesh>
+        <mesh material={mat.pneu} position={[0.62, 0.34, 0.18]} rotation-y={0.6}>
+          <torusGeometry args={[0.32, 0.025, 10, 48]} />
+        </mesh>
+        {[
+          [[-0.52, 0.34, 0], [-0.1, 0.62, 0]],
+          [[-0.1, 0.62, 0], [0.42, 0.66, 0]],
+          [[-0.52, 0.34, 0], [0.0, 0.3, 0]],
+          [[0.0, 0.3, 0], [-0.1, 0.62, 0]],
+          [[0.0, 0.3, 0], [0.42, 0.66, 0]],
+          [[0.42, 0.66, 0], [0.48, 0.9, 0]],
+          [[-0.1, 0.62, 0], [-0.14, 0.82, 0]],
+        ].map(([a, b], i) => {
+          const va = new THREE.Vector3(...a);
+          const vb = new THREE.Vector3(...b);
+          const mil = va.clone().add(vb).multiplyScalar(0.5);
+          const d = vb.clone().sub(va);
+          const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+          return (
+            <mesh key={i} material={mat.cadre} position={mil} quaternion={q} castShadow>
+              <cylinderGeometry args={[0.018, 0.018, d.length(), 10]} />
+            </mesh>
+          );
+        })}
+        <mesh material={mat.noir} position={[-0.14, 0.84, 0]} scale={[1.6, 0.4, 0.8]}>
+          <sphereGeometry args={[0.06, 12, 8]} />
+        </mesh>
+        <mesh material={mat.noir} position={[0.48, 0.9, 0]} rotation-x={Math.PI / 2}>
+          <cylinderGeometry args={[0.012, 0.012, 0.46, 8]} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* ---------- l'épicerie solidaire : un étal de cagettes ---------- */
+function Legumes({ v, sorte, n = 9 }) {
+  const items = useMemo(
+    () =>
+      Array.from({ length: n }, (_, i) => ({
+        p: [-0.16 + (i % 3) * 0.16 + Math.sin(i * 3) * 0.02, 0.05 + Math.floor(i / 9) * 0.06, -0.1 + Math.floor((i % 9) / 3) * 0.1],
+        r: [i, i * 2, 0],
+      })),
+    [n],
+  );
+  return items.map((it, i) =>
+    sorte === 'carottes' ? (
+      <mesh key={i} material={v.carotte} position={it.p} rotation={[Math.PI / 2, 0, it.r[1]]} castShadow>
+        <coneGeometry args={[0.022, 0.16, 10]} />
+      </mesh>
+    ) : sorte === 'courgettes' ? (
+      <mesh key={i} material={v.courgette} position={it.p} rotation={[Math.PI / 2, 0, it.r[1]]} castShadow>
+        <capsuleGeometry args={[0.025, 0.14, 4, 10]} />
+      </mesh>
+    ) : (
+      <mesh key={i} material={sorte === 'tomates' ? v.tomate : v.pomme} position={it.p} castShadow>
+        <sphereGeometry args={[sorte === 'tomates' ? 0.036 : 0.04, 14, 10]} />
+      </mesh>
+    ),
+  );
+}
+
+function Epicerie({ m, v }) {
+  const mat = useMemo(
+    () => ({
+      papier: new THREE.MeshStandardMaterial({ color: '#c9a77a', roughness: 0.95, normalMap: grain(), normalScale: new THREE.Vector2(0.6, 0.6) }),
+      bocal: new THREE.MeshPhysicalMaterial({ color: '#f2efe6', roughness: 0.1, transmission: 0.6, thickness: 0.02, transparent: true, opacity: 0.85 }),
+      confiture: new THREE.MeshStandardMaterial({ color: '#8f2d2a', roughness: 0.4 }),
+      couvercle: new THREE.MeshStandardMaterial({ color: '#d8c49a', roughness: 0.5, metalness: 0.4 }),
+      ardoise: new THREE.MeshStandardMaterial({ map: panneau('Épicerie solidaire', 'Mercredi · 14 h – 19 h'), roughness: 0.7 }),
+    }),
+    [],
+  );
+  const H = 0.86;
+  const cagette = (x, z, sorte) => (
+    <group key={`${x}${z}`} position={[x, H, z]}>
+      <Modele nom="wooden_crate_01" scale={[0.55, 0.3, 0.45]} />
+      <group position={[0, 0.02, 0]}>
+        <Legumes v={v} sorte={sorte} n={sorte === 'carottes' ? 7 : 9} />
+      </group>
+    </group>
+  );
+  return (
+    <group>
+      {/* le comptoir (tréteaux et plateau), les cagettes dessus */}
+      <mesh material={m.planches} position={[0, H - 0.03, -0.15]} castShadow receiveShadow>
+        <boxGeometry args={[1.9, 0.05, 0.7]} />
+      </mesh>
+      {[-0.8, 0.8].map((x) => (
+        <mesh key={x} material={m.planches} position={[x, (H - 0.05) / 2, -0.15]} castShadow>
+          <boxGeometry args={[0.06, H - 0.05, 0.6]} />
+        </mesh>
+      ))}
+      {cagette(-0.6, -0.15, 'pommes')}
+      {cagette(-0.1, -0.15, 'tomates')}
+      {cagette(0.4, -0.18, 'carottes')}
+      {/* étagère du fond : bocaux de confiture */}
+      <mesh material={m.planches} position={[0, 1.35, -0.8]}>
+        <boxGeometry args={[1.8, 0.04, 0.3]} />
+      </mesh>
+      {[-1, 1].map((s) => (
+        <mesh key={s} material={m.planches} position={[s * 0.88, 0.8, -0.8]}>
+          <boxGeometry args={[0.04, 1.6, 0.3]} />
+        </mesh>
+      ))}
+      {Array.from({ length: 9 }, (_, i) => (
+        <group key={i} position={[-0.7 + i * 0.17, 1.43, -0.8]}>
+          <mesh material={mat.confiture} position={[0, -0.01, 0]}>
+            <cylinderGeometry args={[0.042, 0.042, 0.1, 16]} />
+          </mesh>
+          <mesh material={mat.bocal}>
+            <cylinderGeometry args={[0.046, 0.046, 0.13, 16]} />
+          </mesh>
+          <mesh material={mat.couvercle} position={[0, 0.07, 0]}>
+            <cylinderGeometry args={[0.047, 0.047, 0.02, 16]} />
+          </mesh>
+        </group>
+      ))}
+      <mesh material={mat.ardoise} position={[0, 1.95, -0.82]}>
+        <boxGeometry args={[1.3, 0.32, 0.02]} />
+      </mesh>
+      {/* la bénévole derrière le comptoir, face à nous : une main sur la cagette, l'autre tend un sac en papier */}
+      <group position={[-0.35, 0, -0.62]} rotation-y={0.35}>
+        <Personnage pose={POSES.tend} haut="#e5533d" bas="#2f3a4a" objets={[null, <SacPapier key="s" mat={mat} />]} />
+      </group>
+      {/* la cliente, devant, son panier au bras */}
+      <group position={[0.45, 0, 0.55]} rotation-y={-2.4}>
+        <Personnage pose={POSES.panier} haut="#7fb069" bas="#5b4636" objets={[<group key="p" position={[0, -0.05, 0]} scale={0.8}><Modele nom="wicker_basket_01" /></group>, null]} />
+      </group>
+    </group>
+  );
+}
+
+function SacPapier({ mat }) {
+  return (
+    <group position={[0, -0.12, 0.02]}>
+      <mesh material={mat.papier} castShadow>
+        <boxGeometry args={[0.2, 0.26, 0.12]} />
+      </mesh>
+    </group>
+  );
+}
 
 function useMateriaux(def) {
   const planches = usePBR('weathered_planks', { def, repeat: [1, 0.3], couleur: '#d9c7a8', env: 0.5 });
@@ -327,6 +685,9 @@ function Coin({ poste, def }) {
           <Modele nom="flower_gazania" position={[-1.6, 0, -0.9]} scale={1.4} />
         </>
       )}
+      {id === 'devoirs' && <Devoirs m={m} />}
+      {id === 'repair' && <Repair m={m} />}
+      {id === 'epicerie' && <Epicerie m={m} v={v} />}
     </group>
   );
 }
