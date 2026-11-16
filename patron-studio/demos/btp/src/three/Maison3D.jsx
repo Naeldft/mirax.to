@@ -34,21 +34,26 @@ const plafondEtage = (x) => GENOU + (X - Math.abs(x)) * PENTE;
 /* ---------- matières ---------- */
 function useMatiere(nom, { taille, couleur, rough = true, env = 0.6, uni = false, relief = 1, repeat } = {}) {
   // uni : couleur unie (sans la photo de la matière), seul le relief est gardé, pour des murs blancs nets
-  const chemins = {
-    ...(uni ? {} : { map: `${BASE}scene/textures/${nom}-diffuse-${taille}.webp` }),
-    normalMap: `${BASE}scene/textures/${nom}-normal-${taille}.webp`,
-    ...(rough ? { roughnessMap: `${BASE}scene/textures/${nom}-rough-${taille}.webp` } : {}),
+  // chargement en deux temps : 256 px pour le premier affichage, puis la définition visée (512 ou 1 024 px)
+  const chemins = (def) => ({
+    ...(uni ? {} : { map: `${BASE}scene/textures/${nom}-diffuse-${def}.webp` }),
+    normalMap: `${BASE}scene/textures/${nom}-normal-${def}.webp`,
+    ...(rough ? { roughnessMap: `${BASE}scene/textures/${nom}-rough-${def}.webp` } : {}),
+  });
+  const regler = (tex, k) => {
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.anisotropy = 8;
+    if (repeat) tex.repeat.set(repeat, repeat);
+    if (k === 'map') tex.colorSpace = THREE.SRGBColorSpace;
+    tex.needsUpdate = true;
+    return tex;
   };
-  const t = useTexture(chemins);
-  return useMemo(() => {
-    Object.entries(t).forEach(([k, tex]) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      tex.anisotropy = 8;
-      if (repeat) tex.repeat.set(repeat, repeat);
-      if (k === 'map') tex.colorSpace = THREE.SRGBColorSpace;
-    });
+  const t = useTexture(chemins(256));
+  const mat = useMemo(() => {
+    const cartes = {};
+    Object.entries(t).forEach(([k, tex]) => (cartes[k] = regler(tex.clone(), k)));
     return new THREE.MeshStandardMaterial({
-      ...t,
+      ...cartes,
       color: couleur ?? '#ffffff',
       roughness: 1,
       envMapIntensity: env,
@@ -56,6 +61,25 @@ function useMatiere(nom, { taille, couleur, rough = true, env = 0.6, uni = false
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois
   }, [t]);
+  useEffect(() => {
+    let fini = false;
+    const loader = new THREE.TextureLoader();
+    Promise.all(Object.entries(chemins(taille)).map(([k, u]) => loader.loadAsync(u).then((tex) => [k, tex])))
+      .then((liste) => {
+        if (fini) return;
+        liste.forEach(([k, tex]) => {
+          mat[k]?.dispose();
+          mat[k] = regler(tex, k);
+        });
+        mat.needsUpdate = true;
+      })
+      .catch(() => {});
+    return () => {
+      fini = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois par matière
+  }, [mat, taille]);
+  return mat;
 }
 
 /** Boîte dont les coordonnées de texture suivent les mètres réels (une texture = `tuile` mètres). */
