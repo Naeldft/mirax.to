@@ -487,9 +487,9 @@ function Plateau({ poste, m, def }) {
         </group>
       )}
       {/* lumière principale à 45°, réflecteur de l'autre côté, appareil sur trépied, écran de contrôle */}
-      <Octabox m={m} position={[-1.45, 2.05, 0.5]} cible={[0, 1.2, 0]} />
+      <Octabox m={m} position={[-1.5, 2.05, 0.15]} cible={[0, 1.2, 0]} />
       <Reflecteur m={m} position={[1.2, 0.55, 0.95]} rotation={[-0.2, -0.9, 0]} />
-      <AppareilTrepied m={m} position={[-1.1, 0, 1.0]} rotation={-0.83} />
+      <AppareilTrepied m={m} position={[-1.15, 0, 0.75]} rotation={-1.0} />
       {/* l'écran de contrôle, du côté libre de l'image, tourné vers l'allée : la vraie photo de la séance */}
       <Ecran m={m} id={id} def={def} position={[1.05, 1.5, 0.55]} rotation={[0, -0.42, 0]} />
       {/* contre-jour chaud qui détache le sujet du fond */}
@@ -515,7 +515,12 @@ function vue(i, a, portrait, pos, cible) {
   const r = portrait ? 3.9 : 3.8;
   pos.set(cx - cote * Math.cos(a) * r, portrait ? 1.75 : 1.85, z + Math.sin(a) * r);
   cible.set(cx, portrait ? 1.05 : 1.3, z);
-  if (!portrait) {
+  if (portrait) {
+    // téléphone : la visée glisse un peu vers l'écran de contrôle (côté +x du plateau) pour qu'il soit entier
+    const rot = -cote * (Math.PI / 2) + cote * 0.35;
+    cible.x += Math.cos(rot) * 0.45;
+    cible.z -= Math.sin(rot) * 0.45;
+  } else {
     const dx = cible.x - pos.x;
     const dz = cible.z - pos.z;
     const n = Math.hypot(dx, dz);
@@ -537,8 +542,8 @@ function Camera({ progres, foyer }) {
     const p = progres.lisse;
     const poses = ENTREE.map(([t, a, b]) => [t, (pp, cc) => (pp.set(...a), cc.set(...b))]);
     ARRETS.forEach(([ta, tb], i) => {
-      poses.push([ta, (pp, cc) => vue(i, 0.12, portrait, pp, cc)]);
-      poses.push([tb, (pp, cc) => vue(i, 0.62, portrait, pp, cc)]);
+      poses.push([ta, (pp, cc) => vue(i, 0.05, portrait, pp, cc)]);
+      poses.push([tb, (pp, cc) => vue(i, 0.45, portrait, pp, cc)]);
     });
     SORTIE.forEach(([t, a, b]) => poses.push([t, (pp, cc) => (pp.set(...a), cc.set(...b))]));
     let i = 1;
