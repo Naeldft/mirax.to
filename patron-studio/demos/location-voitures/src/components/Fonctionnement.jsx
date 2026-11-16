@@ -62,7 +62,7 @@ export default function Fonctionnement() {
                   value={c.valeur}
                   decimals={c.decimals ?? 0}
                   suffix={c.suffixe}
-                  className="block font-display text-3xl font-bold md:text-4xl lg:text-5xl"
+                  className="block font-display text-3xl font-bold lg:text-5xl"
                 />
                 <span className="mt-1 block text-sm uppercase tracking-wider text-ivoire/55">{c.label}</span>
               </dd>
