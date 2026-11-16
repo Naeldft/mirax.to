@@ -11,27 +11,27 @@ export default function Footer() {
           </p>
           <p className="mt-2 max-w-xs text-base text-ivoire/60">{entreprise.slogan}</p>
           <p className="mt-2 text-base text-ivoire/65">
-            <a href={`tel:${entreprise.telephoneLien}`} className="hover:text-course-vif">
+            <a href={`tel:${entreprise.telephoneLien}`} className="inline-flex min-h-11 items-center hover:text-course-vif">
               {entreprise.telephone}
             </a>{' '}
             ·{' '}
-            <a href={`mailto:${entreprise.email}`} className="hover:text-course-vif">
+            <a href={`mailto:${entreprise.email}`} className="inline-flex min-h-11 items-center hover:text-course-vif">
               {entreprise.email}
             </a>
           </p>
         </div>
         <nav aria-label="Pied de page" className="grid grid-cols-2 gap-x-10 gap-y-1 text-base text-ivoire/70">
           {navigation.map((n) => (
-            <a key={n.href} href={n.href} className="hover:text-course-vif">
+            <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-course-vif">
               {n.label}
             </a>
           ))}
-          <a href="#reserver" className="hover:text-course-vif">
+          <a href="#reserver" className="inline-flex min-h-11 items-center hover:text-course-vif">
             Réserver
           </a>
         </nav>
       </div>
-      <p className="mx-auto mt-10 max-w-7xl text-xs text-ivoire/35">
+      <p className="mx-auto mt-10 max-w-7xl text-[13px] text-ivoire/35">
         © {new Date().getFullYear()} {entreprise.nomComplet} · {entreprise.mention}
       </p>
     </footer>

@@ -56,21 +56,21 @@ export default function App() {
             <Logo className="h-8 w-8" />
             <div>
               <p className="font-display text-3xl">{boutique.nom}</p>
-              <p className="mt-1 text-sm text-ivoire/60">{boutique.adresse}</p>
+              <p className="mt-1 text-base text-ivoire/60">{boutique.adresse}</p>
             </div>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ivoire/60">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-ivoire/60">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-ivoire">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-ivoire">
                 {n.label}
               </a>
             ))}
-            <a href={`mailto:${boutique.email}`} className="hover:text-ivoire">
+            <a href={`mailto:${boutique.email}`} className="inline-flex min-h-11 items-center hover:text-ivoire">
               {boutique.email}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-7xl text-xs text-ivoire/40">
+        <p className="mx-auto mt-8 max-w-7xl text-[13px] text-ivoire/40">
           © {new Date().getFullYear()} {boutique.nom} · {boutique.mention}
         </p>
       </footer>

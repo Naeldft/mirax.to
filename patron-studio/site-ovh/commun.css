@@ -103,3 +103,27 @@ body[data-page] main .offer p:not(.eyebrow), body[data-page] main .spot p:not(.e
 body[data-page] main .studio-copy p, body[data-page] main .reveal-ready > p { color: #b9bec6 !important; }
 .psf-page .psf-field > span { color: #e3e6e9 !important; }
 .deliverable { background: #191919 !important; color: #b9bec6 !important; }
+
+/* ------------------------------------------------------------------
+   Lisibilité (audit 375 → 1 440 px) : descriptions, aides et pied de page en 16 px minimum,
+   mentions de copyright en 13 px minimum, liens isolés avec une zone de clic de 44 px au doigt.
+   Les surtitres en capitales (.eyebrow, .tag) restent des étiquettes courtes, hors de cette règle.
+------------------------------------------------------------------- */
+.at-footnote, .at-hint, .at-check, .at-preflight, .at-field, .at-upload, .at-details summary, .at-section-title > p, .at-top p,
+.tool-extras .checkbox, .checkbox, label.checkbox span, label.checkbox b, .choice b, .tool-section summary, .tool-intro > p:not(.eyebrow),
+.fineprint, .tool-intro .fineprint, .seo-grid > div > .fineprint, .futur-note, .notice, .export-note, .stage-caption, .proof, .small, .offer .small,
+.wrap p:not(.eyebrow), .prose-page p:not(.eyebrow), .prose-page section p, .seo-page li, .seo-grid > div > p:not(.eyebrow), .seo-grid li,
+.page-head > p:not(.eyebrow), .section-head > p:not(.eyebrow), .card p, .steps p, .timeline p, .faq-list p, .offer li, .promises, .promises li,
+.offer > p:not(.offer-price):not(.small), .partner-feature p, .signature-card p, .status-grid p, .measure-plan p, .quality-grid ul,
+.vitals-grid p, .next-steps p, .resource-card p, .project-caption p, .identity-panel > p:last-child, .measurement-note,
+.psf-note, .psf-field, .footer-main p, .footer-main a, .footer-grid p:not(.eyebrow), .footer-grid > div > a:not(.brand),
+.site-footer p, .footer-bottom a, .footer-bottom button {
+  font-size: 1rem !important;
+}
+.footer-bottom, .footer-bottom span { font-size: max(13px, 0.8125rem) !important; }
+@media (max-width: 767px) {
+  .footer-main a, .footer-grid > div > a:not(.brand), .footer-bottom a, .footer-bottom button,
+  .notice > a, .notice a, .page-head a.back-link, span > a[href*="confidentialite"], .legal-layout p > a:only-child {
+    display: inline-flex; align-items: center; min-height: 44px;
+  }
+}

@@ -37,18 +37,18 @@ export default function App() {
       <footer className="bg-creme px-5 py-12 md:px-8 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:justify-between">
           <p className="font-serif text-2xl italic">{salon.nom}</p>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-taupe">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-taupe">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-encre">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-encre">
                 {n.label}
               </a>
             ))}
-            <a href={`mailto:${salon.email}`} className="hover:text-encre">
+            <a href={`mailto:${salon.email}`} className="inline-flex min-h-11 items-center hover:text-encre">
               {salon.email}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-6xl text-xs text-taupe">
+        <p className="mx-auto mt-8 max-w-6xl text-[13px] text-taupe">
           © {new Date().getFullYear()} {salon.nom} · {salon.adresse} · {salon.mention}
         </p>
       </footer>

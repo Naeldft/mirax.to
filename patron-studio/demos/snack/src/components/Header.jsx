@@ -30,7 +30,7 @@ export default function Header() {
         className={`fixed inset-x-0 top-0 z-[60] transition-[background-color,border-color] duration-500 ${scrolled || open ? 'border-b border-trait bg-nuit/85 backdrop-blur-xl' : 'border-b border-transparent'}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
-          <a href="#accueil" aria-label={`${snack.nom}, retour à l’accueil`}>
+          <a href="#accueil" className="flex min-h-11 items-center" aria-label={`${snack.nom}, retour à l’accueil`}>
             <Logo />
           </a>
           <nav aria-label="Navigation principale" className="hidden items-center gap-9 lg:flex">

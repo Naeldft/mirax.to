@@ -31,7 +31,7 @@ export default function Header() {
         className={`fixed inset-x-0 top-0 z-[60] transition-colors duration-300 ${scrolled || open ? 'border-b border-trait bg-papier/90 backdrop-blur-md' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
-          <a href="#accueil" className="flex items-center gap-2" aria-label={`${cabinet.nom}, retour à l’accueil`}>
+          <a href="#accueil" className="flex min-h-11 items-center gap-2" aria-label={`${cabinet.nom}, retour à l’accueil`}>
             <Logo className="h-8 w-8 text-nuit" />
             <span className="font-display text-[1.7rem] leading-none">Cap Horizon</span>
           </a>

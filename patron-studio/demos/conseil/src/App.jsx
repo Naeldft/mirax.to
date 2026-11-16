@@ -44,21 +44,21 @@ export default function App() {
             <Logo className="h-9 w-9 text-papier" />
             <div>
               <p className="font-display text-3xl">{cabinet.nom}</p>
-              <p className="text-sm text-papier/60">{cabinet.adresse}</p>
+              <p className="text-base text-papier/60">{cabinet.adresse}</p>
             </div>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-papier/70">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-papier/70">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-white">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-white">
                 {n.label}
               </a>
             ))}
-            <a href={`tel:${cabinet.telephoneLien}`} className="hover:text-white">
+            <a href={`tel:${cabinet.telephoneLien}`} className="inline-flex min-h-11 items-center hover:text-white">
               {cabinet.telephone}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-7xl text-xs text-papier/40">
+        <p className="mx-auto mt-8 max-w-7xl text-[13px] text-papier/40">
           © {new Date().getFullYear()} {cabinet.nom} · {cabinet.mention}
         </p>
       </footer>

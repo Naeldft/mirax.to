@@ -126,7 +126,7 @@ export function Carte({ ajouter, quantites }) {
                   setVeggie(false);
                   setSansGluten(false);
                 }}
-                className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${!filtres && cat === c.id ? 'bg-creme text-nuit' : 'border border-trait text-creme/75 hover:border-creme/40 hover:text-creme'}`}
+                className={`inline-flex min-h-11 shrink-0 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${!filtres && cat === c.id ? 'bg-creme text-nuit' : 'border border-trait text-creme/75 hover:border-creme/40 hover:text-creme'}`}
               >
                 {c.nom}
               </button>
@@ -142,7 +142,7 @@ export function Carte({ ajouter, quantites }) {
               type="button"
               aria-pressed={v}
               onClick={() => set(!v)}
-              className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${v ? 'bg-braise text-nuit' : 'border border-dashed border-trait text-creme/75 hover:text-creme'}`}
+              className={`inline-flex min-h-11 shrink-0 items-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 ${v ? 'bg-braise text-nuit' : 'border border-dashed border-trait text-creme/75 hover:text-creme'}`}
             >
               {v ? '✓ ' : ''}
               {l}
@@ -186,7 +186,7 @@ export function Carte({ ajouter, quantites }) {
                     <p className="shrink-0 text-lg font-bold text-flamme tabular-nums">{formatEuros(p.prix)}</p>
                   </div>
                   <p className="mt-2 flex-1 leading-relaxed text-sable">{p.desc}</p>
-                  <p className="mt-3 text-xs text-sable/70">
+                  <p className="mt-3 text-base text-sable/70">
                     Allergènes : {p.allergenes.length ? p.allergenes.map((a) => allergenes[a]).join(', ') : 'aucun des 14 majeurs'}
                   </p>
                   <button
@@ -304,7 +304,7 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
             {lignes.length === 0 ? (
               <p className="py-6 text-center text-sable">
                 Votre commande est vide.{' '}
-                <a href="#carte" className="font-semibold text-flamme underline underline-offset-4">
+                <a href="#carte" className="inline-flex min-h-11 items-center font-semibold text-flamme underline underline-offset-4">
                   Choisir dans la carte
                 </a>
               </p>
@@ -362,7 +362,7 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
                   ? `Votre commande (${formatEuros(ok.total)}) sera prête ${ok.jour.toLowerCase()} à ${ok.creneau}, au ${snack.adresse}. Paiement sur place.`
                   : `Livraison ${ok.jour.toLowerCase()} vers ${ok.creneau} au ${ok.adresse} (${formatEuros(ok.total)}). Paiement à la livraison.`}
               </p>
-              <p className="mt-4 text-xs text-sable/70">(Démonstration : aucune commande n’a été transmise.)</p>
+              <p className="mt-4 text-base text-sable/70">(Démonstration : aucune commande n’a été transmise.)</p>
               <button
                 type="button"
                 className="btn btn-ligne mt-6"
@@ -484,7 +484,7 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
               >
                 {lignes.length === 0 ? 'Ajoutez d’abord un produit' : `Valider la commande · ${formatEuros(total)}`}
               </button>
-              <p className="-mt-2 text-center text-xs text-sable/70">
+              <p className="-mt-2 text-center text-base text-sable/70">
                 Paiement sur place ou à la livraison · Démonstration : rien n’est envoyé.
               </p>
             </form>
@@ -545,7 +545,7 @@ export function Allergenes() {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-sm text-sable">● = contient. Traces possibles de tous les allergènes (cuisine commune).</p>
+        <p className="mt-3 text-base text-sable">● = contient. Traces possibles de tous les allergènes (cuisine commune).</p>
       </div>
     </section>
   );

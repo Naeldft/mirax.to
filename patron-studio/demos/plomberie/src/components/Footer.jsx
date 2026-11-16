@@ -11,27 +11,27 @@ export default function Footer() {
           </p>
           <p className="mt-2 text-base text-ecume/60">{entreprise.adresse}</p>
           <p className="mt-1 text-base text-ecume/60">
-            <a href={`tel:${entreprise.telephoneLien}`} className="hover:text-eau">
+            <a href={`tel:${entreprise.telephoneLien}`} className="inline-flex min-h-11 items-center hover:text-eau">
               {entreprise.telephone}
             </a>{' '}
             ·{' '}
-            <a href={`mailto:${entreprise.email}`} className="hover:text-eau">
+            <a href={`mailto:${entreprise.email}`} className="inline-flex min-h-11 items-center hover:text-eau">
               {entreprise.email}
             </a>
           </p>
         </div>
         <nav aria-label="Pied de page" className="grid grid-cols-2 gap-x-10 gap-y-1 text-base text-ecume/70">
           {navigation.map((n) => (
-            <a key={n.href} href={n.href} className="hover:text-eau">
+            <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-eau">
               {n.label}
             </a>
           ))}
-          <a href="#devis" className="hover:text-eau">
+          <a href="#devis" className="inline-flex min-h-11 items-center hover:text-eau">
             Devis gratuit
           </a>
         </nav>
       </div>
-      <p className="mx-auto mt-10 max-w-6xl text-xs text-ecume/35">
+      <p className="mx-auto mt-10 max-w-6xl text-[13px] text-ecume/35">
         © {new Date().getFullYear()} {entreprise.nomComplet} · {entreprise.siret}
       </p>
     </footer>

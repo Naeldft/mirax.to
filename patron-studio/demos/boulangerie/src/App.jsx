@@ -35,18 +35,18 @@ export default function App() {
       <footer className="[&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center papier bg-papier px-5 py-12 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:justify-between">
           <p className="font-serif text-3xl font-bold">{maison.nom}</p>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-croute/80">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-croute/80">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-croute">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-croute">
                 {n.label}
               </a>
             ))}
-            <a href={`mailto:${maison.email}`} className="hover:text-croute">
+            <a href={`mailto:${maison.email}`} className="inline-flex min-h-11 items-center hover:text-croute">
               {maison.email}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-6xl text-xs text-croute/60">
+        <p className="mx-auto mt-8 max-w-6xl text-[13px] text-croute/60">
           © {new Date().getFullYear()} {maison.nom} · {maison.adresse} · {maison.mention}
         </p>
       </footer>

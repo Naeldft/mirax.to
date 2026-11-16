@@ -32,25 +32,25 @@ export default function App() {
         <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:justify-between">
           <div>
             <p className="font-display text-3xl italic">{studio.nom}</p>
-            <p className="mt-1 text-sm text-papier/60">
+            <p className="mt-1 text-base text-papier/60">
               {studio.photographe} · {studio.adresse}
             </p>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-papier/60">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-papier/60">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-ambre">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-ambre">
                 {n.label}
               </a>
             ))}
-            <a href={`mailto:${studio.email}`} className="hover:text-ambre">
+            <a href={`mailto:${studio.email}`} className="inline-flex min-h-11 items-center hover:text-ambre">
               {studio.email}
             </a>
-            <a href={`tel:${studio.telephoneLien}`} className="hover:text-ambre">
+            <a href={`tel:${studio.telephoneLien}`} className="inline-flex min-h-11 items-center hover:text-ambre">
               {studio.telephone}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-7xl text-xs text-papier/40">
+        <p className="mx-auto mt-8 max-w-7xl text-[13px] text-papier/40">
           © {new Date().getFullYear()} {studio.nom} · {studio.mention} · Photos du portfolio : illustrations dessinées pour la
           démonstration.
         </p>

@@ -199,7 +199,7 @@ export default function Hero({ onReady }) {
                 <p className="font-display text-3xl">{p.nom}</p>
                 <p className="tabular-nums">{formatEuros(p.prix)}</p>
               </div>
-              <p className="mt-1 text-sm text-gris">
+              <p className="mt-1 text-base text-gris">
                 {p.couleur} · {p.note}
               </p>
             </div>

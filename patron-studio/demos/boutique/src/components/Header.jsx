@@ -55,7 +55,7 @@ export default function Header({ count, onCart }) {
         className={`fixed inset-x-0 top-0 z-[60] transition-colors duration-300 ${scrolled || open ? 'border-b border-lin bg-ivoire/90 backdrop-blur-md' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
-          <a href="#accueil" className="flex items-center gap-2.5" aria-label={`${boutique.nom}, retour à l’accueil`}>
+          <a href="#accueil" className="flex min-h-11 items-center gap-2.5" aria-label={`${boutique.nom}, retour à l’accueil`}>
             <Logo className="h-7 w-7" />
             <span className="font-display text-2xl tracking-[0.08em]">{boutique.nom}</span>
           </a>

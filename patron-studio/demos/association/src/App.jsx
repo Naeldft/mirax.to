@@ -35,21 +35,21 @@ export default function App() {
             <Logo className="h-10 w-10" />
             <div>
               <p className="font-display text-2xl font-extrabold">{asso.nom}</p>
-              <p className="text-sm text-creme/60">Association loi 1901 · {asso.adresse}</p>
+              <p className="text-base text-creme/60">Association loi 1901 · {asso.adresse}</p>
             </div>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-creme/70">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-creme/70">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-soleil">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-soleil">
                 {n.label}
               </a>
             ))}
-            <a href={`mailto:${asso.email}`} className="hover:text-soleil">
+            <a href={`mailto:${asso.email}`} className="inline-flex min-h-11 items-center hover:text-soleil">
               {asso.email}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-7xl text-xs text-creme/40">
+        <p className="mx-auto mt-8 max-w-7xl text-[13px] text-creme/40">
           © {new Date().getFullYear()} {asso.nom} · {asso.mention}
         </p>
       </footer>

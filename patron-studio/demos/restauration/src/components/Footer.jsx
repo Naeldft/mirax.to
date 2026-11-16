@@ -16,11 +16,11 @@ export default function Footer() {
           className="grid grid-cols-2 gap-x-10 gap-y-1 text-base text-creme/70 [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center"
         >
           {NAV.map((n) => (
-            <a key={n.href} href={n.href} className="hover:text-or-clair">
+            <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-or-clair">
               {n.label}
             </a>
           ))}
-          <a href="#reservation" className="hover:text-or-clair">
+          <a href="#reservation" className="inline-flex min-h-11 items-center hover:text-or-clair">
             Réserver
           </a>
         </nav>
@@ -38,13 +38,13 @@ export default function Footer() {
           ))}
         </ul>
       </div>
-      <div className="mx-auto mt-12 flex max-w-6xl flex-col gap-2 border-t border-creme/10 pt-6 text-xs text-creme/40 md:flex-row md:justify-between">
+      <div className="mx-auto mt-12 flex max-w-6xl flex-col gap-2 border-t border-creme/10 pt-6 text-[13px] text-creme/40 md:flex-row md:justify-between">
         <p>
           © {new Date().getFullYear()} {restaurant.nom} · Restaurant fictif
         </p>
         <p>
           Site démo réalisé par{' '}
-          <a href={PATRON.accueil} className="underline-offset-4 hover:text-creme/70 hover:underline">
+          <a href={PATRON.accueil} className="inline-flex min-h-11 items-center underline-offset-4 hover:text-creme/70 hover:underline">
             Patrôn Studio
           </a>
         </p>

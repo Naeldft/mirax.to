@@ -78,7 +78,7 @@ function Produit({ p, onAdd }) {
           <h3 className="text-2xl">{p.nom}</h3>
           <p className="shrink-0 tabular-nums">{formatEuros(p.prix)}</p>
         </div>
-        <p className="mt-1 text-sm text-gris">{p.note}</p>
+        <p className="mt-1 text-base text-gris">{p.note}</p>
         {!unique && (
           <fieldset className="mt-4">
             <legend className="sr-only">Taille de {p.nom}</legend>
@@ -131,7 +131,7 @@ export function Collection({ onAdd }) {
           >
             Les essentiels
           </Titre>
-          <p className="text-sm text-gris" data-reveal>
+          <p className="text-base text-gris" data-reveal>
             Livraison offerte dès {formatEuros(boutique.livraisonOfferte)}
           </p>
         </div>
@@ -545,7 +545,7 @@ export function Panier({ open, onClose, items, setQty, clear }) {
                   </div>
                 </>
               ) : (
-                <p className="bg-lin p-3 text-sm">Retrait au {boutique.adresse}, prêt le jour même pour toute commande avant midi.</p>
+                <p className="bg-lin p-3 text-base">Retrait au {boutique.adresse}, prêt le jour même pour toute commande avant midi.</p>
               )}
             </div>
             <div className="border-t border-lin px-5 py-5">

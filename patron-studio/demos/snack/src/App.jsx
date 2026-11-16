@@ -99,20 +99,20 @@ export default function App() {
         <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:justify-between">
           <div>
             <Logo className="!text-3xl" />
-            <p className="mt-2 text-sm text-sable">{snack.adresse}</p>
+            <p className="mt-2 text-base text-sable">{snack.adresse}</p>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-sable">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-base text-sable">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-creme">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-creme">
                 {n.label}
               </a>
             ))}
-            <a href={`tel:${snack.telephoneLien}`} className="hover:text-creme">
+            <a href={`tel:${snack.telephoneLien}`} className="inline-flex min-h-11 items-center hover:text-creme">
               {snack.telephone}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-7xl text-xs text-sable/60">
+        <p className="mx-auto mt-8 max-w-7xl text-[13px] text-sable/60">
           © {new Date().getFullYear()} {snack.nom} · {snack.mention} · Photos : Unsplash
         </p>
       </footer>

@@ -11,27 +11,27 @@ export default function Footer() {
           </p>
           <p className="mt-2 text-graphite">{entreprise.adresse}</p>
           <p className="mt-1 text-graphite">
-            <a href={`tel:${entreprise.telephoneLien}`} className="underline-offset-4 hover:underline">
+            <a href={`tel:${entreprise.telephoneLien}`} className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
               {entreprise.telephone}
             </a>{' '}
             ·{' '}
-            <a href={`mailto:${entreprise.email}`} className="underline-offset-4 hover:underline">
+            <a href={`mailto:${entreprise.email}`} className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
               {entreprise.email}
             </a>
           </p>
         </div>
         <nav aria-label="Pied de page" className="grid grid-cols-2 gap-x-10 gap-y-2 font-cond text-lg font-bold uppercase">
           {navigation.map((n) => (
-            <a key={n.href} href={n.href} className="hover:text-plan">
+            <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-plan">
               {n.label}
             </a>
           ))}
-          <a href="#devis" className="hover:text-plan">
+          <a href="#devis" className="inline-flex min-h-11 items-center hover:text-plan">
             Devis gratuit
           </a>
         </nav>
       </div>
-      <p className="mx-auto mt-10 max-w-7xl text-sm text-graphite">
+      <p className="mx-auto mt-10 max-w-7xl text-[13px] text-graphite">
         © {new Date().getFullYear()} {entreprise.nomComplet} · {entreprise.mention}
       </p>
     </footer>

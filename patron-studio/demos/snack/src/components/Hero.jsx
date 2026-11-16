@@ -269,8 +269,8 @@ export default function Hero({ onReady, ajouter }) {
               <h2 className="text-[clamp(1.9rem,7vw,4.4rem)]">{b.nom}</h2>
               <span className="titre whitespace-nowrap text-3xl text-flamme md:text-4xl">{formatEuros(b.prix)}</span>
             </div>
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-creme/80 md:line-clamp-none md:text-lg">{b.desc}</p>
-            <p className="mt-2 text-sm text-creme/60">
+            <p className="mt-2 line-clamp-2 text-base leading-relaxed text-creme/80 md:line-clamp-none md:text-lg">{b.desc}</p>
+            <p className="mt-2 text-base text-creme/60">
               <span className="font-semibold text-creme/80">Allergènes :</span> {b.allergenes.map((a) => allergenes[a]).join(', ')}
             </p>
           </div>
