@@ -1,16 +1,13 @@
-import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { emailOk, isoLocal, telOk } from '@demos/shared/lib/validation.js';
 import { avis, categories, chiffres, deroule, faq, photos, prestations, studio, typesSeance } from '../data/site';
 import Photo from './Photo';
-
-const CameraScene = lazy(() => import('../three/CameraScene'));
 
 function Titre({ tag, children, intro, id }) {
   return (
@@ -32,111 +29,7 @@ function Titre({ tag, children, intro, id }) {
 
 /* ---------------------------------------------------------------- */
 
-const FOCALES = [24, 35, 50, 70, 85, 105];
-const OUVERTURES = ['2.8', '4', '5.6', '8', '11', '16'];
 
-export function Hero({ onReady }) {
-  const section = useRef(null);
-  const exif = useRef(null);
-  const flash = useRef(null);
-  const fondu = useRef(null);
-  const declenche = useRef(false);
-  const onStep = useCallback((p) => {
-    // lecture « EXIF » en direct : la focale suit le zoom, l'ouverture suit le diaphragme
-    const z = Math.min(1, p / 0.45);
-    const f = FOCALES[Math.round(z * (FOCALES.length - 1))];
-    const shut = Math.exp(-Math.pow((p - 0.8) / 0.05, 2));
-    const o = OUVERTURES[Math.round(shut * (OUVERTURES.length - 1))];
-    if (exif.current) exif.current.textContent = `${f} mm · f/${o} · 1/250 s · ISO 200`;
-    if (fondu.current) fondu.current.style.opacity = String(1 - Math.min(1, Math.max(0, (p - 0.35) / 0.25)));
-    // flash au moment du déclenchement
-    if (p > 0.78 && !declenche.current) {
-      declenche.current = true;
-      gsap.fromTo(flash.current, { opacity: 0.85 }, { opacity: 0, duration: 0.9, ease: 'power2.out' });
-    }
-    if (p < 0.7) declenche.current = false;
-  }, []);
-  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady, onStep });
-  useLayoutEffect(() => {
-    if (reduced) return;
-    const ctx = gsap.context(() => {
-      gsap.from('[data-mot]', { yPercent: 110, duration: 1.2, stagger: 0.1, ease: 'expo.out', delay: 0.3 });
-      gsap.from('[data-in]', { opacity: 0, y: 14, stagger: 0.08, duration: 0.8, delay: 0.8 });
-    }, section);
-    return () => ctx.revert();
-  }, [reduced]);
-  return (
-    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[260svh]'}`} aria-label="Accueil">
-      <div className="grain sticky top-0 h-[100svh] overflow-hidden bg-[radial-gradient(ellipse_60%_50%_at_60%_45%,#1e1a15,#0d0d0d_75%)]">
-        {load3d && (
-          <Suspense fallback={null}>
-            <CameraScene progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} />
-          </Suspense>
-        )}
-        <div ref={flash} className="pointer-events-none absolute inset-0 bg-white opacity-0" aria-hidden="true" />
-        {/* cadre de visée */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-4 md:inset-8">
-          {[
-            'left-0 top-16 border-l border-t',
-            'right-0 top-16 border-r border-t',
-            'bottom-0 left-0 border-b border-l',
-            'bottom-0 right-0 border-b border-r',
-          ].map((c) => (
-            <span key={c} className={`absolute h-6 w-6 border-papier/40 ${c}`} />
-          ))}
-          <p
-            ref={exif}
-            className="mono absolute right-2 top-20 z-10 rounded-full bg-nuit/70 px-3 py-1 tabular-nums backdrop-blur-sm md:right-4 md:bg-transparent md:px-0"
-          >
-            24 mm · f/2.8 · 1/250 s · ISO 200
-          </p>
-        </div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-nuit via-nuit/80 to-transparent md:hidden" />
-        <div
-          ref={fondu}
-          className="pointer-events-none relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-10 md:justify-center md:px-8 md:pb-0"
-        >
-          <p data-in className="mono !text-ambre">
-            {studio.accroche}
-          </p>
-          <h1 className="mt-4 text-[clamp(3.2rem,11vw,7.5rem)] leading-[0.98]">
-            <span className="block overflow-hidden pb-2">
-              <span data-mot className="block">
-                Gardez la
-              </span>
-            </span>
-            <span className="block overflow-hidden pb-2">
-              <span data-mot className="block italic text-ambre">
-                lumière
-              </span>
-            </span>
-            <span className="block overflow-hidden pb-2">
-              <span data-mot className="block">
-                du moment.
-              </span>
-            </span>
-          </h1>
-          <p data-in className="mt-4 max-w-md leading-relaxed text-papier/70 max-md:hidden">
-            {studio.intro}
-          </p>
-          <div data-in className="pointer-events-auto mt-6 flex flex-wrap gap-3">
-            <a href="#portfolio" className="btn btn-ambre">
-              Voir le portfolio
-            </a>
-            <a href="#reservation" className="btn btn-ligne">
-              Réserver une séance
-            </a>
-          </div>
-          {!reduced && (
-            <p data-in className="mono mt-8 max-md:hidden" aria-hidden="true">
-              ↓ Faites défiler : déclenchement
-            </p>
-          )}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ---------------------------------------------------------------- */
 

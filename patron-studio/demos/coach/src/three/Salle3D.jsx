@@ -5,7 +5,7 @@ import { BlendFunction, ToneMappingMode } from 'postprocessing';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import Athlete, { Kettlebell } from './Athlete';
-import { brosse, coutures, marquage, moletage, trousRack, usePBR } from './materiaux';
+import { brosse, coutures, marquage, moletage, trousRack, usePBR } from '@demos/shared/three/materiaux.js';
 
 /* ------------------------------------------------------------------
    Intro 3D de Pulse Coaching (pilotée par le défilement, progres 0 → 1).

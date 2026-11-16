@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { teteSculptee } from '@demos/shared/three/mannequin.js';
-import { grain, marquage } from './materiaux';
+import { grain, marquage } from '@demos/shared/three/materiaux.js';
 
 /* ------------------------------------------------------------------
    Athlète de la salle : un mannequin de vitrine haut de gamme en pied, articulé, construit en code.
