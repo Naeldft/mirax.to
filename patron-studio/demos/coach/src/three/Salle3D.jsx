@@ -4,6 +4,7 @@ import { DepthOfField, EffectComposer, N8AO, Noise, ToneMapping, Vignette } from
 import { BlendFunction, ToneMappingMode } from 'postprocessing';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 import Athlete, { Kettlebell } from './Athlete';
 import { brosse, coutures, marquage, moletage, trousRack, usePBR } from '@demos/shared/three/materiaux.js';
 
@@ -42,10 +43,18 @@ export const POSTES = [
 ];
 const X_POSTE = 2.3; // distance du centre de l'allée
 
-function Plante(props) {
+function PlanteCharge(props) {
   const { scene } = useGLTF(`${BASE}scene/modeles/potted_plant_04.glb`);
   const c = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={c} {...props} />;
+}
+/** Chargé après le premier affichage de la scène (détail). */
+function Plante(props) {
+  return (
+    <Differe>
+      <PlanteCharge {...props} />
+    </Differe>
+  );
 }
 
 /** Texte lumineux (néon) sur canevas. */
@@ -933,6 +942,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;

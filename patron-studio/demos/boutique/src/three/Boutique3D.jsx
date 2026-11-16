@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 
 /* ------------------------------------------------------------------
    Intro 3D d'Atelier Lin (pilotée par le défilement, progres 0 → 1).
@@ -68,10 +69,18 @@ function Bloc({ de, a, mat, tuile, ...props }) {
   return <mesh geometry={geo} material={mat} position={[(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2]} {...props} />;
 }
 
-function Modele({ nom, ...props }) {
+function ModeleCharge({ nom, ...props }) {
   const { scene } = useGLTF(`${BASE}scene/modeles/${nom}.glb`);
   const copie = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={copie} {...props} />;
+}
+/** Chargé après le premier affichage de la scène (détail). */
+function Modele(props) {
+  return (
+    <Differe>
+      <ModeleCharge {...props} />
+    </Differe>
+  );
 }
 
 function texte(lignes, { couleur = '#f4f1ec', fond = null, largeur = 1024, hauteur = 256 } = {}) {
@@ -389,6 +398,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;

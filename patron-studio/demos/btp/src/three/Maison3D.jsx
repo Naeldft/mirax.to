@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { RoundedBox, useGLTF, useTexture } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 
 /* ------------------------------------------------------------------
    Intro 3D de Bâti Nord (pilotée par le défilement, progres 0 → 1).
@@ -210,10 +211,18 @@ function Inscription({ lignes, largeur, position, rotation, options }) {
 }
 
 /* ---------- meubles Poly Haven ---------- */
-function Modele({ nom, ...props }) {
+function ModeleCharge({ nom, ...props }) {
   const { scene } = useGLTF(`${BASE}scene/modeles/${nom}.glb`);
   const copie = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={copie} {...props} />;
+}
+/** Les meubles arrivent après la maison (détail) : ils ne retardent pas le premier affichage. */
+function Modele(props) {
+  return (
+    <Differe>
+      <ModeleCharge {...props} />
+    </Differe>
+  );
 }
 
 /** Vraie photo de réalisation dans un cadre noir, accrochée au mur. */
@@ -662,6 +671,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;

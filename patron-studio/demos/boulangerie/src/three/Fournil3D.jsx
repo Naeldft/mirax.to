@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 
 /* ------------------------------------------------------------------
    Intro 3D de Maison Levain (pilotée par le défilement, progres 0 → 1).
@@ -58,10 +59,18 @@ function useMatiere(nom, { repeat = [1, 1], taille = 1024, couleur, env = 0.5 } 
   }, [t]);
 }
 
-function Modele({ nom, ...props }) {
+function ModeleCharge({ nom, ...props }) {
   const { scene } = useGLTF(`${BASE}scene/modeles/${nom}.glb`);
   const copie = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={copie} {...props} />;
+}
+/** Chargé après le premier affichage de la scène (détail). */
+function Modele(props) {
+  return (
+    <Differe>
+      <ModeleCharge {...props} />
+    </Differe>
+  );
 }
 
 /* ---------- la boutique ---------- */
@@ -462,6 +471,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;

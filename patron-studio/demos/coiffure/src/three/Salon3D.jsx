@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 import Mannequin, { TETE_Y } from './Mannequin';
 
 /* ------------------------------------------------------------------
@@ -278,10 +279,18 @@ function Etagere({ x, z, cote, laiton }) {
     </group>
   );
 }
-function Plante(props) {
+function PlanteCharge(props) {
   const { scene } = useGLTF(`${BASE}scene/modeles/potted_plant_04.glb`);
   const copie = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={copie} scale={3.4} {...props} />;
+}
+/** Chargé après le premier affichage de la scène (détail). */
+function Plante(props) {
+  return (
+    <Differe>
+      <PlanteCharge {...props} />
+    </Differe>
+  );
 }
 
 /**
@@ -438,6 +447,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;

@@ -4,6 +4,7 @@ import { DepthOfField, EffectComposer, N8AO, Noise, ToneMapping, Vignette } from
 import { BlendFunction, ToneMappingMode } from 'postprocessing';
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 import Personnage from '@demos/shared/three/Personnage.jsx';
 import { brosse, grain, usePBR } from '@demos/shared/three/materiaux.js';
 
@@ -172,10 +173,18 @@ function texteNeon(texte, couleur) {
   return t;
 }
 
-function Modele({ nom, ...props }) {
+function ModeleCharge({ nom, ...props }) {
   const { scene } = useGLTF(`${BASE}scene/modeles/${nom}.glb`);
   const c = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={c} {...props} />;
+}
+/** Chargé après le premier affichage de la scène (détail). */
+function Modele(props) {
+  return (
+    <Differe>
+      <ModeleCharge {...props} />
+    </Differe>
+  );
 }
 const Plante = (props) => <Modele nom="potted_plant_04" {...props} />;
 
@@ -653,6 +662,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;

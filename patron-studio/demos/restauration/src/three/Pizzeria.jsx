@@ -2,6 +2,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import Differe, { signalerScenePrete } from '@demos/shared/three/Differe.jsx';
 import { disqueImage } from '../data/pizzas';
 
 /* ------------------------------------------------------------------
@@ -542,6 +543,8 @@ function Pilote() {
 
 function Pret({ onReady }) {
   useEffect(() => {
+    // l'essentiel est prêt : les détails peuvent maintenant se charger (et repère de mesure)
+    signalerScenePrete();
     onReady?.();
   }, [onReady]);
   return null;
@@ -605,20 +608,23 @@ export default function Pizzeria({ progres, pizzas, index, direction, geste, red
         <Salle taille={taille} />
         <Four taille={taille} leger={leger} />
         <Comptoir taille={taille} />
-        <Ardoise position={[1.75, 0, 0.45]} rotation={[0, -0.75, 0]} lignes={ARDOISE_1} />
-        <Ardoise position={[-1.75, 0, -0.65]} rotation={[0, 0.75, 0]} lignes={ARDOISE_2} />
-        <Modele url={`${BASE}scene/modeles/wicker_basket_01.glb`} position={[-0.85, 0.96, -1.62]} rotation-y={0.4} />
-        {[
-          [-0.9, 1.0, -1.6],
-          [-0.82, 1.0, -1.66],
-          [-0.86, 1.03, -1.58],
-        ].map((p, i) => (
-          <Modele key={i} url={`${BASE}scene/modeles/lemon.glb`} position={p} rotation={[i, i * 2, 0]} />
-        ))}
-        <Modele url={`${BASE}scene/modeles/wooden_cutting_board.glb`} position={[0.82, 0.96, -1.6]} rotation-y={-0.3} />
-        <Modele url={`${BASE}scene/modeles/wooden_crate_01.glb`} position={[-2.7, 0, -3.2]} rotation-y={0.6} />
-        <Suspension position={[-0.65, 3.6, -1.55]} />
-        <Suspension position={[0.65, 3.6, -1.55]} />
+        {/* décor : chargé après le premier affichage de la scène (détail) */}
+        <Differe>
+          <Ardoise position={[1.75, 0, 0.45]} rotation={[0, -0.75, 0]} lignes={ARDOISE_1} />
+          <Ardoise position={[-1.75, 0, -0.65]} rotation={[0, 0.75, 0]} lignes={ARDOISE_2} />
+          <Modele url={`${BASE}scene/modeles/wicker_basket_01.glb`} position={[-0.85, 0.96, -1.62]} rotation-y={0.4} />
+          {[
+            [-0.9, 1.0, -1.6],
+            [-0.82, 1.0, -1.66],
+            [-0.86, 1.03, -1.58],
+          ].map((p, i) => (
+            <Modele key={i} url={`${BASE}scene/modeles/lemon.glb`} position={p} rotation={[i, i * 2, 0]} />
+          ))}
+          <Modele url={`${BASE}scene/modeles/wooden_cutting_board.glb`} position={[0.82, 0.96, -1.6]} rotation-y={-0.3} />
+          <Modele url={`${BASE}scene/modeles/wooden_crate_01.glb`} position={[-2.7, 0, -3.2]} rotation-y={0.6} />
+          <Suspension position={[-0.65, 3.6, -1.55]} />
+          <Suspension position={[0.65, 3.6, -1.55]} />
+        </Differe>
         <Carrousel pizzas={pizzas} index={index} direction={direction} geste={geste} reduit={reduit} petit={petit} />
         {!leger && <Farine n={petit ? 160 : 380} />}
         <Pret onReady={onReady} />
