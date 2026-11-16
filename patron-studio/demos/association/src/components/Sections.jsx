@@ -1,15 +1,13 @@
-import { Suspense, lazy, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { Suspense, useLayoutEffect, useRef, useState } from 'react';
 import Counter from '@demos/shared/components/Counter.jsx';
 import Faq from '@demos/shared/components/Faq.jsx';
 import { useForm } from '@demos/shared/hooks/useForm.js';
-import { useHero3D } from '@demos/shared/hooks/useHero3D.js';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { useReveal } from '@demos/shared/hooks/useReveal.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { emailOk, formatEuros, parseIso, telOk } from '@demos/shared/lib/validation.js';
 import { actions, adhesions, agenda, asso, disponibilites, faq, impact, missions, montantsDon, reductionImpot } from '../data/site';
 
-const TreeScene = lazy(() => import('../three/TreeScene'));
 
 function Titre({ tag, children, intro, id, couleur = 'text-coquelicot' }) {
   return (
@@ -38,74 +36,6 @@ function Erreur({ f, k }) {
 }
 
 /* ---------------------------------------------------------------- */
-
-export function Hero({ onReady }) {
-  const section = useRef(null);
-  const membres = useRef(null);
-  const onStep = useCallback((p) => {
-    // le compteur de feuilles suit la pousse de l'arbre
-    const n = Math.round(Math.min(1, Math.max(0, (p - 0.62) / 0.3)) * impact[0].valeur);
-    if (membres.current) membres.current.textContent = n;
-  }, []);
-  const { progress, reduced, inView, tier, load3d } = useHero3D(section, { onReady, onStep });
-  useLayoutEffect(() => {
-    if (reduced) {
-      if (membres.current) membres.current.textContent = impact[0].valeur;
-      return;
-    }
-    const ctx = gsap.context(() => {
-      gsap.from('[data-mot]', { y: 60, opacity: 0, rotate: 4, duration: 0.9, stagger: 0.09, ease: 'back.out(1.7)', delay: 0.25 });
-      gsap.from('[data-in]', { opacity: 0, y: 16, stagger: 0.08, duration: 0.7, delay: 0.7 });
-    }, section);
-    return () => ctx.revert();
-  }, [reduced]);
-  return (
-    <section id="accueil" ref={section} className={`relative ${reduced ? '' : 'h-[260svh]'}`} aria-label="Accueil">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-[radial-gradient(ellipse_70%_60%_at_65%_35%,#fff7dc,#fbf6ea_70%)]">
-        {load3d && (
-          <Suspense fallback={null}>
-            <TreeScene progress={progress} reduced={reduced} tier={tier} active={inView} onReady={onReady} />
-          </Suspense>
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-creme via-creme/90 to-transparent md:hidden" />
-        <div className="pointer-events-none relative mx-auto flex h-full max-w-7xl flex-col justify-end px-5 pb-8 md:justify-center md:px-8 md:pb-0">
-          <p data-in className="pastille self-start bg-mousse/25 text-foret">
-            {asso.accroche}
-          </p>
-          <h1 className="mt-4 text-[clamp(2.9rem,10vw,6.5rem)] leading-[0.98] text-foret">
-            <span data-mot className="block">
-              Ensemble,
-            </span>
-            <span data-mot className="block">
-              on fait <span className="feutre">pousser</span>
-            </span>
-            <span data-mot className="block text-coquelicot">
-              le quartier.
-            </span>
-          </h1>
-          <p data-in className="mt-4 max-w-md text-lg leading-relaxed text-gris max-md:hidden">
-            {asso.intro}
-          </p>
-          <p data-in className="mt-4 font-display text-lg font-bold text-foret" aria-hidden="true">
-            🍃{' '}
-            <span ref={membres} className="tabular-nums">
-              0
-            </span>{' '}
-            feuilles · une par adhérent
-          </p>
-          <div data-in className="pointer-events-auto mt-5 flex flex-wrap gap-3">
-            <a href="#benevole" className="btn btn-foret">
-              Devenir bénévole
-            </a>
-            <a href="#soutenir" className="btn btn-coquelicot">
-              Faire un don
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ---------------------------------------------------------------- */
 
@@ -148,7 +78,7 @@ export function Actions() {
                 </span>
                 <h3 className="mt-5 text-2xl text-foret">{a.titre}</h3>
                 <p className="mt-2 leading-relaxed text-gris">{a.texte}</p>
-                <p className="pastille mt-4 bg-sable text-foret">🗓 {a.quand}</p>
+                <p className="pastille mt-4 bg-sable text-foret">{a.quand}</p>
               </article>
             </li>
           ))}
@@ -311,7 +241,6 @@ export function Benevole() {
         <div data-reveal className="min-w-0 rounded-[2rem] bg-white p-5 shadow-[0_6px_0_#e4dccb] md:p-8">
           {ok ? (
             <div role="status" className="py-8 text-center">
-              <p className="text-6xl">🌱</p>
               <p className="mt-4 font-display text-3xl font-extrabold text-foret">Bienvenue {ok.nom.split(' ')[0]} !</p>
               <p className="mx-auto mt-3 max-w-sm leading-relaxed text-gris">
                 Merci pour votre envie de rejoindre {ok.missions.join(', ').toLowerCase()}. Un membre de l’équipe vous écrit cette semaine à{' '}
@@ -457,7 +386,6 @@ function Don() {
   if (ok)
     return (
       <div role="status" className="py-8 text-center">
-        <p className="text-6xl">💚</p>
         <p className="mt-4 font-display text-3xl font-extrabold text-foret">Merci {ok.nom.split(' ')[0]} !</p>
         <p className="mx-auto mt-3 max-w-sm leading-relaxed text-gris">
           Votre don {ok.rythme === 'mensuel' ? 'mensuel ' : ''}de {formatEuros(ok.montant)} finance {equivalence(ok.montant)}. Le reçu
@@ -572,7 +500,6 @@ function Adhesion() {
   if (ok)
     return (
       <div role="status" className="py-8 text-center">
-        <p className="text-6xl">🌳</p>
         <p className="mt-4 font-display text-3xl font-extrabold text-foret">Bienvenue chez Les Racines !</p>
         <p className="mx-auto mt-3 max-w-sm leading-relaxed text-gris">
           Adhésion « {ok.choix.nom} » ({formatEuros(ok.choix.prix)}) notée pour {ok.nom}. Votre carte d’adhérent serait envoyée à {ok.email}

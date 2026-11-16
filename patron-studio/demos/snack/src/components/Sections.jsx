@@ -173,7 +173,7 @@ export function Carte({ ajouter, quantites }) {
                     <p className="absolute left-3 top-3 flex flex-wrap gap-1.5">
                       {p.tags.map((t) => (
                         <span key={t} className="rounded-full bg-nuit/70 px-2.5 py-1 text-[0.7rem] font-semibold backdrop-blur-md">
-                          {t === 'piment' ? '🌶 ' : t === 'veggie' ? '🌱 ' : '★ '}
+                          {t === 'piment' || t === 'veggie' ? '' : '★ '}
                           {TAGS[t]}
                         </span>
                       ))}

@@ -3,7 +3,8 @@ import DemoFooter from '@demos/shared/components/DemoFooter.jsx';
 import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
 import Header, { Logo } from './components/Header';
-import { Actions, Agenda, Benevole, Contact, FaqSection, Hero, Soutenir } from './components/Sections';
+import { Hero } from './components/Hero';
+import { Actions, Agenda, Benevole, Contact, FaqSection, Soutenir } from './components/Sections';
 import { asso, navigation } from './data/site';
 
 export default function App() {
