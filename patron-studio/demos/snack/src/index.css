@@ -28,7 +28,7 @@
 }
 
 @layer components {
-  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-braise); color: var(--color-nuit); padding: 0.6rem 1rem; border-radius: 0.5rem; }
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; display: inline-flex; align-items: center; min-height: 44px; background: var(--color-braise); color: var(--color-nuit); padding: 0.6rem 1rem; border-radius: 0.5rem; }
   .skip-link:focus { top: 1rem; }
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; min-height: 3.25rem; padding: 0.85rem 1.6rem;

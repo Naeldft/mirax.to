@@ -126,7 +126,7 @@ export default function Hero({ onReady }) {
           <p className="mt-1 text-acide">
             {o.prix} · {o.unite}
           </p>
-          <p className="mt-2 text-sm text-blanc/70">{o.points.join(' · ')}</p>
+          <p className="mt-2 text-base text-blanc/70">{o.points.join(' · ')}</p>
         </li>
       ))}
     </ul>

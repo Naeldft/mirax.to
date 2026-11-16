@@ -31,7 +31,7 @@
 }
 
 @layer components {
-  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-chantier); color: var(--color-anthracite); padding: 0.6rem 1rem; font-weight: 700; }
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; display: inline-flex; align-items: center; min-height: 44px; background: var(--color-chantier); color: var(--color-anthracite); padding: 0.6rem 1rem; font-weight: 700; }
   .skip-link:focus { top: 1rem; }
   .hachures { background-image: repeating-linear-gradient(-45deg, var(--color-chantier) 0 18px, var(--color-anthracite) 18px 36px); }
   .quadrillage {

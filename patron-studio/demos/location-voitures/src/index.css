@@ -25,7 +25,7 @@
 }
 
 @layer components {
-  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; background: var(--color-ivoire); color: var(--color-laque); padding: 0.6rem 1rem; font-weight: 700; }
+  .skip-link { position: fixed; left: 1rem; top: -4rem; z-index: 200; display: inline-flex; align-items: center; min-height: 44px; background: var(--color-ivoire); color: var(--color-laque); padding: 0.6rem 1rem; font-weight: 700; }
   .skip-link:focus { top: 1rem; }
   .btn {
     position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;

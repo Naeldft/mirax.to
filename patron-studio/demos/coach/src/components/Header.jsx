@@ -38,7 +38,7 @@ export default function Header() {
         className={`fixed inset-x-0 top-0 z-[60] transition-colors duration-300 ${scrolled || open ? 'bg-noir/90 backdrop-blur-md' : ''}`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:h-20 md:px-8">
-          <a href="#accueil" className="flex items-center gap-2" aria-label={`${coach.nom}, retour à l’accueil`}>
+          <a href="#accueil" className="flex min-h-11 items-center gap-2" aria-label={`${coach.nom}, retour à l’accueil`}>
             <Logo className="h-7 w-11" />
             <span className="font-display text-2xl uppercase tracking-wide">Pulse</span>
           </a>

@@ -34,20 +34,20 @@ export default function App() {
         <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:justify-between">
           <div>
             <p className="font-display text-3xl uppercase">{coach.nom}</p>
-            <p className="mt-1 text-sm text-gris">{coach.lieu}</p>
+            <p className="mt-1 text-base text-gris">{coach.lieu}</p>
           </div>
-          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gris">
+          <nav aria-label="Pied de page" className="flex flex-wrap gap-x-6 text-base text-gris">
             {navigation.map((n) => (
-              <a key={n.href} href={n.href} className="hover:text-acide">
+              <a key={n.href} href={n.href} className="inline-flex min-h-11 items-center hover:text-acide">
                 {n.label}
               </a>
             ))}
-            <a href={`mailto:${coach.email}`} className="hover:text-acide">
+            <a href={`mailto:${coach.email}`} className="inline-flex min-h-11 items-center hover:text-acide">
               {coach.email}
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-8 max-w-7xl text-xs text-gris/70">
+        <p className="mx-auto mt-8 max-w-7xl text-[13px] text-gris/70">
           © {new Date().getFullYear()} {coach.nom} · {coach.mention}
         </p>
       </footer>

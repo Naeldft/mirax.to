@@ -52,7 +52,7 @@ export function Programmes() {
                   <span className="font-display text-5xl">{p.prix}</span>{' '}
                   <span className={`text-sm ${p.vedette ? 'text-noir/70' : 'text-gris'}`}>{p.unite}</span>
                 </p>
-                <ul className={`mt-5 space-y-2 text-sm ${p.vedette ? 'text-noir/80' : 'text-gris'}`}>
+                <ul className={`mt-5 space-y-2 text-base ${p.vedette ? 'text-noir/80' : 'text-gris'}`}>
                   {p.points.map((x) => (
                     <li key={x}>→ {x}</li>
                   ))}
@@ -149,8 +149,35 @@ export function Planning() {
             ))}
           </div>
         </div>
-        <div className="mt-10 overflow-x-auto rounded-xl border border-acier" data-reveal>
-          <table className="w-full min-w-[640px] border-collapse text-sm">
+        {/* téléphone : une liste par jour (le tableau de la semaine ne tient pas sur un petit écran) */}
+        <ul className="mt-10 grid gap-3 sm:grid-cols-2 md:hidden" aria-label="Séances par jour">
+          {jours.map((j) => {
+            const seances = planning.filter((x) => x.jour === j).sort((a, b) => a.heure.padStart(5, '0').localeCompare(b.heure.padStart(5, '0')));
+            if (!seances.length) return null;
+            return (
+              <li key={j} className="rounded-xl border border-acier bg-graphite/40 p-4">
+                <p className="font-display text-2xl uppercase">{j}</p>
+                <ul className="mt-2 space-y-2">
+                  {seances.map((s) => {
+                    const visible = type === 'tout' || s.type === type;
+                    return (
+                      <li key={s.heure} className={`flex items-center gap-3 transition-opacity duration-300 ${visible ? '' : 'opacity-25'}`}>
+                        <span className="w-16 shrink-0 text-base font-semibold text-gris">{s.heure.replace(':', ' h ')}</span>
+                        <span
+                          className={`min-w-0 flex-1 rounded-md px-3 py-2 text-base font-bold uppercase break-words ${s.type === 'groupe' ? 'bg-acide text-noir' : s.type === 'duo' ? 'bg-blanc text-noir' : 'border border-acide text-acide'}`}
+                        >
+                          {s.titre}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="mt-10 hidden overflow-x-auto rounded-xl border border-acier md:block" data-reveal>
+          <table className="w-full table-fixed border-collapse text-sm">
             <caption className="sr-only">Séances par jour et par heure</caption>
             <thead>
               <tr>
@@ -177,7 +204,7 @@ export function Planning() {
                       <td key={j} className="p-1.5">
                         {s && (
                           <span
-                            className={`block rounded-md px-2 py-2 text-center text-xs font-bold uppercase transition-all duration-300 ${visible ? (s.type === 'groupe' ? 'bg-acide text-noir' : s.type === 'duo' ? 'bg-blanc text-noir' : 'border border-acide text-acide') : 'opacity-15'}`}
+                            className={`block rounded-md px-2 py-2 text-center text-xs font-bold uppercase break-words hyphens-auto transition-all duration-300 ${visible ? (s.type === 'groupe' ? 'bg-acide text-noir' : s.type === 'duo' ? 'bg-blanc text-noir' : 'border border-acide text-acide') : 'opacity-15'}`}
                           >
                             {s.titre}
                           </span>
@@ -284,7 +311,7 @@ export function Essai() {
                 {ok.nom.trim().split(' ')[0]}, objectif « {ok.objectif.toLowerCase()} » noté. Je vous rappelle au {ok.telephone} sous 24
                 heures.
               </p>
-              <p className="mt-6 rounded-md bg-noir px-4 py-3 text-xs text-gris">
+              <p className="mt-6 rounded-md bg-noir px-4 py-3 text-base text-gris">
                 Site de démonstration : aucune demande n’est réellement transmise.
               </p>
               <button type="button" className="btn btn-ligne mt-6" onClick={() => (setOk(null), f.reset())}>
@@ -327,7 +354,7 @@ export function Essai() {
                   max="5"
                   value={v.niveau}
                   onChange={f.set('niveau')}
-                  className="w-full accent-[#c6ff3d]"
+                  className="h-11 w-full cursor-pointer accent-[#c6ff3d]"
                   aria-valuetext={niveaux[v.niveau - 1]}
                 />
               </div>

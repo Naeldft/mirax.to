@@ -50,6 +50,9 @@
     left: 1rem;
     top: -4rem;
     z-index: 200;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     background: var(--color-eau);
     color: var(--color-nuit);
     padding: 0.6rem 1rem;
