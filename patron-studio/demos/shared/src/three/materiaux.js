@@ -1,47 +1,78 @@
 import { useTexture } from '@react-three/drei';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 
 /* ------------------------------------------------------------------
-   Matières PBR de la salle (Poly Haven, CC0) : couleur, relief (normal), rugosité, occlusion (AO),
-   en deux définitions : « hd » (2 048 px ou 1 024 px) sur ordinateur, « sd » sur téléphone.
+   Matières PBR (Poly Haven, CC0) : couleur, relief (normal), rugosité ; 1 024 px sur ordinateur, 512 px sur téléphone,
+   précédées d'une version 256 px pour un premier affichage rapide.
    Et quelques cartes calculées : moletage des barres, grain mat des mannequins, coutures, marquages.
 ------------------------------------------------------------------- */
 
 const BASE = import.meta.env.BASE_URL;
 
-export function usePBR(nom, { def = 'hd', repeat = [1, 1], couleur = '#ffffff', rugosite = 1, metal = 0, env = 0.8, relief = 1, ao = 1, sansCouleur = false } = {}) {
-  // sansCouleur : on ne garde que le relief, la rugosité et l'occlusion (matière teintée par « couleur »)
-  const t = useTexture({
-    ...(sansCouleur ? {} : { map: `${BASE}scene/pbr/${nom}-diffuse-${def}.webp` }),
-    normalMap: `${BASE}scene/pbr/${nom}-normal-${def}.webp`,
-    roughnessMap: `${BASE}scene/pbr/${nom}-rough-${def}.webp`,
-    aoMap: `${BASE}scene/pbr/${nom}-ao-${def}.webp`,
-  });
-  return useMemo(() => {
-    Object.entries(t).forEach(([k, tex]) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-      // une texture peut servir à plusieurs matières, avec des répétitions différentes : on la clone
-      if (tex.userData.prise) {
-        t[k] = tex.clone();
-        tex = t[k];
-      }
-      tex.userData.prise = true;
-      tex.repeat.set(...repeat);
-      tex.anisotropy = 8;
-      if (k === 'map') tex.colorSpace = THREE.SRGBColorSpace;
-    });
+// Définitions : « hd » 1 024 px (ordinateur), « sd » 512 px (téléphone), « xs » 256 px (premier affichage).
+const urlsPBR = (nom, def, sansCouleur) => ({
+  ...(sansCouleur ? {} : { map: `${BASE}scene/pbr/${nom}-diffuse-${def}.webp` }),
+  normalMap: `${BASE}scene/pbr/${nom}-normal-${def}.webp`,
+  roughnessMap: `${BASE}scene/pbr/${nom}-rough-${def}.webp`,
+});
+const enCours = new Map();
+const charge = (url) => {
+  if (!enCours.has(url)) enCours.set(url, new THREE.TextureLoader().loadAsync(url));
+  return enCours.get(url);
+};
+function regler(tex, cle, repeat) {
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(...repeat);
+  tex.anisotropy = 8;
+  if (cle === 'map') tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/**
+ * Matière PBR à chargement progressif : la scène s'affiche tout de suite avec les textures 256 px
+ * (quelques dizaines de Ko), puis la définition visée (1 024 px ou 512 px) arrive en arrière-plan et remplace les premières.
+ * Pas de carte d'occlusion : l'occlusion ambiante est calculée à l'écran (N8AO).
+ */
+export function usePBR(nom, { def = 'hd', repeat = [1, 1], couleur = '#ffffff', rugosite = 1, metal = 0, env = 0.8, relief = 1, sansCouleur = false } = {}) {
+  const t = useTexture(urlsPBR(nom, 'xs', sansCouleur));
+  const [, setVersion] = useState(0);
+  const mat = useMemo(() => {
+    const cartes = {};
+    // une même texture peut servir à plusieurs matières avec des répétitions différentes : une copie par matière
+    Object.entries(t).forEach(([k, tex]) => (cartes[k] = regler(tex.clone(), k, repeat)));
     return new THREE.MeshStandardMaterial({
-      ...t,
+      ...cartes,
       color: couleur,
       roughness: rugosite,
       metalness: metal,
       envMapIntensity: env,
       normalScale: new THREE.Vector2(relief, relief),
-      aoMapIntensity: ao,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois
   }, [t]);
+  useEffect(() => {
+    if (def === 'xs') return;
+    let fini = false;
+    const urls = urlsPBR(nom, def, sansCouleur);
+    Promise.all(Object.entries(urls).map(([k, u]) => charge(u).then((tex) => [k, tex])))
+      .then((liste) => {
+        if (fini) return;
+        liste.forEach(([k, tex]) => {
+          mat[k]?.dispose();
+          mat[k] = regler(tex.clone(), k, repeat);
+        });
+        mat.needsUpdate = true;
+        setVersion((v) => v + 1);
+      })
+      .catch(() => {});
+    return () => {
+      fini = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- une fois par matière
+  }, [mat, def]);
+  return mat;
 }
 
 function canevas(l, h, dessin) {

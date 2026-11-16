@@ -103,7 +103,6 @@ function Sol({ def, reflets }) {
           normalMap={mat.normalMap}
           normalScale={mat.normalScale}
           roughnessMap={mat.roughnessMap}
-          aoMap={mat.aoMap}
           color="#d6d3cf"
           roughness={1}
           envMapIntensity={0.35}
@@ -607,12 +606,13 @@ function Video({ nom, l, h, i, progres, def }) {
     const e = etat.current;
     if (proche && !e.charge) {
       e.charge = true;
-      for (const [ext, type] of [
-        ['mp4', 'video/mp4'],
-        ['webm', 'video/webm'],
+      // MP4 (H.264) partout ; un WebM léger en secours pour les rares navigateurs sans H.264
+      for (const [fichier, type] of [
+        [`${nom}-${def}.mp4`, 'video/mp4'],
+        [`${nom}-sd.webm`, 'video/webm'],
       ]) {
         const s = document.createElement('source');
-        s.src = `${BASE}scene/videos/${nom}-${def}.${ext}`;
+        s.src = `${BASE}scene/videos/${fichier}`;
         s.type = type;
         video.appendChild(s);
       }
@@ -848,7 +848,7 @@ function Camera({ progres, foyer }) {
 
 /** Lumière et reflets d'une vraie salle de sport : HDRI Poly Haven (crossfit gym), neutralisée et réchauffée. */
 function Ambiance({ def }) {
-  return <Environment files={`${BASE}scene/gym-${def === 'hd' ? '1k' : '512'}.hdr`} environmentIntensity={0.42} />;
+  return <Environment files={`${BASE}scene/gym-${def}.hdr`} environmentIntensity={0.42} />;
 }
 
 /** Le soleil rasant entre par la verrière : ombres douces au sol, rais de lumière entre les montants. */

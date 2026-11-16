@@ -606,7 +606,7 @@ function Camera({ progres, refPorte, refSoleil, refCiel }) {
 }
 
 function Ambiance({ taille }) {
-  const [env, ciel] = useTexture([`${BASE}scene/maison-${taille}.jpg`, `${BASE}scene/jardin-${taille * 2}.jpg`]);
+  const [env, ciel] = useTexture([`${BASE}scene/maison-${taille}.jpg`, `${BASE}scene/jardin-${taille}.jpg`]);
   const { scene } = useThree();
   useEffect(() => {
     for (const t of [env, ciel]) {

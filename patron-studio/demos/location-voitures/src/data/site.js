@@ -3,7 +3,7 @@
  *  VELOCITÀ LOCATION — textes et données (entreprise fictive).
  * ============================================================
  *  Chaque modèle a sa vraie photo (photos/flotte-<id>.jpg) et sa version détourée pour l’accueil 3D
- *  (public/scene/voiture-<id>-1400|720.webp).
+ *  (public/scene/voiture-<id>-1024|512.webp).
  *  Numéro de téléphone : tranche 01 99 00 … réservée à la fiction.
  */
 

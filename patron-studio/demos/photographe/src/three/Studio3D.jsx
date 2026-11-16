@@ -51,7 +51,6 @@ function Sol({ def, reflets }) {
           normalMap={mat.normalMap}
           normalScale={mat.normalScale}
           roughnessMap={mat.roughnessMap}
-          aoMap={mat.aoMap}
           color="#e9dccb"
           roughness={1}
           envMapIntensity={0.5}
@@ -127,8 +126,8 @@ function Piece({ def, reflets }) {
         <meshBasicMaterial map={enseigne} transparent toneMapped={false} depthWrite={false} />
       </mesh>
       <pointLight position={[0, 2.8, FOND + 0.8]} color={AMBRE} intensity={1.6} distance={5} decay={1.8} />
-      <Plante position={[-L + 0.55, 0, -0.8]} scale={1.15} />
-      <Plante position={[L - 0.6, 0, -12.6]} scale={1.15} rotation-y={1} />
+      <Plante position={[-L + 0.55, 0, -0.8]} scale={4} />
+      <Plante position={[L - 0.6, 0, -12.6]} scale={4} rotation-y={1} />
     </group>
   );
 }
@@ -178,7 +177,7 @@ function Modele({ nom, ...props }) {
   const c = useMemo(() => scene.clone(true), [scene]);
   return <primitive object={c} {...props} />;
 }
-const Plante = (props) => <Modele nom="potted_plant_01" {...props} />;
+const Plante = (props) => <Modele nom="potted_plant_04" {...props} />;
 
 /* ---------- le matériel du photographe ---------- */
 function useMateriel(def) {
@@ -567,7 +566,7 @@ function Camera({ progres, foyer }) {
 
 /* ---------- lumière, ombres, rendu caméra ---------- */
 function Ambiance({ def }) {
-  return <Environment files={`${BASE}scene/studio-${def === 'hd' ? '1k' : '512'}.hdr`} environmentIntensity={0.5} />;
+  return <Environment files={`${BASE}scene/studio-${def}.hdr`} environmentIntensity={0.5} />;
 }
 
 function Soleil({ taille }) {

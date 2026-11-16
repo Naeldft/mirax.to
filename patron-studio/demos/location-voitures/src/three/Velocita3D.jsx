@@ -173,7 +173,7 @@ function pointPhoto(u, v, prof, aspect) {
 }
 
 function Habitacle({ petit, refProf }) {
-  const tex = useTexture(`${BASE}scene/habitacle-${petit ? 1000 : 1800}.webp`);
+  const tex = useTexture(`${BASE}scene/habitacle-${petit ? 512 : 1024}.webp`);
   useMemo(() => {
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
@@ -303,7 +303,7 @@ function Allees({ modeles, petit }) {
               <boxGeometry args={[3.6, 0.05, 0.3]} />
               <meshBasicMaterial color="#ffffff" toneMapped={false} />
             </mesh>
-            <Voiture fichier={`${BASE}scene/voiture-${m.id}-${petit ? 720 : 1400}.webp`} hauteur={m.hauteurPhoto} />
+            <Voiture fichier={`${BASE}scene/voiture-${m.id}-${petit ? 512 : 1024}.webp`} hauteur={m.hauteurPhoto} />
             <mesh position={[0, 0.42, 1.75]} rotation-x={-0.5}>
               <planeGeometry args={[2.4, 0.84]} />
               <meshBasicMaterial map={etiquettes[i]} transparent toneMapped={false} />
@@ -461,7 +461,7 @@ export default function Velocita3D({ progres, modeles, leger, actif = true, onRe
         <Ambiance taille={petit ? 512 : 1024} />
         <Sol />
         <TraitsVitesse progres={progres} />
-        <Voiture fichier={`${BASE}scene/voiture-premium-${petit ? 720 : 1400}.webp`} hauteur={coupe.hauteurPhoto} refVoiture={refVoiture} />
+        <Voiture fichier={`${BASE}scene/voiture-premium-${petit ? 512 : 1024}.webp`} hauteur={coupe.hauteurPhoto} refVoiture={refVoiture} />
         <Habitacle petit={petit} refProf={refProf} />
         <Etiquettes refProf={refProf} aspect={aspect} />
         <Allees modeles={modeles} petit={petit} />
