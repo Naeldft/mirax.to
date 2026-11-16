@@ -392,9 +392,9 @@ const POSES = {
   // portrait d'affaires : debout, les mains dans les poches du pantalon
   poches: { tete: 0.04, teteY: -0.12, rotBras: [-0.187, -0.022], epaules: [-0.295, -0.334], ouverture: [0.049, -0.046], coudes: [0.833, 0.892] },
   // famille : la mère pose la main sur l'épaule de l'enfant, l'autre bras détendu le long du corps
-  mere: { teteY: -0.25, tete: 0.1, epaules: [0.472, 0.06], ouverture: [0.152, 0.1], coudes: [0.239, 0.18], rotBras: [-0.022, 0] },
+  mere: { teteY: -0.25, tete: 0.12, rotBras: [0.015, 0], epaules: [0.024, 0.06], ouverture: [0.081, 0.1], coudes: [0.682, 0.18] },
   // le père pose aussi la main sur l'autre épaule de l'enfant
-  pere: { teteY: 0.2, tete: 0.1, rotBras: [0, -0.011], epaules: [0.08, 0.519], ouverture: [0.1, 0.13], coudes: [0.15, 0.153] },
+  pere: { teteY: 0.2, tete: 0.12, rotBras: [0, -0.009], epaules: [0.06, 0.276], ouverture: [0.1, 0.058], coudes: [0.15, 0.192] },
   enfant: { epaules: [0.05, 0.05], ouverture: [0.12, 0.12], coudes: [0.15, 0.15], tete: 0.12 },
   // mariage : les mariés se tiennent la main ; la mariée tient son bouquet de l'autre main
   marie: { teteY: 0.35, tete: 0.05, rotBras: [0, -0.079], epaules: [0.08, 0.288], ouverture: [0.1, -0.089], coudes: [0.15, 0.528] },
@@ -460,13 +460,13 @@ function Plateau({ poste, m, def }) {
       )}
       {id === 'famille' && (
         <>
-          <group position={[-0.42, 0, -0.1]} rotation-y={0.18}>
+          <group position={[-0.33, 0, -0.02]} rotation-y={0.2}>
             <Personnage pose={POSES.pere} homme haut="#2f3a45" bas="#c9bfae" />
           </group>
-          <group position={[0.46, 0, -0.05]} rotation-y={-0.2}>
+          <group position={[0.35, 0, 0]} rotation-y={-0.22}>
             <Personnage pose={POSES.mere} haut="#d7c6ae" bas="#3d3a37" />
           </group>
-          <group position={[0.03, 0, 0.22]} scale={0.62}>
+          <group position={[0.02, 0, 0.14]} scale={0.62}>
             <Personnage pose={POSES.enfant} haut="#a9562f" bas="#36383d" />
           </group>
         </>
@@ -487,9 +487,9 @@ function Plateau({ poste, m, def }) {
         </group>
       )}
       {/* lumière principale à 45°, réflecteur de l'autre côté, appareil sur trépied, écran de contrôle */}
-      <Octabox m={m} position={[-1.4, 2.05, 0.95]} cible={[0, 1.2, 0]} />
-      <Reflecteur m={m} position={[0.95, 0.55, 1.25]} rotation={[-0.2, -0.75, 0]} />
-      <AppareilTrepied m={m} position={[-1.05, 0, 1.45]} rotation={-0.63} />
+      <Octabox m={m} position={[-1.45, 2.05, 0.5]} cible={[0, 1.2, 0]} />
+      <Reflecteur m={m} position={[1.2, 0.55, 0.95]} rotation={[-0.2, -0.9, 0]} />
+      <AppareilTrepied m={m} position={[-1.1, 0, 1.0]} rotation={-0.83} />
       {/* l'écran de contrôle, du côté libre de l'image, tourné vers l'allée : la vraie photo de la séance */}
       <Ecran m={m} id={id} def={def} position={[1.05, 1.5, 0.55]} rotation={[0, -0.42, 0]} />
       {/* contre-jour chaud qui détache le sujet du fond */}
@@ -512,7 +512,7 @@ const SORTIE = [
 function vue(i, a, portrait, pos, cible) {
   const { cote, z } = POSTES[i];
   const cx = cote * X_POSTE;
-  const r = portrait ? 4.6 : 4.0;
+  const r = portrait ? 3.9 : 3.8;
   pos.set(cx - cote * Math.cos(a) * r, portrait ? 1.75 : 1.85, z + Math.sin(a) * r);
   cible.set(cx, portrait ? 1.05 : 1.3, z);
   if (!portrait) {
