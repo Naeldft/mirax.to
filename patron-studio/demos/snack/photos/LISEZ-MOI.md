@@ -67,3 +67,9 @@ restaurant, afin que les clients voient ce qu'ils mangeront vraiment.
 Les 5 burgers posés sur le passe-plat de l'accueil 3D sont les mêmes photos, **détourées** (fond transparent,
 WebP 1 024 et 512 px) : `burger-classic`, `burger-fume`, `burger-brasier`, `burger-chti`, `burger-green`.
 Pour changer un burger de l'accueil : détourez la nouvelle photo et gardez le même nom.
+
+## Intro (séquence au défilement)
+
+Les images de `public/sequence/` viennent de 3 vidéos fournies par le client, réalisées avec Kling AI
+(clip 1 : façade et entrée ; clip 2 : la salle ; clip 3 : la cuisine puis le burger). Montage : clip 1 de 0,2 à 5 s,
+clip 2 de 0,5 à 8,3 s, clip 3 de 0,3 à 4,6 s puis de 5 à 7,8 s, fondus de 0,5 s ; vitesse inchangée.

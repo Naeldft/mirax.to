@@ -1,22 +1,15 @@
-import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { getDeviceTier } from '@demos/shared/hooks/useDeviceTier.js';
-import { useInView } from '@demos/shared/hooks/useInView.js';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from '@demos/shared/hooks/useReducedMotion.js';
 import { gsap } from '@demos/shared/lib/gsap.js';
 import { formatEuros } from '@demos/shared/lib/validation.js';
-import { allergenes, produits, snack } from '../data/site';
+import { allergenes, produits } from '../data/site';
 import { Photo } from './Sections';
-
-// La scène 3D (three.js) est chargée à part, après l'affichage du texte.
-const Snack3D = lazy(() => import('../three/Snack3D'));
 
 const BURGERS = produits.filter((p) => p.cat === 'burgers');
 const N = BURGERS.length;
-// mêmes repères que la scène (three/Snack3D.jsx, TRAJET) : sur les burgers à partir de 0,38 ;
-// chaque burger occupe ensuite une part égale du défilement, jusqu'à la sortie vers le site
-const CHOIX = [0.4, 0.9];
-const SUR_BURGER = 0.37;
-const FIN = [0.92, 0.98];
+// chaque burger occupe une part égale du défilement, puis fondu vers la carte
+const CHOIX = [0.02, 0.9];
+const FIN = [0.93, 0.99];
 const MAX_PIVOT = 0.35;
 const TAG = { veggie: 'Végétarien', piment: 'Ça pique', star: 'Le best-seller' };
 
@@ -27,36 +20,23 @@ const Fleche = ({ sens }) => (
 );
 
 /**
- * Accueil Crunch! : une vraie scène 3D pilotée par le défilement (et le doigt).
- * La devanture et son néon, on entre, puis zoom rapide par-dessus le comptoir jusqu'à la plancha :
- * les burgers (vraies photos détourées) attendent sur le passe-plat. Le burger change au défilement,
- * avec les flèches ou d'un geste ; glisser lentement le fait pivoter. Puis la carte et les allergènes.
- * Sans 3D ou avec « réduire les animations » : la vraie photo du burger choisi et les mêmes commandes.
+ * Le choix du burger, juste après la visite filmée (Sequence.jsx) qui se termine sur la plancha :
+ * la vraie photo du burger plein écran ; le défilement passe d'un burger au suivant, comme les flèches
+ * et le glissé du doigt (glisser lentement fait pivoter légèrement la photo). Puis la carte et les allergènes.
+ * Avec « réduire les animations » : pas d'épinglage, les flèches seules.
  */
-export default function Hero({ onReady, ajouter }) {
+export default function Hero({ ajouter }) {
   const reduit = useReducedMotion();
   const section = useRef(null);
-  const intro = useRef(null);
   const fin = useRef(null);
-  const progres = useRef(0);
-  const indexRef = useRef(0);
   const geste = useRef({ spin: 0 });
   const glisse = useRef(null);
-  const enVue = useInView(section, '0px');
-  const [tier] = useState(getDeviceTier);
-  const [charger3d, setCharger3d] = useState(false);
-  const [pret3d, setPret3d] = useState(false);
-  const [etape, setEtape] = useState(0); // 0 dehors, 1 visite, 2 sur les burgers
+  const photo = useRef(null);
   const [index, setIndex] = useState(0);
   const [ajoute, setAjoute] = useState(false);
-  const avec3d = tier !== 'none' && !reduit;
-  const leger = tier === 'low';
-  const surBurger = etape === 2 || !avec3d;
+  const avec3d = !reduit; // nom gardé : « le défilement pilote le choix »
+  const surBurger = true;
   const b = BURGERS[index];
-
-  useEffect(() => {
-    indexRef.current = index;
-  }, [index]);
 
   useEffect(() => {
     if (!avec3d) return;
@@ -65,8 +45,6 @@ export default function Hero({ onReady, ajouter }) {
       if (!s) return;
       const r = s.getBoundingClientRect();
       const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
-      progres.current = p;
-      setEtape(p < 0.03 ? 0 : p < SUR_BURGER ? 1 : 2);
       // le défilement choisit le burger
       const k = Math.min(N - 1, Math.max(0, Math.floor(((p - CHOIX[0]) / (CHOIX[1] - CHOIX[0])) * N)));
       setIndex(k);
@@ -81,32 +59,16 @@ export default function Hero({ onReady, ajouter }) {
     };
   }, [avec3d]);
 
+  // le glissé fait légèrement pivoter la photo (retour élastique)
   useEffect(() => {
-    if (!avec3d) {
-      onReady?.();
-      return;
-    }
-    const go = () => setCharger3d(true);
-    const t = 'requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 600 }) : setTimeout(go, 150);
-    const garde = setTimeout(() => onReady?.(), 2500);
-    return () => {
-      'cancelIdleCallback' in window ? cancelIdleCallback(t) : clearTimeout(t);
-      clearTimeout(garde);
+    let raf;
+    const boucle = () => {
+      raf = requestAnimationFrame(boucle);
+      if (photo.current) photo.current.style.transform = `perspective(1200px) rotateY(${geste.current.spin * 30}deg) scale(1.04)`;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- au montage
+    boucle();
+    return () => cancelAnimationFrame(raf);
   }, []);
-  const pret = useCallback(() => {
-    setPret3d(true);
-    onReady?.();
-  }, [onReady]);
-
-  useLayoutEffect(() => {
-    if (reduit) return;
-    const ctx = gsap.context(() => {
-      gsap.from('[data-in]', { opacity: 0, y: 26, duration: 1, stagger: 0.09, ease: 'power3.out', delay: 0.35 });
-    }, intro);
-    return () => ctx.revert();
-  }, [reduit]);
 
   /** Aller à un burger : avec la 3D, on fait défiler jusqu'à sa place (le défilement reste le seul pilote). */
   const aller = useCallback(
@@ -124,10 +86,6 @@ export default function Hero({ onReady, ajouter }) {
     [avec3d, reduit],
   );
   const changer = (pas) => aller(index + pas);
-  const entrer = () => {
-    const s = section.current;
-    scrollTo({ top: s.getBoundingClientRect().top + scrollY + 0.38 * (s.offsetHeight - innerHeight), behavior: 'smooth' });
-  };
 
   /* glisser lentement = pivoter le burger ; glisser vite = burger suivant */
   const down = (e) => {
@@ -164,68 +122,24 @@ export default function Hero({ onReady, ajouter }) {
     setTimeout(() => setAjoute(false), 1500);
   };
 
-  const Intro = (
-    <div ref={intro} className="relative z-10 max-w-xl px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:max-w-[48%] md:px-12 md:pb-0">
-      <p data-in className="surtitre">
-        {snack.accroche}
-      </p>
-      <h1 className="mt-3 text-[clamp(3rem,min(12vw,10svh),7.5rem)]">
-        <span data-in className="block">
-          Smash.
-        </span>
-        <span data-in className="block bg-gradient-to-r from-braise via-[#ff8a2b] to-flamme bg-clip-text pb-1 text-transparent">
-          Crunch.
-        </span>
-        <span data-in className="block">
-          Miam.
-        </span>
-      </h1>
-      <p data-in className="mt-5 hidden max-w-md text-lg leading-relaxed text-creme/80 md:block">
-        {snack.intro}
-      </p>
-      <div data-in className="mt-7 flex flex-wrap gap-3">
-        {avec3d ? (
-          <button type="button" onClick={entrer} className="btn btn-braise px-8 text-lg">
-            Entrer
-          </button>
-        ) : (
-          <a href="#commande" className="btn btn-braise px-8 text-lg">
-            Commander
-          </a>
-        )}
-        <a href="#carte" className="btn btn-ligne">
-          Voir la carte
-        </a>
-      </div>
-    </div>
-  );
-
   return (
     <section
-      id="accueil"
+      id="burgers"
       ref={section}
-      aria-label="Accueil : Crunch!, smash burgers"
+      aria-label="Nos burgers"
       className="relative bg-nuit text-creme"
-      style={{ height: avec3d ? '820svh' : 'auto' }}
+      style={{ height: avec3d ? `${N * 55 + 45}svh` : 'auto' }}
     >
       <div className={avec3d ? 'sticky top-0 h-[100svh] overflow-hidden' : 'relative min-h-[100svh] overflow-hidden'}>
-        {/* la vraie photo (le temps que la 3D se charge, ou sans 3D) */}
-        {(!avec3d || !pret3d) && (
-          <div className={`absolute inset-0 transition-opacity duration-700 ${pret3d ? 'opacity-0' : 'opacity-100'}`}>
-            <Photo
-              nom={avec3d ? 'accueil-smash-burger' : b.photo}
-              alt={avec3d ? '' : b.nom}
-              sizes="100vw"
-              prioritaire
-              className="h-full w-full object-cover md:object-[70%_50%]"
-            />
-          </div>
-        )}
-        {avec3d && charger3d && (
-          <Suspense fallback={null}>
-            <Snack3D progres={progres} burgers={BURGERS} index={indexRef} geste={geste} leger={leger} actif={enVue} onReady={pret} />
-          </Suspense>
-        )}
+        {reduit && <h1 className="sr-only">Crunch!, smash burgers à Lille</h1>}
+        {/* la vraie photo de chaque burger, en fondu de l'un à l'autre */}
+        <div ref={photo} className="absolute inset-0 will-change-transform">
+          {BURGERS.map((x, i) => (
+            <div key={x.id} className={`absolute inset-0 transition-opacity duration-500 ${i === index ? 'opacity-100' : 'opacity-0'}`}>
+              <Photo nom={x.photo} alt={i === index ? x.nom : ''} sizes="100vw" prioritaire={i === 0} className="h-full w-full object-cover md:object-[70%_50%]" />
+            </div>
+          ))}
+        </div>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-nuit/90 via-transparent to-nuit/30 md:bg-gradient-to-r md:from-nuit/85 md:via-nuit/10 md:to-transparent" />
 
         {/* zone de manipulation du burger */}
@@ -243,15 +157,6 @@ export default function Hero({ onReady, ajouter }) {
             surBurger ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'
           }`}
         />
-
-        {/* dehors : le titre */}
-        <div
-          className={`absolute inset-0 flex items-end transition-opacity duration-500 md:items-center ${
-            etape === 0 || !avec3d ? (surBurger && !avec3d ? 'pointer-events-none opacity-0' : 'opacity-100') : 'pointer-events-none opacity-0'
-          }`}
-        >
-          {Intro}
-        </div>
 
         {/* sur les burgers : nom, prix, recette, allergènes, flèches */}
         <div

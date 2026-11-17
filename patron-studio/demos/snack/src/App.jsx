@@ -5,6 +5,7 @@ import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
 import { formatEuros } from '@demos/shared/lib/validation.js';
 import Header, { Logo } from './components/Header';
 import Hero from './components/Hero';
+import Sequence from './components/Sequence';
 import { Allergenes, Avis, Bandeau, Carte, Commande, FaqSection, Infos } from './components/Sections';
 import { formule, navigation, produits, snack } from './data/site';
 
@@ -20,6 +21,7 @@ export default function App() {
   const [menus, setMenus] = useState(0);
   const [commandeVisible, setCommandeVisible] = useState(false);
   useScrollRefresh();
+  useEffect(() => setReady(true), []);
 
   const ajouter = useCallback((id) => setQuantites((q) => ({ ...q, [id]: Math.min(20, (q[id] || 0) + 1) })), []);
   const setQte = useCallback((id, n) => setQuantites((q) => ({ ...q, [id]: Math.max(0, Math.min(20, n)) })), []);
@@ -57,7 +59,9 @@ export default function App() {
       />
       <Header />
       <main>
-        <Hero onReady={() => setReady(true)} ajouter={ajouter} />
+        {/* l'intro a son propre écran de chargement (néon et progression) : le chargeur général s'efface tout de suite */}
+        <Sequence />
+        <Hero ajouter={ajouter} />
         <Bandeau />
         <Carte ajouter={ajouter} quantites={quantites} />
         <Commande lignes={lignes} setQte={setQte} menus={menus} setMenus={setMenus} vider={vider} />

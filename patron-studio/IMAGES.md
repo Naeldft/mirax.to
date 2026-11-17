@@ -170,22 +170,14 @@ Construits en code : devanture, porte, vitrine, enseigne, murs, portants, croche
 ### Crunch! (snack)
 
 Détail complet des photos : `demos/snack/photos/LISEZ-MOI.md`.
-- Intro : vraie scène 3D construite en code (`src/three/Snack3D.jsx`) : devanture de nuit et néon « CRUNCH! »,
-  salle en briques sombres, néons, menus lumineux, comptoir, plancha et hotte. Les 5 burgers sont de vraies photos
-  détourées, posées sur des planches sur le passe-plat ; le burger change au défilement, aux flèches ou au doigt.
+- Intro : **3 vidéos fournies par le client, réalisées avec Kling AI** (la façade, la salle, la cuisine, le burger),
+  montées en une séquence de 18 s (vitesse d'origine, passages lents coupés, fondus courts aux raccords), découpée
+  en 218 images WebP (12 par seconde) qui défilent au scroll dans un canvas : `demos/snack/public/sequence/ordi/`
+  (1 280 × 720) et `sequence/mobile/` (recadrage vertical au centre, 540 × 960). Le filigrane « KlingAI 4.0 »
+  des vidéos d'origine reste visible en bas à droite sur ordinateur (le recadrage téléphone l'exclut).
+- Puis le choix du burger sur les vraies photos (flèches, défilement, glissé), la carte et les allergènes.
 - Recettes adaptées aux photos : « Le Ch’ti » (maroilles) devient « L’Œuf-Bacon », et la recette du Brasier suit sa photo.
-
-Matières et lumière : **Poly Haven, licence CC0**, dans `demos/snack/public/scene/`.
-
-| Élément | Fichier | Source Poly Haven |
-|---|---|---|
-| Murs et façade en brique | `textures/dark_brick_wall-*` | https://polyhaven.com/a/dark_brick_wall |
-| Carrelage de la cuisine | `textures/long_white_tiles-*` | https://polyhaven.com/a/long_white_tiles |
-| Sol et trottoir | `textures/concrete_floor_02-*` | https://polyhaven.com/a/concrete_floor_02 |
-| Comptoir et planches | `textures/wood_table_001-*` | https://polyhaven.com/a/wood_table_001 |
-| Reflets (photo 360°) | `neon-1024.jpg`, `-512.jpg` | https://polyhaven.com/a/neon_photostudio |
-
-Construits en code : façade, néons, menus lumineux, comptoir, passe-plat, plancha, hotte, lampes, fumée.
+- L'ancienne scène 3D (Snack3D, textures Poly Haven) est retirée.
 
 ### Atelier Mèche (coiffure)
 
