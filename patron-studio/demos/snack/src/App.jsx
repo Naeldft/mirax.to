@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import DemoFooter from '@demos/shared/components/DemoFooter.jsx';
-import Loader from '@demos/shared/components/Loader.jsx';
 import { useScrollRefresh } from '@demos/shared/hooks/useScrollRefresh.js';
 import { formatEuros } from '@demos/shared/lib/validation.js';
 import Header, { Logo } from './components/Header';
@@ -16,12 +15,10 @@ const Telephone = () => (
 );
 
 export default function App() {
-  const [ready, setReady] = useState(false);
   const [quantites, setQuantites] = useState({});
   const [menus, setMenus] = useState(0);
   const [commandeVisible, setCommandeVisible] = useState(false);
   useScrollRefresh();
-  useEffect(() => setReady(true), []);
 
   const ajouter = useCallback((id) => setQuantites((q) => ({ ...q, [id]: Math.min(20, (q[id] || 0) + 1) })), []);
   const setQte = useCallback((id, n) => setQuantites((q) => ({ ...q, [id]: Math.max(0, Math.min(20, n)) })), []);
@@ -48,18 +45,9 @@ export default function App() {
 
   return (
     <div className="grain">
-      <Loader
-        ready={ready}
-        name="Crunch!"
-        tagline="La plancha chauffe…"
-        fontClass="titre"
-        colors={{ bg: '#0d0b0a', fg: '#f3ece2', accent: '#ff6b1a' }}
-        mark={<span className="block h-3 w-3 animate-pulse rounded-full bg-braise shadow-[0_0_30px_8px_rgb(255_107_26/0.6)]" />}
-        maxMs={3000}
-      />
       <Header />
       <main>
-        {/* l'intro a son propre écran de chargement (néon et progression) : le chargeur général s'efface tout de suite */}
+        {/* l'intro a son propre écran de chargement (néon et progression du préchargement) */}
         <Sequence />
         <Hero ajouter={ajouter} />
         <Bandeau />
