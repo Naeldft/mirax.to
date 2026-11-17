@@ -86,16 +86,18 @@
     l.rel = 'prefetch';
     l.href = a.href;
     document.head.appendChild(l);
-    // Crunch! : les premières images du film (l'entrée dans le snack, jouée dès l'arrivée) se chargent tout de suite
+    // Crunch! : l'entrée (la façade, l'intérieur juste après la porte) puis le début du film se chargent tout de suite
     var img = a.querySelector('img[data-sequence]');
     if (img) {
       var dossier = innerWidth / innerHeight < 1 || innerWidth < 768 ? 'mobile' : 'ordi';
       var base = new URL('./demos/' + img.getAttribute('data-sequence') + '/sequence/' + dossier + '/', location.href).href;
-      for (var i = 1; i <= 100; i++) {
+      var liste = [1, 97];
+      for (var i = 98; i <= 150; i += 2) liste.push(i);
+      liste.forEach(function (n) {
         var im = new Image();
-        im.src = base + String(i).padStart(3, '0') + '.webp';
+        im.src = base + String(n).padStart(3, '0') + '.webp';
         gardees.push(im);
-      }
+      });
     }
   }
   document.addEventListener('pointerover', precharger, { passive: true });

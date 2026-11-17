@@ -170,14 +170,18 @@ Construits en code : devanture, porte, vitrine, enseigne, murs, portants, croche
 ### Crunch! (snack)
 
 Détail complet des photos : `demos/snack/photos/LISEZ-MOI.md`.
-- Intro : **3 vidéos fournies par le client, réalisées avec Kling AI** (la façade, la salle, la cuisine, le burger),
-  montées bout à bout en une séquence de 24 s (toutes les images, vitesse d'origine, fondus de 0,5 s aux raccords),
-  recadrée et zoomée de 15 % pour sortir le filigrane Kling du cadre, puis découpée en 579 images WebP
-  (24 par seconde) qui défilent au scroll dans un canvas : `demos/snack/public/sequence/ordi/` (1 280 × 720)
-  et `sequence/mobile/` (recadrage vertical au centre, 540 × 960).
-- Puis le choix du burger sur les vraies photos (flèches, défilement, glissé), la carte et les allergènes.
-- Recettes adaptées aux photos : « Le Ch’ti » (maroilles) devient « L’Œuf-Bacon », et la recette du Brasier suit sa photo.
-- L'ancienne scène 3D (Snack3D, textures Poly Haven) est retirée.
+- Entrée : la première image de la vidéo (la façade) et l'intérieur juste après la porte, posés en deux plans de
+  profondeur ; la caméra passe la porte (vrai relief, pas un zoom), puis la vidéo prend le relais.
+- Intro : **3 vidéos fournies par le client, réalisées avec Kling AI** (la façade, la salle, la cuisine),
+  montées bout à bout (toutes les images, vitesse d'origine, fondus de 0,5 s aux raccords), recadrées pour sortir le
+  filigrane Kling du cadre, étalonnées en commun (couleurs harmonisées, noirs profonds, teinte chaude, vignette ;
+  grain ajouté à l'écran), arrêtées sur la plancha et découpées en 458 images WebP qui défilent au scroll :
+  `demos/snack/public/sequence/ordi/` (1 280 × 720) et `sequence/mobile/` (recadrage vertical au centre, 540 × 960).
+- Burgers 3D : **5 photos de référence fournies par le client**, détourées ; le contour de chaque photo donne le volume
+  du burger, découpé en couches, sur lequel la photo est projetée (`public/scene3d/burgers/`). Les mêmes photos
+  illustrent la carte. Planche : Poly Haven « Wooden Cutting Board » (CC0), https://polyhaven.com/a/wooden_cutting_board ;
+  reflets : Poly Haven « Bush Restaurant » (CC0), https://polyhaven.com/a/bush_restaurant.
+- La carte (filtres, allergènes, click & collect) garde ses photos Unsplash pour les sides, desserts et boissons.
 
 ### Atelier Mèche (coiffure)
 

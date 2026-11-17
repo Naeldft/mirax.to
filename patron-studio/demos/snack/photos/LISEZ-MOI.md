@@ -13,11 +13,11 @@ Les photos de la carte sont recadrées au format 4:3 (le cadrage suit automatiqu
 | Emplacement (nom du fichier) | Où il apparaît | Format conseillé |
 |---|---|---|
 | `accueil-smash-burger` | Grande photo de l'accueil | **vertical** (2:3), sujet au centre |
-| `burger-classic` | Carte : Le Crunch Classic | 4:3 |
-| `burger-fume` | Carte : Le Fumé | 4:3 |
-| `burger-brasier` | Carte : Le Brasier (pain rouge, effiloché, fromage fondu, salade) | 4:3 |
-| `burger-chti` | Carte : L’Œuf-Bacon (bacon, œuf au plat, cheddar, tomate, salade) | 4:3 |
-| `burger-green` | Carte : Le Green | 4:3 |
+| `burger-chicken-crispy` | Carte : Chicken Crispy Bacon | portrait |
+| `burger-forestier` | Carte : Le Forestier | portrait |
+| `burger-double-cheese` | Carte : Double Cheese Bacon | portrait |
+| `burger-chicken-avocat` | Carte : Chicken Avocat | portrait |
+| `burger-egg-bacon` | Carte : L’Egg Bacon | portrait |
 | `poulet-tenders` | Carte : Tenders × 5 | 4:3 |
 | `poulet-wrap` | Carte : Wrap Crispy | 4:3 |
 | `side-frites` | Carte : Frites maison | 4:3 |
@@ -44,11 +44,7 @@ restaurant, afin que les clients voient ce qu'ils mangeront vraiment.
 | Fichier | Photo d'origine |
 |---|---|
 | accueil-smash-burger | https://images.unsplash.com/photo-1607013251379-e6eecfffe234 |
-| burger-classic | https://images.unsplash.com/photo-1572802419224-296b0aeee0d9 |
-| burger-fume | https://images.unsplash.com/photo-1553979459-d2229ba7433b |
-| burger-brasier | https://images.unsplash.com/photo-1596662951482-0c4ba74a6df6 |
-| burger-chti | https://images.unsplash.com/photo-1550317138-10000687a72b |
-| burger-green | https://images.unsplash.com/photo-1525059696034-4967a8e1dca2 |
+| burger-chicken-crispy, burger-forestier, burger-double-cheese, burger-chicken-avocat, burger-egg-bacon | photos de référence fournies par le client (voir « Burgers 3D » ci-dessous) |
 | poulet-tenders | https://images.unsplash.com/photo-1562967914-608f82629710 |
 | poulet-wrap | https://images.unsplash.com/photo-1626700051175-6818013e1d4f |
 | side-frites | https://images.unsplash.com/photo-1630384060421-cb20d0e0649d |
@@ -62,15 +58,21 @@ restaurant, afin que les clients voient ce qu'ils mangeront vraiment.
 | ambiance-black-bun | https://images.unsplash.com/photo-1582196016295-f8c8bd4b3a99 |
 | ambiance-salle | https://images.unsplash.com/photo-1615297928064-24977384d0da |
 
-## Accueil 3D (`public/scene/burgers/`)
+## Burgers 3D (`public/scene3d/burgers/`)
 
-Les 5 burgers posés sur le passe-plat de l'accueil 3D sont les mêmes photos, **détourées** (fond transparent,
-WebP 1 024 et 512 px) : `burger-classic`, `burger-fume`, `burger-brasier`, `burger-chti`, `burger-green`.
-Pour changer un burger de l'accueil : détourez la nouvelle photo et gardez le même nom.
+Les 5 burgers en 3D sont construits d'après les **photos de référence fournies par le client**
+(`photos/burgers-3d/references-client.png`, découpée en 5 et détourée : `photos/burgers-3d/<burger>.png`).
+Le contour de chaque photo donne le volume du burger, découpé en couches, et la photo est projetée dessus.
+Pour changer un burger : remplacez sa photo détourée dans `photos/burgers-3d/` (même nom, fond transparent),
+ajustez si besoin le découpage des couches dans `src/three/burger/bornes.js`, puis lancez
+`python3 scripts/burgers-photo.py`. Planche à découper : Poly Haven « Wooden Cutting Board » (CC0).
+Les mêmes photos, avec leur fond, servent aux cartes de la carte (`burger-<id>.jpg`).
 
 ## Intro (séquence au défilement)
 
 Les images de `public/sequence/` viennent de 3 vidéos fournies par le client, réalisées avec Kling AI
 (clip 1 : façade et entrée ; clip 2 : la salle ; clip 3 : la cuisine puis le burger), montées en entier, à vitesse
 d'origine, avec des fondus de 0,5 s aux raccords ; image recadrée (1 664 × 936 au centre du 1 920 × 1 080) pour
-sortir le filigrane Kling du cadre.
+sortir le filigrane Kling du cadre. La séquence s'arrête sur la plancha (458 images, le plan du burger Kling est
+retiré : les burgers sont en 3D). Étalonnage commun (couleurs des 3 clips harmonisées, noirs profonds, teinte
+chaude, vignette) : `python3 scripts/sequence-crunch.py <montage.mp4>` ; le grain est ajouté à l'écran.
