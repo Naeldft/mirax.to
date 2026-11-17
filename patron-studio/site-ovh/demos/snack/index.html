@@ -17,19 +17,17 @@
           window.psArrivee = true;
           var d = document.createElement('div');
           d.setAttribute('aria-hidden', 'true');
-          d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;pointer-events:none;transition:opacity .45s ease,filter .45s ease;background:#000 url("../../assets/captures/' + p[0] + (p[1] === 'mobile' ? '-mobile' : '-ordi-1200') + '.webp") top center/cover no-repeat';
+          // arrivée depuis la carte de l'accueil : exactement la première image du film, plein écran, cadrage centré
+          d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;pointer-events:none;background:#000 url("./sequence/ordi/001.webp") center/cover no-repeat';
           document.documentElement.appendChild(d);
           // au-dessus de tout ce que la démo affichera (même niveau d'empilement : le dernier gagne)
           document.addEventListener('DOMContentLoaded', function () { document.body.appendChild(d); });
-          var t0 = Date.now(), fini = false;
+          var fini = false;
+          // la démo a dessiné cette même image dans son canvas : on retire l'image d'attente d'un coup, sans fondu
           var fin = function () {
             if (fini) return;
             fini = true;
-            setTimeout(function () {
-              d.style.opacity = '0';
-              d.style.filter = 'blur(8px)'; // les mises en page peuvent différer un peu selon la taille d'écran : pas d'image fantôme
-              setTimeout(function () { d.remove(); }, 550);
-            }, Math.max(900, 350 - (Date.now() - t0))); // laisse les animations d'entrée de la démo se poser
+            d.remove();
           };
           addEventListener('ps-demo-prete', fin);
           setTimeout(fin, 4000); // sécurité
@@ -40,10 +38,10 @@
     <title>Crunch! — Smash burgers & frites maison à Lille</title>
     <meta name="description" content="Crunch!, snack à Lille Wazemmes : smash burgers, tenders, frites maison. Commande à emporter en ligne, retrait en 15 minutes, livraison dans Lille." />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <!-- photo d'accueil chargée en priorité (affichage plus rapide sur mobile) -->
-    <link rel="preload" as="image" type="image/webp" href="./images/accueil-smash-burger-800.webp" imagesrcset="./images/accueil-smash-burger-800.webp 800w, ./images/accueil-smash-burger-1200.webp 1200w, ./images/accueil-smash-burger-1800.webp 1800w" imagesizes="(min-width: 768px) 62vw, 100vw" fetchpriority="high" />
-    <script type="module" crossorigin src="./assets/index-D-pDXoJK.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-0DUWo696.css">
+    <!-- première image du film, chargée en priorité -->
+    <link rel="preload" as="image" type="image/webp" href="./sequence/ordi/001.webp" fetchpriority="high" />
+    <script type="module" crossorigin src="./assets/index-Dpydc0va.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Duf4vmWQ.css">
   </head>
   <body>
     <a href="#carte" class="skip-link">Aller à la carte</a>

@@ -41,12 +41,15 @@
     var r = depart.getBoundingClientRect();
     var rayon = getComputedStyle(depart).borderRadius || '14px';
     var cap = './assets/captures/' + id;
+    // démo « vidéo au défilement » (Crunch!) : la carte montre la première image du film ; elle grandit et se pose
+    // exactement sur cette image, que la démo affiche ensuite telle quelle (même cadrage centré, aucun fondu)
+    var sequence = depart.getAttribute('data-sequence');
     var fond = document.createElement('div');
     fond.id = 'ps-transition';
     fond.setAttribute('aria-hidden', 'true');
     fond.innerHTML =
-      '<div class="ps-tr-vignette"><img alt="" src="' + (depart.currentSrc || depart.src) + '">' +
-      (portrait ? '<img alt="" class="ps-tr-mobile" src="' + cap + '-mobile.webp">' : '') + '</div>';
+      '<div class="ps-tr-vignette"><img alt="" src="' + (depart.currentSrc || depart.src) + '"' + (sequence ? ' style="object-position:center"' : '') + '>' +
+      (portrait && !sequence ? '<img alt="" class="ps-tr-mobile" src="' + cap + '-mobile.webp">' : '') + '</div>';
     document.body.appendChild(fond);
     var vignette = fond.firstChild;
     var debut = { top: r.top + 'px', left: r.left + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: rayon };
@@ -57,6 +60,11 @@
     var duree = 680;
     fond.animate([{ backgroundColor: 'rgba(0,0,0,0)' }, { backgroundColor: 'rgba(0,0,0,1)' }], { duration: duree * 0.6, fill: 'forwards' });
     var anim = vignette.animate([debut, fin], { duration: duree, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
+    if (sequence) {
+      // la carte était légèrement zoomée au survol : on part de ce zoom pour qu'il n'y ait aucun saut
+      var zoom = new DOMMatrix(getComputedStyle(depart).transform === 'none' ? undefined : getComputedStyle(depart).transform).a || 1;
+      vignette.firstChild.animate([{ transform: 'scale(' + zoom + ')' }, { transform: 'scale(1)' }], { duration: duree, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
+    }
     // écran vertical : la capture mobile prend le relais pendant l'agrandissement (c'est elle que la démo affiche en arrivant)
     var mobile = fond.querySelector('.ps-tr-mobile');
     if (mobile) mobile.animate([{ opacity: 0 }, { opacity: 0, offset: 0.35 }, { opacity: 1 }], { duration: duree, fill: 'forwards' });
@@ -69,6 +77,7 @@
 
   // préchargement de la démo au survol ou au premier toucher (elle s'ouvre plus vite)
   var faits = {};
+  var gardees = [];
   function precharger(e) {
     var a = e.target.closest && e.target.closest('a.futur-card, #trade-link');
     if (!a || faits[a.href]) return;
@@ -77,6 +86,17 @@
     l.rel = 'prefetch';
     l.href = a.href;
     document.head.appendChild(l);
+    // Crunch! : les premières images du film (l'entrée dans le snack, jouée dès l'arrivée) se chargent tout de suite
+    var img = a.querySelector('img[data-sequence]');
+    if (img) {
+      var dossier = innerWidth / innerHeight < 1 || innerWidth < 768 ? 'mobile' : 'ordi';
+      var base = new URL('./demos/' + img.getAttribute('data-sequence') + '/sequence/' + dossier + '/', location.href).href;
+      for (var i = 1; i <= 100; i++) {
+        var im = new Image();
+        im.src = base + String(i).padStart(3, '0') + '.webp';
+        gardees.push(im);
+      }
+    }
   }
   document.addEventListener('pointerover', precharger, { passive: true });
   document.addEventListener('touchstart', precharger, { passive: true });
