@@ -6,28 +6,29 @@ import { snack } from '../data/site';
    Intro « vidéo au défilement » (technique des pages produit Apple) : la visite filmée de Crunch!
    (la façade, la salle, la cuisine, le burger) est découpée en images ; le défilement choisit l'image,
    dans un canvas. On avance quand on descend, on recule quand on remonte, avec un léger lissage.
-   - 218 images (12 par seconde, 18 s de film, vitesse d'origine), 1 280 × 720 sur ordinateur,
-     recadrage vertical au centre en 540 × 960 sur téléphone.
-   - Chargement en plusieurs passes : 1 image sur 4 d'abord (le film est déjà parcourable, moins de 2 Mo
-     sur téléphone), puis les autres en arrière-plan ; on affiche toujours l'image chargée la plus proche.
+   - 579 images : toutes les images des 3 clips (24 par seconde, 24 s de film, vitesse d'origine), raccords en
+     fondu ; image légèrement recadrée et zoomée (×1,15) pour sortir le filigrane Kling du cadre.
+     1 280 × 720 sur ordinateur, recadrage vertical au centre en 540 × 960 sur téléphone.
+   - Chargement en plusieurs passes : 1 image sur 8 d'abord (le film est déjà parcourable : 2 Mo sur téléphone),
+     puis les autres en arrière-plan ; on affiche toujours l'image chargée la plus proche.
    - Le défilement total tient en environ 2,5 hauteurs d'écran.
 ------------------------------------------------------------------- */
 
 const BASE = import.meta.env.BASE_URL;
-const N = 218;
+const N = 579;
 const HAUTEUR = 350; // svh : 100 d'écran fixe + 250 de défilement
 const LISSAGE = 0.16;
 
 /** Les textes du parcours : [début, fin] en part du défilement. */
 const ETAPES = [
-  { de: 0.0, a: 0.17, sur: 'La façade', titre: 'Smash. Crunch. Miam.', texte: `${snack.accroche}` },
-  { de: 0.3, a: 0.56, sur: 'La salle', titre: 'On s’installe.', texte: 'Banquettes, lumière chaude, et la cuisine en ligne de mire.' },
-  { de: 0.66, a: 0.82, sur: 'La cuisine', titre: 'Smashé à la plancha.', texte: 'Devant vous, minute par minute.' },
-  { de: 0.88, a: 1.01, sur: 'Le burger', titre: 'Et voilà.', texte: snack.intro },
+  { de: 0.0, a: 0.12, sur: 'La façade', titre: 'Smash. Crunch. Miam.', texte: `${snack.accroche}` },
+  { de: 0.22, a: 0.52, sur: 'La salle', titre: 'On s’installe.', texte: 'Banquettes, lumière chaude, et la cuisine en ligne de mire.' },
+  { de: 0.62, a: 0.78, sur: 'La cuisine', titre: 'Smashé à la plancha.', texte: 'Devant vous, minute par minute.' },
+  { de: 0.84, a: 1.01, sur: 'Le burger', titre: 'Et voilà.', texte: snack.intro },
 ];
 
 const nom = (i, dossier) => `${BASE}sequence/${dossier}/${String(i + 1).padStart(3, '0')}.webp`;
-/** Ordre de chargement : 1 image sur 8, puis 1 sur 4 (premier affichage), puis 1 sur 2, puis toutes. */
+/** Ordre de chargement : 1 image sur 8 (premier affichage), puis 1 sur 4, 1 sur 2, puis toutes. */
 const PASSES = [8, 4, 2, 1];
 const ordre = () => {
   const vu = new Set();
@@ -57,7 +58,7 @@ export default function Sequence({ onPret }) {
     const mobile = matchMedia('(max-width: 767px), (orientation: portrait)').matches;
     const dossier = mobile ? 'mobile' : 'ordi';
     const liste = ordre();
-    const premiers = liste.filter(([, pas]) => pas >= 4).length;
+    const premiers = liste.filter(([, pas]) => pas >= 8).length;
     let fini = 0;
     let annule = false;
     let k = 0;

@@ -171,10 +171,10 @@ Construits en code : devanture, porte, vitrine, enseigne, murs, portants, croche
 
 Détail complet des photos : `demos/snack/photos/LISEZ-MOI.md`.
 - Intro : **3 vidéos fournies par le client, réalisées avec Kling AI** (la façade, la salle, la cuisine, le burger),
-  montées en une séquence de 18 s (vitesse d'origine, passages lents coupés, fondus courts aux raccords), découpée
-  en 218 images WebP (12 par seconde) qui défilent au scroll dans un canvas : `demos/snack/public/sequence/ordi/`
-  (1 280 × 720) et `sequence/mobile/` (recadrage vertical au centre, 540 × 960). Le filigrane « KlingAI 4.0 »
-  des vidéos d'origine reste visible en bas à droite sur ordinateur (le recadrage téléphone l'exclut).
+  montées bout à bout en une séquence de 24 s (toutes les images, vitesse d'origine, fondus de 0,5 s aux raccords),
+  recadrée et zoomée de 15 % pour sortir le filigrane Kling du cadre, puis découpée en 579 images WebP
+  (24 par seconde) qui défilent au scroll dans un canvas : `demos/snack/public/sequence/ordi/` (1 280 × 720)
+  et `sequence/mobile/` (recadrage vertical au centre, 540 × 960).
 - Puis le choix du burger sur les vraies photos (flèches, défilement, glissé), la carte et les allergènes.
 - Recettes adaptées aux photos : « Le Ch’ti » (maroilles) devient « L’Œuf-Bacon », et la recette du Brasier suit sa photo.
 - L'ancienne scène 3D (Snack3D, textures Poly Haven) est retirée.
