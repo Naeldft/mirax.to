@@ -401,7 +401,7 @@ export function Commande({ lignes, setQte, menus, setMenus, vider }) {
                 </legend>
                 <div className="relative -mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
                   {creneaux.liste.slice(0, 16).map((c, i) => (
-                    <label key={c.label} className="shrink-0 cursor-pointer">
+                    <label key={c.label} className="relative shrink-0 cursor-pointer">
                       <input
                         type="radio"
                         name="creneau"
@@ -511,7 +511,7 @@ export function Allergenes() {
         >
           On vous dit tout
         </Titre>
-        <div className="carte mt-10 overflow-x-auto" data-reveal tabIndex={0} role="region" aria-label="Tableau des allergènes (défilable)">
+        <div className="carte relative mt-10 overflow-x-auto" data-reveal tabIndex={0} role="region" aria-label="Tableau des allergènes (défilable)">
           <table className="w-full min-w-[42rem] border-collapse text-sm">
             <thead>
               <tr className="border-b border-trait text-left text-sable">

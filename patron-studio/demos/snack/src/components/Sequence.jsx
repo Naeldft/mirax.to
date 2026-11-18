@@ -289,6 +289,7 @@ export default function Sequence() {
         if (!signale) {
           signale = true;
           // la façade est à l'écran : l'image d'attente de la transition depuis l'accueil peut partir
+          performance.mark('scene-prete');
           requestAnimationFrame(() => dispatchEvent(new Event('ps-demo-prete')));
         }
         if (e.debut && u >= 1) {
