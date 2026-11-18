@@ -61,15 +61,25 @@ function couche(p, haut, bas, { lignes = 36, couvercles = true, echelle, cx0, ys
     }
   // couvercles (dessus et dessous de la couche), visibles quand les couches sont séparées
   if (couvercles) {
+    // les couvercles ont leurs propres sommets : la couleur vient du centre de la tranche (avec un léger dégradé
+    // vers le bord), au lieu d'étirer la photo en stries
     [0, lignes - 1].forEach((j, k) => {
-      const centre = pos.length / 3;
       const yc = yb(k ? bas : haut, 0);
       const [cx] = prof(yc);
+      const uc = cx / p.l;
+      const vc = 1 - (yc + (k ? -6 : 6)) / p.h; // un peu à l'intérieur de la couche
+      const centre = pos.length / 3;
       pos.push((cx - cx0) * echelle, (ysol - yc) * echelle, 0);
-      uv.push(cx / p.l, 1 - yc / p.h);
+      uv.push(uc, vc);
+      const premier = pos.length / 3;
+      for (let i = 0; i <= SEG; i++) {
+        const v = i * lignes + j;
+        pos.push(pos[v * 3], pos[v * 3 + 1], pos[v * 3 + 2]);
+        uv.push(uc + (uv[v * 2] - uc) * 0.04, vc);
+      }
       for (let i = 0; i < SEG; i++) {
-        const a = i * lignes + j;
-        const b = (i + 1) * lignes + j;
+        const a = premier + i;
+        const b = premier + i + 1;
         if (k) idx.push(centre, a, b);
         else idx.push(centre, b, a);
       }

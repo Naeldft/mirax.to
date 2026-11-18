@@ -142,14 +142,36 @@ function VapeurCentre({ k, etat }) {
   );
 }
 
-/** Cadrage : sur ordinateur le burger à droite du texte, sur téléphone au-dessus du texte. */
+/**
+ * Cadrage. Ordinateur : le burger à droite du texte.
+ * Téléphone : le burger et sa planche tiennent exactement dans l'espace libre entre l'en-tête et le bloc de texte
+ * (quelle que soit la hauteur de l'écran), en reculant la caméra et en décalant l'image vers le haut.
+ */
+const HAUT_MOBILE = 66; // px : l'en-tête
+const BAS_MOBILE = 372; // px : le bloc de texte, les boutons et la barre du bas
 function Camera() {
   const { camera, size } = useThree();
   useEffect(() => {
     const portrait = size.width / size.height < 1;
-    camera.fov = portrait ? 34 : 26;
-    camera.position.set(0, portrait ? 0.15 : 0.13, portrait ? 0.56 : 0.62);
-    camera.lookAt(0, portrait ? 0.02 : 0.06, 0);
+    camera.clearViewOffset();
+    if (!portrait) {
+      camera.fov = 26;
+      camera.position.set(0, 0.13, 0.62);
+      camera.lookAt(0, 0.06, 0);
+      camera.updateProjectionMatrix();
+      return;
+    }
+    camera.fov = 30;
+    const libre = Math.max(160, size.height - HAUT_MOBILE - BAS_MOBILE);
+    const vise = HAUT_MOBILE + libre / 2;
+    // hauteur du monde visible : la scène (planche + burger, ~0,2 m de haut) occupe 90 % de l'espace libre,
+    // et le burger (~0,13 m de large) tient dans la largeur de l'écran
+    const hMonde = Math.max((0.2 * size.height) / (0.9 * libre), (0.145 / 0.9) * (size.height / size.width));
+    const d = hMonde / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    const a = THREE.MathUtils.degToRad(14);
+    camera.position.set(0, 0.085 + d * Math.sin(a), d * Math.cos(a));
+    camera.lookAt(0, 0.085, 0);
+    camera.setViewOffset(size.width, size.height, 0, size.height / 2 - vise, size.width, size.height);
     camera.updateProjectionMatrix();
   }, [camera, size]);
   return null;

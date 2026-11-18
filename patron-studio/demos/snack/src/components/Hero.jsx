@@ -168,11 +168,9 @@ export default function Hero({ ajouter }) {
         Burger {index + 1} / {N}
         {b.tags.filter((t) => TAG[t]).map((t) => ` · ${TAG[t]}`)}
       </p>
-      <div className="mt-1 flex items-baseline justify-between gap-4 md:block">
-        <h2 className="text-[clamp(1.9rem,7vw,4.2rem)] leading-[0.95]">{b.nom}</h2>
-        <p className="titre whitespace-nowrap text-3xl text-flamme md:mt-3 md:text-4xl">{formatEuros(b.prix)}</p>
-      </div>
-      <p className="mt-2 line-clamp-2 text-base leading-relaxed text-creme/80 md:line-clamp-none md:text-lg">{b.desc}</p>
+      <h2 className="mt-1 text-[clamp(1.8rem,7.5vw,4.2rem)] leading-[0.95]">{b.nom}</h2>
+      <p className="titre mt-1 whitespace-nowrap text-2xl text-flamme md:mt-3 md:text-4xl">{formatEuros(b.prix)}</p>
+      <p className="mt-1.5 line-clamp-2 text-base leading-snug text-creme/80 md:mt-2 md:line-clamp-none md:text-lg md:leading-relaxed">{b.desc}</p>
       <p className="mt-2 hidden text-base text-creme/60 md:block">
         <span className="font-semibold text-creme/80">Allergènes :</span> {b.allergenes.map((a) => allergenes[a]).join(', ')}
       </p>
@@ -201,7 +199,13 @@ export default function Hero({ ajouter }) {
       </div>
       <div className="mt-4 flex gap-3">
         <button type="button" onClick={commander} className="btn btn-braise flex-1 md:flex-none">
-          {ajoute ? 'Ajouté ✓' : `Commander · ${formatEuros(b.prix)}`}
+          {ajoute ? (
+            'Ajouté ✓'
+          ) : (
+            <>
+              Commander<span className="hidden sm:inline"> · {formatEuros(b.prix)}</span>
+            </>
+          )}
         </button>
         <a href="#carte" className="btn btn-ligne flex-1 md:flex-none">
           Voir la carte
