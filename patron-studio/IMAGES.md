@@ -179,7 +179,7 @@ Détail complet des photos : `demos/snack/photos/LISEZ-MOI.md`.
   `demos/snack/public/sequence/ordi/` (1 280 × 720) et `sequence/mobile/` (recadrage vertical au centre, 540 × 960).
 - Burgers 3D : **5 photos de référence fournies par le client**, détourées ; le contour de chaque photo donne le volume
   du burger, découpé en couches, sur lequel la photo est projetée (`public/scene3d/burgers/`). Les mêmes photos
-  illustrent la carte. Planche : Poly Haven « Wooden Cutting Board » (CC0), https://polyhaven.com/a/wooden_cutting_board ;
+  illustrent la carte. Ombres des burgers sur leur planche calculées dans Blender (Cycles, `scripts/burgers-blender.sh`). Planche : Poly Haven « Wooden Cutting Board » (CC0), https://polyhaven.com/a/wooden_cutting_board ;
   reflets : Poly Haven « Bush Restaurant » (CC0), https://polyhaven.com/a/bush_restaurant.
 - La carte (filtres, allergènes, click & collect) garde ses photos Unsplash pour les sides, desserts et boissons.
 

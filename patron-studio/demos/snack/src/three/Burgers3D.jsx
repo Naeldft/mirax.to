@@ -1,4 +1,4 @@
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, useTexture } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -116,7 +116,7 @@ function Plateau({ ids, etat, def, leger }) {
           <Ombre tex={ombre} l={0.4} p={0.26} y={0.0005} opacite={0.9} />
           <Planche />
           <group position-y={HAUT_PLANCHE}>
-            <Ombre tex={ombre} l={0.15} p={0.12} y={0.0006} opacite={0.85} />
+            <OmbreBurger id={id} k={k} etat={etat} />
             <group ref={(el) => (burgers.current[k] = el)}>
               <BurgerPhoto id={id} bornes={bornes[id]} def={def} assemblage={assemblages[k]} />
             </group>
@@ -125,6 +125,26 @@ function Plateau({ ids, etat, def, leger }) {
         </group>
       ))}
     </group>
+  );
+}
+
+/**
+ * L'ombre du burger sur sa planche, calculée dans Blender (scripts/burgers-blender.py) : la vraie forme du burger,
+ * portée vers l'arrière droit par la lumière principale (devant, à gauche), avec l'assombrissement du contact.
+ * Elle apparaît à mesure que le burger s'assemble ; elle ne tourne pas avec lui (la lumière, elle, ne bouge pas).
+ */
+function OmbreBurger({ id, k, etat }) {
+  const tex = useTexture(`${BASE}scene3d/burgers/${id}-ombre.webp`);
+  const mat = useRef();
+  useFrame(() => {
+    const a = etat.current.a[k] ?? 0;
+    if (mat.current) mat.current.opacity = 0.72 * a * a;
+  });
+  return (
+    <mesh rotation-x={-Math.PI / 2} position-y={0.0006} renderOrder={1}>
+      <planeGeometry args={[0.36, 0.36]} />
+      <meshBasicMaterial ref={mat} map={tex} transparent opacity={0} depthWrite={false} toneMapped={false} />
+    </mesh>
   );
 }
 

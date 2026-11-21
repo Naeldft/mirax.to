@@ -67,6 +67,9 @@ Pour changer un burger : remplacez sa photo détourée dans `photos/burgers-3d/`
 ajustez si besoin le découpage des couches dans `src/three/burger/bornes.js`, puis lancez
 `python3 scripts/burgers-photo.py`. Planche à découper : Poly Haven « Wooden Cutting Board » (CC0).
 Les mêmes photos, avec leur fond, servent aux cartes de la carte (`burger-<id>.jpg`).
+L'ombre de chaque burger sur sa planche (`public/scene3d/burgers/<burger>-ombre.webp`) est calculée dans Blender
+(rendu Cycles, même lumière que la scène du site) : `./scripts/burgers-blender.sh <planche.gltf>`, à relancer si l'on
+change une photo ou le découpage des couches.
 
 ## Intro (séquence au défilement)
 
