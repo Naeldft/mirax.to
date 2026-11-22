@@ -370,7 +370,7 @@ def niveau_haut():
     for rr in (0.012, 0.024, 0.036):
         zs += [hauteur(math.cos(a) * rr, math.sin(a) * rr) for a in [i * math.pi / 6 for i in range(12)]]
     zs.sort()
-    return zs[int(len(zs) * 0.95)]
+    return zs[int(len(zs) * 0.85)]
 
 
 def draper(bm, ecart, bord, tombe=60.0, relief=True):
@@ -820,18 +820,18 @@ def poulet_pane():
 
 def mat_poulet_grille():
     m, b = principled('poulet_grille', Roughness=0.45, Coat_Weight=0.3, Coat_Roughness=0.25, Subsurface_Weight=0.1, Subsurface_Scale=0.003)
-    r = rampe(m, [(0.3, (0.7, 0.48, 0.28)), (0.6, (0.86, 0.66, 0.44)), (0.8, (0.9, 0.74, 0.54))])
+    r = rampe(m, [(0.3, (0.72, 0.48, 0.24)), (0.6, (0.86, 0.64, 0.38)), (0.8, (0.92, 0.74, 0.5))])
     lier(m, bruit(m, 60, 6).outputs['Fac'], r.inputs['Fac'])
     mp = noeud(m, 'ShaderNodeMapping')
     mp.inputs['Rotation'].default_value = (0, 0, math.radians(35))
     lier(m, coord_objet(m), mp.inputs['Vector'])
     wv = noeud(m, 'ShaderNodeTexWave', wave_type='BANDS', bands_direction='X')
     wv.inputs['Scale'].default_value = 26  # une marque de grill tous les 12 mm
-    wv.inputs['Distortion'].default_value = 2
-    wv.inputs['Detail'].default_value = 3
+    wv.inputs['Distortion'].default_value = 0.4
+    wv.inputs['Detail'].default_value = 1
     lier(m, mp.outputs['Vector'], wv.inputs['Vector'])
-    marques = plage(m, wv.outputs['Fac'], 0.82, 0.95)
-    c = melange(m, marques, r.outputs['Color'], (0.2, 0.09, 0.04))
+    marques = plage(m, wv.outputs['Fac'], 0.86, 0.97)
+    c = melange(m, marques, r.outputs['Color'], (0.3, 0.15, 0.06))
     lier(m, c, b.inputs['Base Color'])
     bosses(m, b, 150, 0.35, 0.001, 6)
     return m
@@ -943,7 +943,7 @@ def sauce(materiau, rayon=0.053, gouttes=((-1.95, 0.008), (-1.2, 0.005), (-0.55,
 
 def mat_champignon():
     m, b = principled('champignon', Roughness=0.3, Coat_Weight=0.55, Coat_Roughness=0.12, Subsurface_Weight=0.15, Subsurface_Scale=0.002)
-    r = rampe(m, [(0.0, (0.3, 0.2, 0.12)), (0.4, (0.5, 0.36, 0.24)), (0.7, (0.68, 0.54, 0.4)), (1.0, (0.78, 0.66, 0.52))])
+    r = rampe(m, [(0.0, (0.2, 0.12, 0.06)), (0.35, (0.36, 0.23, 0.13)), (0.65, (0.55, 0.4, 0.26)), (1.0, (0.68, 0.54, 0.38))])
     v = noeud(m, 'ShaderNodeMath', operation='MULTIPLY_ADD')
     lier(m, creux(m), v.inputs[0])
     v.inputs[1].default_value = -0.7
@@ -961,7 +961,7 @@ def champignons(n=14):
     """Lamelles de champignons de Paris poêlées (coupe : chapeau + pied), en tas."""
     objs = []
     for i in range(n):
-        h = random.uniform(0.026, 0.034)
+        h = random.uniform(0.024, 0.03)
         lc = h * random.uniform(0.9, 1.1)
         contour = []
         # chapeau (demi-ellipse) puis pied
@@ -984,8 +984,8 @@ def champignons(n=14):
         x, y = math.cos(a) * r, math.sin(a) * r
         o.location = (x, y, niveau() + 0.002 + random.uniform(0, 0.004) + (i % 3) * 0.0015)
         if i <= 4:
-            o.location.z = niveau() + h * 0.3
-            o.rotation_euler = (1.0 + random.uniform(-0.15, 0.15), random.uniform(-0.2, 0.2), a + math.pi / 2 + random.uniform(-0.2, 0.2))
+            o.location.z = niveau() + 0.002
+            o.rotation_euler = (random.uniform(-0.3, -0.15), random.uniform(-0.1, 0.1), a - math.pi / 2 + random.uniform(-0.25, 0.25))
         else:
             o.rotation_euler = (random.uniform(-0.35, 0.35), random.uniform(-0.35, 0.35), a + math.pi / 2 + random.uniform(-0.6, 0.6))
         bv = o.modifiers.new('b', 'BEVEL')
@@ -1030,7 +1030,7 @@ def brins(nom, n, materiau, rayon=0.0013, etale=0.042, deborde=0.25, croustillan
     # les objets sont créés après coup : chaque lanière est posée sur la pile d'avant, pas sur les autres lanières
     for i, pts in enumerate(poses):
         bm = bmesh.new()
-        tube(bm, pts, lambda u: rayon * (0.5 + 0.5 * min(1, u * 8, (1 - u) * 8)), 6, 0.6)
+        tube(bm, pts, lambda u: rayon * (0.5 + 0.5 * min(1, u * 8, (1 - u) * 8)), 6, 0.45)
         o = nouvel_objet(f'{nom}{i}', bm, materiau)
         if croustillant:
             modif_deplace(o, texture_bruit(f't_{nom}{i}', 'CLOUDS', 0.0008, 2), 0.0005)
@@ -1040,7 +1040,7 @@ def brins(nom, n, materiau, rayon=0.0013, etale=0.042, deborde=0.25, croustillan
 
 
 def mat_roquette():
-    m, b = principled('roquette', Roughness=0.35, Subsurface_Weight=0.3, Subsurface_Scale=0.0015, Coat_Weight=0.35, Coat_Roughness=0.15)
+    m, b = principled('roquette', Roughness=0.5, Subsurface_Weight=0.3, Subsurface_Scale=0.0015, Coat_Weight=0.12, Coat_Roughness=0.3)
     b.inputs['Subsurface Radius'].default_value = (0.5, 1.0, 0.3)
     uv = noeud(m, 'ShaderNodeSeparateXYZ')
     lier(m, coord_uv(m), uv.inputs['Vector'])
@@ -1049,7 +1049,7 @@ def mat_roquette():
     lier(m, uv.outputs['Y'], s.inputs[0])
     s.inputs[1].default_value = 0.5
     lier(m, s.outputs[0], milieu.inputs[0])
-    feuille = melange(m, bruit(m, 80, 3).outputs['Fac'], (0.14, 0.3, 0.05), (0.24, 0.42, 0.09))
+    feuille = melange(m, bruit(m, 80, 3).outputs['Fac'], (0.2, 0.36, 0.08), (0.32, 0.5, 0.13))
     lier(m, melange(m, plage(m, milieu.outputs[0], 0.06, 0.02), feuille, (0.58, 0.72, 0.36)), b.inputs['Base Color'])
     bosses(m, b, 200, 0.2, 0.0004, 3)
     return m
@@ -1059,7 +1059,7 @@ def roquette(n=26):
     """Feuilles de roquette (lobées), éparpillées ; plusieurs dépassent du pain."""
     objs = []
     for i in range(n):
-        lg = random.uniform(0.028, 0.042)
+        lg = random.uniform(0.022, 0.034)
         larg = lg * random.uniform(0.28, 0.36)
         lobes = random.randint(3, 5)
         ph = random.uniform(0, 6)
@@ -1089,13 +1089,13 @@ def roquette(n=26):
 
 
 def mat_avocat():
-    m, b = principled('avocat', Roughness=0.25, Subsurface_Weight=0.35, Subsurface_Scale=0.002, Coat_Weight=0.5, Coat_Roughness=0.08)
+    m, b = principled('avocat', Roughness=0.38, Subsurface_Weight=0.35, Subsurface_Scale=0.002, Coat_Weight=0.25, Coat_Roughness=0.15)
     b.inputs['Subsurface Radius'].default_value = (0.7, 1.0, 0.3)
     uv = noeud(m, 'ShaderNodeSeparateXYZ')
     lier(m, coord_uv(m), uv.inputs['Vector'])
-    r = rampe(m, [(0.0, (0.36, 0.56, 0.12)), (0.2, (0.56, 0.72, 0.22)), (0.6, (0.78, 0.84, 0.4)), (1.0, (0.88, 0.88, 0.52))])
+    r = rampe(m, [(0.0, (0.2, 0.32, 0.07)), (0.05, (0.36, 0.54, 0.12)), (0.3, (0.6, 0.72, 0.24)), (0.75, (0.8, 0.82, 0.42)), (1.0, (0.86, 0.84, 0.5))])
     lier(m, uv.outputs['Y'], r.inputs['Fac'])
-    lier(m, r.outputs['Color'], b.inputs['Base Color'])
+    lier(m, melange(m, plage(m, bruit(m, 25, 3).outputs['Fac'], 0.3, 0.7), r.outputs['Color'], (0.7, 0.75, 0.35), 'OVERLAY'), b.inputs['Base Color'])
     bosses(m, b, 160, 0.1, 0.0004, 3)
     return m
 
@@ -1121,15 +1121,19 @@ def avocat(n=5):
             v.co = rot @ v.co + off
         draper(bm, 0.0008, R * 0.96, 30, relief=False)
         bms.append(bm)
+    haut = 0
     for i, bm in enumerate(bms):
         for v in bm.verts:
             v.co.z += i * 0.0012
+            haut = max(haut, v.co.z)
+    NIVEAU_MIN[0] = haut + 0.0045  # le pain repose sur l'avocat
+    for i, bm in enumerate(bms):
         o = nouvel_objet(f'avocat{i}', bm, mat('avocat', mat_avocat))
         so = o.modifiers.new('epaisseur', 'SOLIDIFY')
-        so.thickness = 0.007
+        so.thickness = 0.0055
         so.offset = 1
         bv = o.modifiers.new('b', 'BEVEL')
-        bv.width = 0.002
+        bv.width = 0.0015
         bv.segments = 3
         bv.limit_method = 'ANGLE'
         modif_subdiv(o, 1)
@@ -1321,8 +1325,8 @@ def forestier():
     s = steak()
     cheddar(s, [(-1.3, 0.01), (-1.95, 0.007), (-0.75, 0.008), (-2.5, 0.006), (0.6, 0.006)], rot=-12)
     champignons(14)
-    brins('oignon_caramel', 60, mat_brins('oignon_caramel', [(0.2, (0.36, 0.16, 0.05)), (0.5, (0.55, 0.28, 0.08)), (0.8, (0.72, 0.44, 0.16))], False), 0.0017, 0.04, 0.45, False, 0.004)
-    roquette(20)
+    brins('oignon_caramel', 70, mat_brins('oignon_caramel', [(0.2, (0.3, 0.13, 0.04)), (0.5, (0.48, 0.24, 0.07)), (0.8, (0.62, 0.36, 0.12))], False), 0.0012, 0.042, 0.35, False, 0.003)
+    roquette(18)
     pain_haut()
 
 
@@ -1343,7 +1347,7 @@ def chicken_avocat():
     poulet_grille()
     avocat(5)
     oignons([(-0.014, -0.03, (0.013, 0.019, 0.024)), (0.02, -0.026, (0.011, 0.016))], rouge=True, epais=0.0014)
-    sauce(mat_sauce('sauce_herbes', (0.9, 0.92, 0.8), herbes=True), rayon=0.04, gouttes=((-1.15, 0.006), (-2.0, 0.005)))
+    sauce(mat_sauce('sauce_herbes', (0.9, 0.92, 0.8), herbes=True), rayon=0.047, gouttes=((-1.15, 0.007), (-2.0, 0.006), (-1.6, 0.005)))
     pain_haut()
 
 
@@ -1363,6 +1367,9 @@ dg = maj()
 Z_HAUT = max((o.matrix_world @ Vector(c)).z for o in BURGER for c in o.bound_box)
 H = Z_HAUT - Z0
 print('HAUTEUR', round(H, 4), 'OBJETS', len(BURGER), flush=True)
+for o in BURGER[:40]:
+    zz = [(o.matrix_world @ Vector(c)).z - Z0 for c in o.bound_box]
+    print('  OBJ', o.name, len(o.data.vertices), round(min(zz), 4), round(max(zz), 4), [m.name for m in o.data.materials], flush=True)
 
 # ================================================================ lumières et caméra (cadrées sur la hauteur du burger)
 zc = Z0 + H * 0.46
