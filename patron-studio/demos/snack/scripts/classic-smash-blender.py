@@ -1,20 +1,25 @@
 """
-Classic Smash de Crunch!, modélisé et rendu dans Blender (Cycles), rendu de face pour validation.
-  blender -b --factory-startup -P scripts/classic-smash-blender.py -- <dossier Poly Haven> <sortie.png> <largeur> <échantillons> [<scène.blend>]
-Le dossier Poly Haven contient : brown_photostudio_02_2k.hdr, dark_wooden_planks_{diff,nor_gl,rough}_2k.jpg,
-board.gltf (wooden_cutting_board 2k, avec wooden_cutting_board.bin et textures/). Unités : mètres.
+Classic Smash de Crunch!, construit et rendu dans Blender (Cycles).
+  Avec Blender 4.2 en module Python (pip install bpy==4.2.0, Python 3.11 ; il contient le débruiteur OpenImageDenoise) :
+  python classic-smash-blender.py -- <dossier poly haven> <sortie.png> <largeur> <echantillons> [<blend> ou -] [<images de simulation>]
+  Assets Poly Haven (CC0) : HDRI brown_photostudio_02, textures dark_wooden_planks, modèle wooden_cutting_board.
+  Le cheddar est une tranche simulée comme un tissu qui retombe sur le steak ; nappes et coulures (cheddar, sauce)
+  sont réunies par remaillage en voxels pour former une seule forme continue.
+Unités : mètres. Le burger est posé au centre de la planche, face à la caméra (axe -Y).
 """
 import math
 import random
 import sys
 
+import bpy  # (en module Python, bpy doit être importé avant bmesh)
 import bmesh
 import bpy
 from mathutils import Matrix, Vector, noise
 
 argv = sys.argv[sys.argv.index('--') + 1:]
 PH, SORTIE, LARGEUR, ECH = argv[0], argv[1], int(argv[2]), int(argv[3])
-BLEND = argv[4] if len(argv) > 4 else None
+BLEND = argv[4] if len(argv) > 4 and argv[4] != '-' else None
+IMAGES_TISSU = int(argv[5]) if len(argv) > 5 else 30
 random.seed(7)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -64,6 +69,57 @@ def modif_deplace(o, tex, force, coords='OBJECT'):
     m.mid_level = 0.5
     m.texture_coords = coords
     return m
+
+
+def appliquer(o):
+    """Fige l'objet tel qu'il est évalué (modificateurs, simulation) dans un nouveau maillage."""
+    dg = bpy.context.evaluated_depsgraph_get()
+    me = bpy.data.meshes.new_from_object(o.evaluated_get(dg))
+    o.modifiers.clear()
+    o.data = me
+    return o
+
+
+def en_maillage(o):
+    """Métaballes → maillage. La résolution des métaballes ne descend pas sous 5 mm dans Blender : on les construit
+    10 fois plus grandes et on réduit l'objet (résolution réelle : 0,5 mm)."""
+    mb = o.data
+    for e in mb.elements:
+        e.co = e.co * 10
+        e.radius *= 10
+    mb.resolution = mb.render_resolution = 0.005
+    o.scale = (0.1, 0.1, 0.1)
+    dg = bpy.context.evaluated_depsgraph_get()
+    dg.update()
+    me = bpy.data.meshes.new_from_object(o.evaluated_get(dg))
+    n = bpy.data.objects.new(o.name + '_m', me)
+    n.matrix_world = o.matrix_world.copy()
+    col.objects.link(n)
+    bpy.data.objects.remove(o)
+    return n
+
+
+def fusionner(nom, objs, voxel, lissage=6):
+    """Réunit des morceaux (nappe + coulures) en une seule forme continue : remaillage en voxels puis lissage,
+    pour que les coulures naissent de la nappe sans arête."""
+    for o in objs:
+        appliquer(o)
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.object.join()
+    o = objs[0]
+    o.name = nom
+    rm = o.modifiers.new('remaillage', 'REMESH')
+    rm.mode = 'VOXEL'
+    rm.voxel_size = voxel
+    li = o.modifiers.new('lissage', 'LAPLACIANSMOOTH')
+    li.iterations = lissage
+    li.lambda_factor = 0.6
+    li.use_volume_preserve = True
+    lisse(o)
+    return o
 
 
 def principled(nom, **k):
@@ -168,6 +224,13 @@ lier(mt, tn.outputs['Color'], nm.inputs['Color'])
 lier(mt, nm.outputs['Normal'], bt.inputs['Normal'])
 table.data.materials.append(mt)
 
+# fond : un mur sombre derrière (la table ne reflète plus le studio de l'HDRI à l'horizon)
+bpy.ops.mesh.primitive_plane_add(size=4, location=(0, 0.75, 1.0), rotation=(math.radians(90), 0, 0))
+mur = bpy.context.active_object
+mm, bm_ = principled('mur', Roughness=0.9)
+bm_.inputs['Base Color'].default_value = (*L((0.05, 0.035, 0.028)), 1)
+mur.data.materials.append(mm)
+
 # monde : HDRI Poly Haven pour la lumière et les reflets, fond noir vu de la caméra
 w = bpy.data.worlds.new('monde')
 sc.world = w
@@ -201,7 +264,7 @@ def lampe(nom, pos, vise, energie, couleur, taille):
 
 
 Z0 = H_PL  # le dessus de la planche
-lampe('cle', (-0.42, -0.42, 0.5), (0, 0, Z0 + 0.04), 18, (1.0, 0.8, 0.6), 0.75)
+lampe('cle', (-0.42, -0.42, 0.5), (0, 0, Z0 + 0.04), 16, (1.0, 0.8, 0.6), 0.42)  # plus petite : reflet du pain plus net
 lampe('contre', (0.32, 0.38, 0.28), (0, 0, Z0 + 0.05), 14, (1.0, 0.62, 0.32), 0.25)
 lampe('contre2', (-0.3, 0.4, 0.22), (0, 0, Z0 + 0.04), 7, (1.0, 0.7, 0.45), 0.2)
 lampe('remplissage', (0.45, -0.5, 0.12), (0, 0, Z0 + 0.04), 1.5, (1.0, 0.85, 0.7), 0.6)
@@ -228,7 +291,7 @@ bp.inputs['Subsurface Radius'].default_value = (1, 0.6, 0.3)
 bp.inputs['Subsurface Scale'].default_value = 0.004
 nz = noeud(mp, 'ShaderNodeTexNoise')
 nz.inputs['Scale'].default_value = 120
-r = rampe(mp, [(0.25, (0.62, 0.36, 0.15)), (0.5, (0.76, 0.5, 0.24)), (0.75, (0.86, 0.63, 0.36))])
+r = rampe(mp, [(0.25, (0.6, 0.34, 0.13)), (0.5, (0.72, 0.46, 0.2)), (0.75, (0.84, 0.6, 0.32))])
 lier(mp, nz.outputs['Fac'], r.inputs['Fac'])
 lier(mp, r.outputs['Color'], bp.inputs['Base Color'])
 bosses(mp, bp, 300, 0.45, 0.0012, 10)
@@ -268,7 +331,21 @@ n1.inputs['Scale'].default_value = 90
 n1.inputs['Detail'].default_value = 10
 r = rampe(ms, [(0.3, (0.1, 0.05, 0.03)), (0.45, (0.24, 0.12, 0.06)), (0.58, (0.42, 0.22, 0.1)), (0.68, (0.6, 0.34, 0.14)), (0.78, (0.7, 0.45, 0.2))])
 lier(ms, n1.outputs['Fac'], r.inputs['Fac'])
-lier(ms, r.outputs['Color'], bs.inputs['Base Color'])
+# le bord en dentelle est plus cuit : presque noir par endroits (réaction de Maillard à la plancha)
+lg = noeud(ms, 'ShaderNodeVectorMath', operation='LENGTH')
+sxy = noeud(ms, 'ShaderNodeVectorMath', operation='MULTIPLY')
+sxy.inputs[1].default_value = (1, 1, 0)
+lier(ms, coord_objet(ms), sxy.inputs[0])
+lier(ms, sxy.outputs['Vector'], lg.inputs[0])
+mr = noeud(ms, 'ShaderNodeMapRange')
+mr.inputs['From Min'].default_value = RS * 0.72
+mr.inputs['From Max'].default_value = RS * 1.05
+lier(ms, lg.outputs['Value'], mr.inputs['Value'])
+cuit = noeud(ms, 'ShaderNodeMixRGB', blend_type='MULTIPLY')
+lier(ms, mr.outputs['Result'], cuit.inputs['Fac'])
+cuit.inputs['Color2'].default_value = (*L((0.42, 0.3, 0.24)), 1)
+lier(ms, r.outputs['Color'], cuit.inputs['Color1'])
+lier(ms, cuit.outputs['Color'], bs.inputs['Base Color'])
 rr = rampe(ms, [(0.4, (0.25, 0.25, 0.25)), (0.65, (0.6, 0.6, 0.6))])
 lier(ms, n1.outputs['Fac'], rr.inputs['Fac'])
 lier(ms, rr.outputs['Color'], bs.inputs['Roughness'])
@@ -277,84 +354,121 @@ steak.data.materials.append(ms)
 Z_STEAK = Z0 + 0.024 + 0.0115
 
 
-# ---------------------------------------------------------------- 3. cheddar fondu, drapé sur le steak, qui coule
+# ---------------------------------------------------------------- 3. cheddar fondu : une tranche qui retombe sur le steak (simulation de tissu), qui coule
 def rayon_steak(a):
     return RS * (1 + 0.13 * noise.noise(Vector((math.cos(a) * 1.7, math.sin(a) * 1.7, 3.1))) + 0.07 * noise.noise(Vector((math.cos(a) * 7, math.sin(a) * 7, 1.3))))
 
 
-C = 0.104
+C = 0.108
 bm = bmesh.new()
-bmesh.ops.create_grid(bm, x_segments=90, y_segments=90, size=C / 2)
-rot = Matrix.Rotation(math.radians(22), 4, 'Z')
-coulures = [(math.radians(22) + math.pi / 4 + i * math.pi / 2 + random.uniform(-0.2, 0.2), random.uniform(0.12, 0.2), random.uniform(0.012, 0.02)) for i in range(4)]
-coulures = [(c[0], c[1], c[2] * 0.6) for c in coulures]
+bmesh.ops.create_grid(bm, x_segments=72, y_segments=72, size=C / 2)
+coins = []
 for v in bm.verts:
-    v.co = rot @ v.co
-    r = math.hypot(v.co.x, v.co.y)
-    a = math.atan2(v.co.y, v.co.x)
-    rb = rayon_steak(a) * 0.95
-    z = 0.0006 * math.sin(min(1, r / rb) * math.pi) + 0.0004 * noise.noise(v.co * 90)
-    rn = r
-    if r > rb:
-        t = r - rb
-        z -= t * t * 22 + t * 0.55
-        rn = rb + t * 0.18
-    for ca, l, h in coulures:
-        da = abs((a - ca + math.pi) % (2 * math.pi) - math.pi)
-        wgt = math.exp(-((da / l) ** 2))
-        if r > rb * 0.85 and wgt > 0.02:
-            u = min(1, max(0, (r - rb * 0.85) / (rb * 0.3)))
-            z -= wgt * h * u * u * (3 - 2 * u)
-            rn = min(rn, rb + (r - rb) * 0.12 + 0.0012)
-    k = rn / r if r > 0 else 1
-    v.co.x *= k
-    v.co.y *= k
-    v.co.z = z
+    # une tranche un peu irrégulière (pas un carré parfait), légèrement bombée
+    v.co.x += 0.0012 * noise.noise(v.co * 40 + Vector((1, 2, 3)))
+    v.co.y += 0.0012 * noise.noise(v.co * 40 + Vector((4, 5, 6)))
+    v.co.z = 0.0015 * (1 - (v.co.x ** 2 + v.co.y ** 2) / (C * C / 2))
+bm.verts.ensure_lookup_table()
+coins = [max(bm.verts, key=lambda v: sx * v.co.x + sy * v.co.y).index for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1))]
 fromage = nouvel_objet('cheddar', bm)
-fromage.location = (0, 0, Z_STEAK + 0.0006)
+fromage.location = (0, 0, Z_STEAK + 0.0035)
+fromage.rotation_euler = (0, 0, math.radians(24))
+steak.modifiers.new('collision', 'COLLISION')
+steak.collision.thickness_outer = 0.0006
+steak.collision.cloth_friction = 8
+steak.collision.damping = 1
+talon.modifiers.new('collision', 'COLLISION')
+talon.collision.thickness_outer = 0.0006
+talon.collision.cloth_friction = 8
+tissu = fromage.modifiers.new('tissu', 'CLOTH')
+cs = tissu.settings
+cs.quality = 14
+cs.mass = 0.012
+cs.tension_stiffness = cs.compression_stiffness = 3
+cs.shear_stiffness = 2
+cs.bending_stiffness = 0.004  # fondu : il ne garde pas sa forme
+cs.air_damping = 2
+tissu.collision_settings.distance_min = 0.0005
+tissu.collision_settings.collision_quality = 4
+tissu.collision_settings.use_self_collision = False
+tissu.point_cache.frame_start = 1
+tissu.point_cache.frame_end = IMAGES_TISSU
+sc.frame_start, sc.frame_end = 1, IMAGES_TISSU
+for f in range(1, IMAGES_TISSU + 1):
+    sc.frame_set(f)
+appliquer(fromage)
+steak.modifiers.remove(steak.modifiers['collision'])
+talon.modifiers.remove(talon.modifiers['collision'])
+mw = fromage.matrix_world
+pointes = [mw @ fromage.data.vertices[i].co for i in coins]
+print('POINTES', [(round(p.x, 4), round(p.y, 4), round(p.z - Z0, 4)) for p in pointes], flush=True)
 so = fromage.modifiers.new('epaisseur', 'SOLIDIFY')
 so.thickness = 0.0016
-so.offset = -1
-modif_subdiv(fromage, 1)
-lisse(fromage)
-mc, bc = principled('cheddar', Roughness=0.3)
-bc.inputs['Base Color'].default_value = (*L((1.0, 0.64, 0.06)), 1)
-bc.inputs['Subsurface Weight'].default_value = 0.3
-bc.inputs['Subsurface Radius'].default_value = (1.0, 0.35, 0.05)
-bc.inputs['Subsurface Scale'].default_value = 0.004
-bc.inputs['Coat Weight'].default_value = 0.35
-bc.inputs['Coat Roughness'].default_value = 0.15
-bosses(mc, bc, 140, 0.15, 0.0006, 3)
-fromage.data.materials.append(mc)
+so.offset = 1
 
-# coulures de cheddar fondu : des gouttes arrondies qui pendent le long du bord du steak (devant, face à la caméra)
+# coulures : elles partent des coins (et d'un point du bord devant) et descendent le long du steak ; la goutte
+# s'élargit au bout, comme du fromage qui coule
 mbf = bpy.data.metaballs.new('coulures_cheddar')
-mbf.resolution = 0.0009
-mbf.render_resolution = 0.0006
+mbf.resolution = 0.0008
+mbf.render_resolution = 0.0005
 mbf.threshold = 0.6
-for a, longueur, epais in [(-1.3, 0.012, 1.05), (-1.86, 0.005, 0.85), (-0.75, 0.007, 0.8), (-2.55, 0.009, 0.9), (0.6, 0.006, 0.8), (2.3, 0.01, 0.9)]:
-    rb = rayon_steak(a) * 0.97
-    pas = 12
-    tangente = Vector((-math.sin(a), math.cos(a), 0))
-    radial = Vector((math.cos(a), math.sin(a), 0))
-    rot_el = Matrix((tangente, radial, (0, 0, 1))).transposed().to_quaternion()
-    for k in range(pas + 1):
-        u = k / pas
-        e = mbf.elements.new()
-        rr_ = rb + 0.0008 + 0.0012 * math.sin(u * math.pi)
-        e.co = (math.cos(a) * rr_, math.sin(a) * rr_, -u * longueur)
-        # nappe large en haut qui s'affine, petite goutte au bout ; aplatie contre le steak
-        e.type = 'ELLIPSOID'
-        e.rotation = rot_el
-        e.radius = epais * (0.0036 * (1 - 0.5 * u) + (0.0009 if k == pas else 0))
-        e.size_x = 1.6 - 0.6 * u  # le long du bord
-        e.size_y = 0.55  # épaisseur
-        e.size_z = 1.2
 gouttes = bpy.data.objects.new('coulures_cheddar', mbf)
 col.objects.link(gouttes)
-gouttes.location = (0, 0, Z_STEAK + 0.0004)
-gouttes.data.materials.append(mc)
-Z_FROMAGE = Z_STEAK + 0.0022
+haut_talon = Z0 + 0.0245
+verts_f = [mw @ v.co for v in fromage.data.vertices]
+departs = []
+for a, longueur in [(-1.25, 0.011), (-1.9, 0.006), (-0.7, 0.008), (-2.45, 0.007), (0.5, 0.006), (2.5, 0.007)]:
+    # le point du bord de la tranche le plus loin du centre dans cette direction
+    fen = [p for p in verts_f if abs((math.atan2(p.y, p.x) - a + math.pi) % (2 * math.pi) - math.pi) < 0.05]
+    if fen:
+        departs.append((a, max(fen, key=lambda p: p.x * math.cos(a) + p.y * math.sin(a)), longueur))
+steak_eval = steak.evaluated_get(bpy.context.evaluated_depsgraph_get())
+
+
+def surface_steak(a, z):
+    """Rayon réel du steak (bosses comprises) dans la direction a, à la hauteur z."""
+    d = Vector((math.cos(a), math.sin(a), 0))
+    ok, loc, _, _ = steak_eval.ray_cast(d * 0.1 + Vector((0, 0, z - steak.location.z)), -d)
+    return math.hypot(loc.x, loc.y) if ok else rayon_steak(a)
+
+
+for a, p, longueur in departs:
+    ep = random.uniform(0.8, 1.15)
+    radial = Vector((math.cos(a), math.sin(a), 0))
+    rb = max(surface_steak(a, Z_STEAK - 0.002 - k * 0.002) for k in range(5)) + 0.0014
+    r0 = p.x * math.cos(a) + p.y * math.sin(a)
+    z_bord = Z_STEAK - 0.0015  # le haut du flanc du steak
+    bas = max(haut_talon, z_bord - longueur)
+    chemin = []
+    # par-dessus le bord du steak, puis le long du flanc ; la goutte grossit au bout
+    for k in range(6):
+        u = k / 5
+        chemin.append((radial * (r0 + (rb - r0) * u) + Vector((0, 0, p.z + (z_bord - p.z) * u * u)), 0.0032 * ep, 1.6))
+    for k in range(1, 11):
+        u = k / 10
+        chemin.append((radial * (rb + 0.0004 * math.sin(u * math.pi)) + Vector((0, 0, z_bord + (bas - z_bord) * u)), (0.0032 * (1 - 0.45 * u) + (0.0011 if k == 10 else 0)) * ep, 1.6 - 0.75 * u))
+    for pos, ray, large in chemin:
+        e = mbf.elements.new()
+        e.co = pos
+        e.radius = ray
+        e.type = 'ELLIPSOID'
+        e.rotation = Vector((0, 0, 1)).rotation_difference(Vector((0, 0, 1)))
+        e.size_x, e.size_y, e.size_z = large, 0.6, 1.2
+        e.rotation = Matrix.Rotation(a - math.pi / 2, 4, 'Z').to_quaternion()
+print('COULURES', len(departs), flush=True)
+gouttes = en_maillage(gouttes)
+fromage = fusionner('cheddar', [fromage, gouttes], 0.00032, 4)
+mc, bc = principled('cheddar', Roughness=0.32)
+bc.inputs['Base Color'].default_value = (*L((0.98, 0.6, 0.1)), 1)
+bc.inputs['Subsurface Weight'].default_value = 0.35
+bc.inputs['Subsurface Radius'].default_value = (1.0, 0.45, 0.1)
+bc.inputs['Subsurface Scale'].default_value = 0.003
+bc.inputs['Coat Weight'].default_value = 0.4
+bc.inputs['Coat Roughness'].default_value = 0.12
+bosses(mc, bc, 160, 0.12, 0.0005, 3)
+fromage.data.materials.append(mc)
+Z_FROMAGE = Z_STEAK + 0.0035
+
 
 
 # ---------------------------------------------------------------- 4. pickles (rondelles ondulées)
@@ -362,8 +476,8 @@ mpk, bpk = principled('pickle', Roughness=0.22)
 bpk.inputs['Subsurface Weight'].default_value = 0.5
 bpk.inputs['Subsurface Radius'].default_value = (0.5, 1.0, 0.3)
 bpk.inputs['Subsurface Scale'].default_value = 0.003
-bpk.inputs['Coat Weight'].default_value = 0.8
-bpk.inputs['Coat Roughness'].default_value = 0.08
+bpk.inputs['Coat Weight'].default_value = 0.5
+bpk.inputs['Coat Roughness'].default_value = 0.14
 grad = noeud(mpk, 'ShaderNodeTexGradient', gradient_type='SPHERICAL')
 mp_ = noeud(mpk, 'ShaderNodeMapping')
 mp_.inputs['Scale'].default_value = (60, 60, 60)
@@ -400,32 +514,31 @@ for i in range(5):
 Z_PICKLES = Z_FROMAGE + 0.0035
 
 
-# ---------------------------------------------------------------- 5. oignons (anneaux fins, translucides)
-mo, bo = principled('oignon', Roughness=0.2)
-bo.inputs['Base Color'].default_value = (*L((0.95, 0.92, 0.86)), 1)
-bo.inputs['Subsurface Weight'].default_value = 0.7
-bo.inputs['Subsurface Radius'].default_value = (1, 0.95, 0.85)
-bo.inputs['Subsurface Scale'].default_value = 0.004
-bo.inputs['Transmission Weight'].default_value = 0.25
-bo.inputs['Coat Weight'].default_value = 0.6
-for t in range(2):
-    cx, cy = (-0.016, 0.006) if t == 0 else (0.02, -0.004)
-    for j, rr_ in enumerate((0.009, 0.014, 0.019, 0.024)):
-        arc = random.uniform(1.2, 2.0) * math.pi
+# ---------------------------------------------------------------- 5. oignons (anneaux fins, blancs translucides ; quelques-uns dépassent devant)
+mo, bo = principled('oignon', Roughness=0.25)
+bo.inputs['Base Color'].default_value = (*L((0.94, 0.91, 0.82)), 1)
+bo.inputs['Subsurface Weight'].default_value = 0.45
+bo.inputs['Subsurface Radius'].default_value = (1.0, 0.9, 0.65)
+bo.inputs['Subsurface Scale'].default_value = 0.0015
+bo.inputs['Coat Weight'].default_value = 0.5
+bo.inputs['Coat Roughness'].default_value = 0.1
+for t, (cx, cy, rayons) in enumerate([(-0.014, -0.038, (0.012, 0.017, 0.021)), (0.018, -0.036, (0.01, 0.015)), (0.004, 0.018, (0.014, 0.02))]):
+    for j, rr_ in enumerate(rayons):
+        arc = random.uniform(1.1, 1.7) * math.pi
+        debut = random.uniform(0, 2 * math.pi)
         bm = bmesh.new()
-        n = 64
-        cercle = []
-        for i in range(n + 1):
-            a = arc * i / n
-            cercle.append(Vector((math.cos(a) * rr_, math.sin(a) * rr_, 0)))
-        # un tube aplati le long de l'arc
+        n = 72
         prev = None
-        for i, c in enumerate(cercle):
-            ring = []
+        for i in range(n + 1):
+            a = debut + arc * i / n
+            rloc = rr_ * (1 + 0.04 * noise.noise(Vector((math.cos(a) * 3, math.sin(a) * 3, t + j))))
+            c = Vector((math.cos(a) * rloc, math.sin(a) * rloc, 0))
             d = c.normalized()
+            fin = min(1, i / 6, (n - i) / 6)  # les bouts s'affinent
+            ring = []
             for k in range(8):
                 b = 2 * math.pi * k / 8
-                p = c + d * math.cos(b) * 0.0013 + Vector((0, 0, 1)) * math.sin(b) * 0.0007
+                p = c + d * math.cos(b) * 0.0011 * (0.4 + 0.6 * fin) + Vector((0, 0, 1)) * math.sin(b) * 0.0006 * (0.4 + 0.6 * fin)
                 ring.append(bm.verts.new(p))
             if prev:
                 for k in range(8):
@@ -434,94 +547,126 @@ for t in range(2):
         o = nouvel_objet(f'oignon{t}{j}', bm)
         modif_subdiv(o, 1)
         lisse(o)
-        o.location = (cx, cy, Z_PICKLES + 0.001)
-        o.rotation_euler = (random.uniform(-0.06, 0.06), random.uniform(-0.06, 0.06), random.uniform(0, 6.28))
+        o.location = (cx, cy, Z_PICKLES + 0.0008 + j * 0.0003)
+        o.rotation_euler = (random.uniform(-0.08, 0.08), random.uniform(-0.08, 0.08), 0)
         o.data.materials.append(mo)
-Z_OIGNONS = Z_PICKLES + 0.0022
+Z_OIGNONS = Z_PICKLES + 0.0018
 
 
-# ---------------------------------------------------------------- 6. sauce (nappe et coulures brillantes)
-mb = bpy.data.metaballs.new('sauce')
-mb.resolution = 0.0012
-mb.render_resolution = 0.0008
-mb.threshold = 0.6
-sauce = bpy.data.objects.new('sauce', mb)
-col.objects.link(sauce)
-sauce.location = (0, 0, Z_OIGNONS + 0.001)
-for i in range(70):
-    a = random.uniform(0, 2 * math.pi)
-    r = random.uniform(0, 0.044)
-    e = mb.elements.new()
-    e.co = (math.cos(a) * r, math.sin(a) * r, 0)
-    e.radius = random.uniform(0.006, 0.01)
-    e.type = 'ELLIPSOID'
-    e.size_z = 0.18
-# coulures sur le devant et les côtés
-for a in (-1.85, -1.55, -1.25, -0.9, -2.2, -2.5, 0.4, 2.6):
-    for k in range(7):
-        e = mb.elements.new()
-        rr_ = 0.05 + k * 0.0012
-        e.co = (math.cos(a) * rr_, math.sin(a) * rr_, -k * 0.0028)
-        e.radius = 0.0045 - k * 0.0003
-        e.type = 'BALL'
-msa, bsa = principled('sauce', Roughness=0.08)
-bsa.inputs['Base Color'].default_value = (*L((0.88, 0.5, 0.24)), 1)
-bsa.inputs['Subsurface Weight'].default_value = 0.4
-bsa.inputs['Subsurface Radius'].default_value = (1, 0.5, 0.3)
+# ---------------------------------------------------------------- 6. sauce : une nappe aux bords irréguliers qui déborde un peu du pain, deux coulures
+def rayon_sauce(a):
+    return 0.053 + 0.006 * noise.noise(Vector((math.cos(a) * 2.2, math.sin(a) * 2.2, 7.7))) + 0.0025 * noise.noise(Vector((math.cos(a) * 9, math.sin(a) * 9, 2.2)))
+
+
+bm = bmesh.new()
+NA, NR = 160, 26
+centre = bm.verts.new((0, 0, 0.0006))
+anneaux = []
+for j in range(1, NR + 1):
+    ring = []
+    for i in range(NA):
+        a = 2 * math.pi * i / NA
+        rmax = rayon_sauce(a)
+        r = rmax * j / NR
+        z = 0.0006 * (1 - (j / NR) ** 2)
+        if r > 0.045:  # le bord retombe sur ce qu'il y a dessous
+            z -= (r - 0.045) ** 2 * 60
+        ring.append(bm.verts.new((math.cos(a) * r, math.sin(a) * r, z)))
+    anneaux.append(ring)
+for i in range(NA):
+    bm.faces.new((centre, anneaux[0][i], anneaux[0][(i + 1) % NA]))
+for j in range(NR - 1):
+    for i in range(NA):
+        i2 = (i + 1) % NA
+        bm.faces.new((anneaux[j][i], anneaux[j + 1][i], anneaux[j + 1][i2], anneaux[j][i2]))
+nappe = nouvel_objet('sauce_nappe', bm)
+nappe.location = (0, 0, Z_OIGNONS + 0.0008)
+so = nappe.modifiers.new('epaisseur', 'SOLIDIFY')
+so.thickness = 0.0016
+so.offset = 0
+mbs = bpy.data.metaballs.new('coulures_sauce')
+mbs.resolution = 0.0008
+mbs.render_resolution = 0.0005
+mbs.threshold = 0.6
+cs_ = bpy.data.objects.new('coulures_sauce', mbs)
+col.objects.link(cs_)
+cs_.location = nappe.location
+for a, longueur in [(-1.95, 0.008), (-1.2, 0.005), (-0.55, 0.004)]:
+    r0 = rayon_sauce(a) - 0.0012
+    z0 = -(r0 - 0.045) ** 2 * 60
+    n = 10
+    for k in range(n + 1):
+        u = k / n
+        e = mbs.elements.new()
+        e.co = (math.cos(a) * (r0 + 0.0012 * u), math.sin(a) * (r0 + 0.0012 * u), z0 - longueur * u)
+        e.radius = 0.0028 * (1 - 0.4 * u) + (0.0009 if k == n else 0)
+        e.type = 'ELLIPSOID'
+        e.size_x = e.size_y = 0.8
+        e.size_z = 1.2
+cs_ = en_maillage(cs_)
+sauce = fusionner('sauce', [nappe, cs_], 0.00032, 4)
+msa, bsa = principled('sauce', Roughness=0.22)
+bsa.inputs['Base Color'].default_value = (*L((0.9, 0.55, 0.32)), 1)  # sauce burger : mayonnaise, ketchup, moutarde
+bsa.inputs['Subsurface Weight'].default_value = 0.35
+bsa.inputs['Subsurface Radius'].default_value = (1, 0.55, 0.35)
 bsa.inputs['Subsurface Scale'].default_value = 0.002
-bsa.inputs['Coat Weight'].default_value = 1.0
-bsa.inputs['Coat Roughness'].default_value = 0.03
+bsa.inputs['Coat Weight'].default_value = 0.7
+bsa.inputs['Coat Roughness'].default_value = 0.06
+bosses(msa, bsa, 90, 0.08, 0.0004, 2)
 sauce.data.materials.append(msa)
-Z_SAUCE = Z_OIGNONS + 0.0025
+Z_SAUCE = Z_OIGNONS + 0.0022
 
 
-# ---------------------------------------------------------------- 7. pain du dessus (brioché, brillant) et sésame
+
+# ---------------------------------------------------------------- 7. pain du dessus (brioché, brillant : dorure à l'œuf) et sésame
 bm = bmesh.new()
 bmesh.ops.create_uvsphere(bm, u_segments=128, v_segments=64, radius=1)
 for v in [v for v in bm.verts if v.co.z < -0.02]:
     bm.verts.remove(v)
-# fond plat légèrement arrondi
-bord = [v for v in bm.verts if abs(v.co.z) < 0.03]
 for v in bm.verts:
-    z = v.co.z
-    v.co.x *= R * 1.02
-    v.co.y *= R * 1.02
-    v.co.z = max(0, z) * 0.046 * (1 + 0.05 * noise.noise(v.co * 30))
+    z = max(0, v.co.z)
+    # profil de brioche : épaules pleines, dessus plus plat qu'une demi-sphère
+    v.co.x *= R * 1.03
+    v.co.y *= R * 1.03
+    v.co.z = 0.042 * z ** 0.72 * (1 + 0.05 * noise.noise(v.co * 30))
 bmesh.ops.holes_fill(bm, edges=[e for e in bm.edges if e.is_boundary])
 dome = nouvel_objet('pain_haut', bm)
-dome.location = (0, 0, Z_SAUCE)
+dome.location = (0, 0, Z_SAUCE - 0.0006)
 dome.scale = (1, 0.985, 1)
+dome.rotation_euler = (math.radians(1.2), math.radians(-1.5), 0)  # posé un peu de travers, comme à la main
 bv = dome.modifiers.new('b', 'BEVEL')
 bv.width = 0.004
 bv.segments = 4
 bv.limit_method = 'ANGLE'
 modif_subdiv(dome, 1)
 modif_deplace(dome, texture_bruit('t_dome', 'CLOUDS', 0.018, 3), 0.0022)
-modif_deplace(dome, texture_bruit('t_dome2', 'CLOUDS', 0.06, 1), 0.005)
+modif_deplace(dome, texture_bruit('t_dome2', 'CLOUDS', 0.06, 1), 0.004)
 lisse(dome)
-md, bd = principled('pain_haut', Roughness=0.32)
-bd.inputs['Coat Weight'].default_value = 0.45
-bd.inputs['Coat Roughness'].default_value = 0.2
+md, bd = principled('pain_haut', Roughness=0.5)
+bd.inputs['Coat Weight'].default_value = 0.65
+bd.inputs['Coat Roughness'].default_value = 0.09
+bd.inputs['Coat IOR'].default_value = 1.45
 bd.inputs['Subsurface Weight'].default_value = 0.12
 bd.inputs['Subsurface Radius'].default_value = (1, 0.55, 0.25)
 bd.inputs['Subsurface Scale'].default_value = 0.004
 sep = noeud(md, 'ShaderNodeSeparateXYZ')
 lier(md, coord_objet(md), sep.inputs['Vector'])
 nz = noeud(md, 'ShaderNodeTexNoise')
-nz.inputs['Scale'].default_value = 60
+nz.inputs['Scale'].default_value = 45
 nz.inputs['Detail'].default_value = 6
 haut = noeud(md, 'ShaderNodeMath', operation='MULTIPLY_ADD')
-haut.inputs[1].default_value = 24  # z (m) → 0..1 sur la hauteur du dôme
+haut.inputs[1].default_value = 26  # z (m) → 0..1 sur la hauteur du dôme
 lier(md, sep.outputs['Z'], haut.inputs[0])
 lier(md, nz.outputs['Fac'], haut.inputs[2])
 haut2 = noeud(md, 'ShaderNodeMath', operation='SUBTRACT')
 lier(md, haut.outputs[0], haut2.inputs[0])
 haut2.inputs[1].default_value = 0.35
-r = rampe(md, [(0.0, (0.88, 0.66, 0.38)), (0.12, (0.78, 0.5, 0.22)), (0.35, (0.62, 0.32, 0.1)), (0.8, (0.48, 0.2, 0.06)), (1.0, (0.4, 0.15, 0.04))])
+r = rampe(md, [(0.0, (0.9, 0.72, 0.45)), (0.1, (0.8, 0.54, 0.25)), (0.32, (0.66, 0.38, 0.13)), (0.75, (0.52, 0.27, 0.08)), (1.0, (0.44, 0.21, 0.06))])
 lier(md, haut2.outputs[0], r.inputs['Fac'])
 lier(md, r.outputs['Color'], bd.inputs['Base Color'])
 bosses(md, bd, 500, 0.12, 0.0008, 4)
 dome.data.materials.append(md)
+
 
 # sésame : graines posées sur le dôme, orientées selon la surface
 mse, bse = principled('sesame', Roughness=0.38)
@@ -583,8 +728,10 @@ sc.render.engine = 'CYCLES'
 sc.cycles.device = 'CPU'
 sc.cycles.samples = ECH
 sc.cycles.use_adaptive_sampling = True
-sc.cycles.adaptive_threshold = 0.015
-sc.cycles.use_denoising = False
+sc.cycles.adaptive_threshold = 0.01
+sc.cycles.use_denoising = True
+sc.cycles.denoiser = 'OPENIMAGEDENOISE'
+sc.cycles.denoising_input_passes = 'RGB_ALBEDO_NORMAL'
 sc.cycles.max_bounces = 8
 sc.cycles.transmission_bounces = 6
 sc.render.resolution_x = LARGEUR
