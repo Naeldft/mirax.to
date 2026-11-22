@@ -8,6 +8,7 @@ Classic Smash de Crunch!, construit et rendu dans Blender (Cycles).
 Unités : mètres. Le burger est posé au centre de la planche, face à la caméra (axe -Y).
 """
 import math
+import os
 import random
 import sys
 
@@ -17,7 +18,7 @@ import bpy
 from mathutils import Matrix, Vector, noise
 
 argv = sys.argv[sys.argv.index('--') + 1:]
-PH, SORTIE, LARGEUR, ECH = argv[0], argv[1], int(argv[2]), int(argv[3])
+PH, SORTIE, LARGEUR, ECH = os.path.abspath(argv[0]), os.path.abspath(argv[1]), int(argv[2]), int(argv[3])  # chemins absolus : sinon, une fois la scène enregistrée, Blender ne retrouve plus les textures (magenta)
 BLEND = argv[4] if len(argv) > 4 and argv[4] != '-' else None
 IMAGES_TISSU = int(argv[5]) if len(argv) > 5 else 30
 random.seed(7)
